@@ -399,6 +399,14 @@ def main():
         json.dump(combined_web_data, f, indent=2, ensure_ascii=False)
     logging.info(f"Saved combined web data to {ROOT_DATA_FILE}")
 
+    # Also save data.js for instantaneous failproof browser loading
+    data_js_file = os.path.join(BASE_DIR, "data.js")
+    with open(data_js_file, "w", encoding="utf-8") as f:
+        f.write("window.__TECHFEST_DATA__ = ")
+        json.dump(combined_web_data, f, ensure_ascii=False)
+        f.write(";\n")
+    logging.info(f"Saved instantaneous bundle to {data_js_file}")
+
     print("\n✅ Multi-Event Sync Completed Successfully!")
     print(f"🎪 Total Events Scanned: {len(events_summary)} | Events with Paid Participants: {len(active_events)}")
     print(f"📊 Total Fest Applicants: {total_fest_applicants} | Total Paid/Completed: {total_paid_count}")
