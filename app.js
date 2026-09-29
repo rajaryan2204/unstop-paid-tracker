@@ -1112,3 +1112,27 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+const BOOKMARKLET_RAW = `javascript:(function(){try{let t="";const m=document.cookie.match(/(?:^|;\\s*)access_token=([^;]+)/);if(m)t=decodeURIComponent(m[1]);if(!t){for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const v=localStorage.getItem(k);if(typeof v==="string"&&v.startsWith("eyJ")&&v.split(".").length===3){t=v;break;}}}if(!t){alert("⚠️ No Unstop session token found. Please open this while logged into Unstop Organiser Panel.");return;}let exp="24 hours";try{const p=JSON.parse(atob(t.split(".")[1]));if(p.exp)exp=new Date(p.exp*1000).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});}catch(e){}const ex=document.getElementById("tfSyncBox");if(ex)ex.remove();const b=document.createElement("div");b.id="tfSyncBox";b.style.cssText="position:fixed;top:24px;right:24px;z-index:9999999;background:#0d1017;color:#f1f5f9;border:1px solid #10b981;border-radius:14px;padding:18px;box-shadow:0 25px 50px rgba(0,0,0,0.85);font-family:system-ui,-apple-system,sans-serif;max-width:360px;";b.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><strong style="color:#10b981;font-size:14px;">⚡ techFEST \\'26 Sync</strong><button onclick="this.closest(\\'#tfSyncBox\\').remove()" style="background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;">✕</button></div><p style="font-size:12px;color:#cbd5e1;margin:0 0 12px 0;">Token extracted! Valid until <b>'+exp+'</b>.</p><div style="display:flex;flex-direction:column;gap:8px;"><button id="tfCopyBtn" style="background:#10b981;color:#000;border:none;padding:8px 12px;border-radius:7px;font-weight:700;font-size:12px;cursor:pointer;">📋 Copy Token to Clipboard</button><button id="tfSecretBtn" style="background:#1e293b;color:#f1f5f9;border:1px solid #334155;padding:8px 12px;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer;">⚙️ Open GitHub Secret (Paste & Save)</button><button id="tfTriggerBtn" style="background:#0f172a;color:#38bdf8;border:1px solid #0284c7;padding:8px 12px;border-radius:7px;font-weight:600;font-size:11px;cursor:pointer;">🚀 Trigger GitHub Actions Sync</button></div><div id="tfMsg" style="font-size:11px;color:#94a3b8;margin-top:8px;text-align:center;">Click to copy or update secret</div>';document.body.appendChild(b);document.getElementById("tfCopyBtn").onclick=function(){navigator.clipboard.writeText(t).then(()=>{this.innerText="✅ Copied!";document.getElementById("tfMsg").innerHTML="<span style=\\'color:#10b981;\\'>Copied to clipboard!</span>";});};document.getElementById("tfSecretBtn").onclick=function(){navigator.clipboard.writeText(t);window.open("https://github.com/rajaryan2204/unstop-paid-tracker/settings/secrets/actions/UNSTOP_TOKEN","_blank");};document.getElementById("tfTriggerBtn").onclick=function(){const pat=prompt("Enter your GitHub Personal Access Token (or click cancel):",localStorage.getItem("tf_pat")||"");if(pat){localStorage.setItem("tf_pat",pat);document.getElementById("tfMsg").innerText="⏳ Triggering sync on GitHub...";fetch("https://api.github.com/repos/rajaryan2204/unstop-paid-tracker/actions/workflows/sync.yml/dispatches",{method:"POST",headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+pat,"Content-Type":"application/json"},body:JSON.stringify({ref:"main",inputs:{unstop_token:t,unstop_cookies:document.cookie}})}).then(r=>{if(r.ok)document.getElementById("tfMsg").innerHTML="<b style=\\'color:#10b981;\\'>🚀 Sync Started! Updates in ~30s.</b>";else document.getElementById("tfMsg").innerText="GitHub Error: "+r.status;}).catch(e=>{document.getElementById("tfMsg").innerText="Network Error: "+e;});}};}catch(e){alert("Error: "+e);}})();`;
+
+function openBookmarkletModal() {
+  const modal = document.getElementById('bookmarkletModal');
+  const link = document.getElementById('draggableBookmarkLink');
+  if (link) link.setAttribute('href', BOOKMARKLET_RAW);
+  if (modal) modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeBookmarkletModal() {
+  const modal = document.getElementById('bookmarkletModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function copyBookmarkletCode(btn) {
+  navigator.clipboard.writeText(BOOKMARKLET_RAW).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="text-emerald-400 font-bold">Copied!</span>';
+    setTimeout(() => { btn.innerHTML = orig; if (window.lucide) lucide.createIcons(); }, 1500);
+  });
+}
+

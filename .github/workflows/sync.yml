@@ -4,7 +4,16 @@ on:
   schedule:
     # Runs every 8 hours (00:00, 08:00, 16:00 UTC)
     - cron: '0 */8 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      unstop_token:
+        description: 'Fresh Unstop Bearer Token'
+        required: false
+        default: ''
+      unstop_cookies:
+        description: 'Fresh Unstop Cookies'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -31,8 +40,8 @@ jobs:
       - name: Fetch and Filter Paid Registrations
         env:
           UNSTOP_API_URL: ${{ secrets.UNSTOP_API_URL }}
-          UNSTOP_TOKEN: ${{ secrets.UNSTOP_TOKEN }}
-          UNSTOP_COOKIES: ${{ secrets.UNSTOP_COOKIES }}
+          UNSTOP_TOKEN: ${{ github.event.inputs.unstop_token != '' && github.event.inputs.unstop_token || secrets.UNSTOP_TOKEN }}
+          UNSTOP_COOKIES: ${{ github.event.inputs.unstop_cookies != '' && github.event.inputs.unstop_cookies || secrets.UNSTOP_COOKIES }}
           UNSTOP_ACCOUNT_ID: ${{ secrets.UNSTOP_ACCOUNT_ID }}
         run: |
           python scripts/fetch_registrations.py
