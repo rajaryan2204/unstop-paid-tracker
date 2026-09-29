@@ -1,7 +1,8 @@
 // techFEST '26 • SLIET Central Organizer Desk Controller
-// Ultra-fast client-side rendering with instant memory cache, slide-over drawer, token expiry tracking & password authentication
+// Responsive Mobile + Desktop Engine with Instant Cache, Drawer & Gatekeeper
 
 const ACCESS_KEY = 'sliet@tf26';
+let inMemoryAuth = false;
 
 let allParticipants = [];
 let currentFiltered = [];
@@ -19,10 +20,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Gatekeeper Authentication
+ * Gatekeeper Authentication with Multi-Storage & Query Param Fallback
  */
+function isUserAuthorized() {
+  if (inMemoryAuth) return true;
+
+  // 1. Check URL query params (?pass=sliet@tf26 or ?auth=sliet@tf26)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const qPass = params.get('pass') || params.get('auth');
+    if (qPass && qPass.trim().toLowerCase() === ACCESS_KEY) {
+      setUserAuthorized(true);
+      return true;
+    }
+  } catch (e) {}
+
+  // 2. Check localStorage
+  try {
+    if (localStorage.getItem('tf26_authorized') === 'true') return true;
+  } catch (e) {}
+
+  // 3. Check sessionStorage
+  try {
+    if (sessionStorage.getItem('tf26_authorized') === 'true') return true;
+  } catch (e) {}
+
+  // 4. Check Cookie
+  try {
+    if (document.cookie.includes('tf26_auth=1')) return true;
+  } catch (e) {}
+
+  return false;
+}
+
+function setUserAuthorized(val) {
+  inMemoryAuth = !!val;
+  if (val) {
+    try { localStorage.setItem('tf26_authorized', 'true'); } catch (e) {}
+    try { sessionStorage.setItem('tf26_authorized', 'true'); } catch (e) {}
+    try { document.cookie = 'tf26_auth=1; max-age=604800; path=/; SameSite=Lax'; } catch (e) {}
+  } else {
+    try { localStorage.removeItem('tf26_authorized'); } catch (e) {}
+    try { sessionStorage.removeItem('tf26_authorized'); } catch (e) {}
+    try { document.cookie = 'tf26_auth=0; max-age=0; path=/'; } catch (e) {}
+  }
+}
+
 function checkAuthentication() {
-  const isAuth = localStorage.getItem('tf26_authorized') === 'true';
+  const isAuth = isUserAuthorized();
   const lockScreen = document.getElementById('lockScreen');
   const appContainer = document.getElementById('authenticatedApp');
 
@@ -40,17 +85,18 @@ function checkAuthentication() {
 }
 
 function handleAuthSubmit(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
+  
   const input = document.getElementById('passInput');
   const errorMsg = document.getElementById('authErrorMsg');
   const lockCard = document.getElementById('lockCard');
-  const val = (input.value || '').trim();
+  const val = (input ? input.value : '').trim().toLowerCase();
 
   if (val === ACCESS_KEY) {
-    localStorage.setItem('tf26_authorized', 'true');
+    setUserAuthorized(true);
     if (errorMsg) errorMsg.classList.add('hidden');
     
-    // Unlock screen
+    // Unlock immediate UI
     const lockScreen = document.getElementById('lockScreen');
     const appContainer = document.getElementById('authenticatedApp');
     if (lockScreen) lockScreen.classList.add('hidden');
@@ -65,9 +111,12 @@ function handleAuthSubmit(e) {
       void lockCard.offsetWidth; // trigger reflow
       lockCard.classList.add('shake-card');
     }
-    input.value = '';
-    input.focus();
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
   }
+  return false;
 }
 
 function togglePassVisibility() {
@@ -86,7 +135,7 @@ function togglePassVisibility() {
 }
 
 function lockDesk() {
-  localStorage.removeItem('tf26_authorized');
+  setUserAuthorized(false);
   const lockScreen = document.getElementById('lockScreen');
   const appContainer = document.getElementById('authenticatedApp');
   const passInput = document.getElementById('passInput');
@@ -106,7 +155,7 @@ function setupKeyboardShortcuts() {
     if (e.key === 'Escape') {
       closeDrawer();
     }
-    // "/" focuses search input if not inside password input
+    // "/" focuses search input if not inside input
     if (e.key === '/' && document.activeElement !== document.getElementById('searchInput') && document.activeElement !== document.getElementById('passInput')) {
       e.preventDefault();
       const input = document.getElementById('searchInput');
@@ -122,12 +171,14 @@ async function loadData() {
   const loading = document.getElementById('loadingState');
   const emptyState = document.getElementById('emptyState');
   const tableBody = document.getElementById('tableBody');
+  const mobileContainer = document.getElementById('mobileCardsContainer');
   const refreshIcon = document.getElementById('refreshIcon');
 
   if (refreshIcon) refreshIcon.classList.add('animate-spin');
   if (loading) loading.classList.remove('hidden');
   if (emptyState) emptyState.classList.add('hidden');
   if (tableBody) tableBody.innerHTML = '';
+  if (mobileContainer) mobileContainer.innerHTML = '';
 
   try {
     let data = null;
@@ -193,7 +244,7 @@ async function loadData() {
     if (tableBody) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="9" class="py-14 text-center">
+          <td colspan="8" class="py-14 text-center">
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 mb-3 border border-rose-500/20">
               <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
@@ -247,7 +298,6 @@ function renderTokenExpiry(summary) {
   });
 
   if (diffMs <= 0) {
-    // Expired
     if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-rose-400 animate-pulse';
     if (tokenText) tokenText.textContent = 'Token: Expired';
     if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-rose-500/10 border border-rose-500/30 text-rose-300';
@@ -260,7 +310,6 @@ function renderTokenExpiry(summary) {
     if (bannerIcon) bannerIcon.className = 'w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0';
 
   } else if (diffHours < 6) {
-    // Expiring Soon
     if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
     if (tokenText) tokenText.textContent = `Token: ${diffHours}h left`;
     if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300';
@@ -273,7 +322,6 @@ function renderTokenExpiry(summary) {
     if (bannerIcon) bannerIcon.className = 'w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0';
 
   } else {
-    // Healthy
     if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
     if (tokenText) tokenText.textContent = `Token: ~${diffHours}h left`;
     if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-[#0e111a] border border-[#1e2436] text-slate-300';
@@ -309,13 +357,13 @@ function renderSummary(summary, participants) {
 
   // Subtitles
   const subPaid = document.getElementById('subTotalPaid');
-  if (subPaid) subPaid.textContent = `${freeCount} Free Entry • ${paidCount} Gateway Paid`;
+  if (subPaid) subPaid.textContent = `${freeCount} Free • ${paidCount} Paid`;
 
   const subRevenue = document.getElementById('subTotalRevenue');
-  if (subRevenue) subRevenue.textContent = `RC Boat (₹2,995) + Ghost Code (₹200)`;
+  if (subRevenue) subRevenue.textContent = `RC Boat + Ghost Code`;
 
   const subColleges = document.getElementById('subColleges');
-  if (subColleges) subColleges.textContent = `SLIET, IITs, NITs, LPU & State Univs`;
+  if (subColleges) subColleges.textContent = `PAN-India (${colleges.size} Colleges)`;
 }
 
 /**
@@ -354,8 +402,8 @@ function updatePaymentFilterCounts(participants) {
   const btnFree = document.getElementById('payFilterFree');
 
   if (btnAll) btnAll.textContent = `All (${participants.length})`;
-  if (btnPaid) btnPaid.textContent = `💰 Gateway Paid (${paidCount})`;
-  if (btnFree) btnFree.textContent = `Free Entry (${freeCount})`;
+  if (btnPaid) btnPaid.textContent = `💰 Paid (${paidCount})`;
+  if (btnFree) btnFree.textContent = `Free (${freeCount})`;
 }
 
 function setPaymentFilter(type) {
@@ -371,9 +419,9 @@ function setPaymentFilter(type) {
     const el = document.getElementById(b.id);
     if (!el) return;
     if (b.val === type) {
-      el.className = 'px-2.5 py-1.5 rounded-md font-semibold bg-[#1a2032] text-emerald-400 border border-emerald-500/30 transition';
+      el.className = 'px-2.5 py-1.5 rounded-md font-semibold bg-[#1a2032] text-emerald-400 border border-emerald-500/30 whitespace-nowrap transition';
     } else {
-      el.className = 'px-2.5 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 hover:bg-[#121624] border border-transparent transition';
+      el.className = 'px-2.5 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 hover:bg-[#121624] border border-transparent whitespace-nowrap transition';
     }
   });
 
@@ -514,7 +562,7 @@ function applyFilters() {
   });
 
   currentFiltered = filtered;
-  renderTable(filtered);
+  renderDataViews(filtered);
 }
 
 function clearSearch() {
@@ -529,13 +577,13 @@ function changePageSize() {
   const val = document.getElementById('pageSizeSelect').value;
   pageSize = val === 'all' ? 99999 : parseInt(val, 10);
   currentPage = 1;
-  renderTable(currentFiltered);
+  renderDataViews(currentFiltered);
 }
 
 function prevPage() {
   if (currentPage > 1) {
     currentPage--;
-    renderTable(currentFiltered);
+    renderDataViews(currentFiltered);
     window.scrollTo({ top: 220, behavior: 'smooth' });
   }
 }
@@ -544,16 +592,17 @@ function nextPage() {
   const totalPages = Math.ceil(currentFiltered.length / pageSize);
   if (currentPage < totalPages) {
     currentPage++;
-    renderTable(currentFiltered);
+    renderDataViews(currentFiltered);
     window.scrollTo({ top: 220, behavior: 'smooth' });
   }
 }
 
 /**
- * Render High Polish Data Grid
+ * Render Both Desktop Table & Mobile Cards Feed
  */
-function renderTable(participants) {
+function renderDataViews(participants) {
   const tableBody = document.getElementById('tableBody');
+  const mobileContainer = document.getElementById('mobileCardsContainer');
   const emptyState = document.getElementById('emptyState');
   const visibleCount = document.getElementById('visibleCount');
   const totalCount = document.getElementById('totalCount');
@@ -563,7 +612,8 @@ function renderTable(participants) {
   if (totalCount) totalCount.textContent = allParticipants.length;
 
   if (participants.length === 0) {
-    tableBody.innerHTML = '';
+    if (tableBody) tableBody.innerHTML = '';
+    if (mobileContainer) mobileContainer.innerHTML = '';
     if (emptyState) emptyState.classList.remove('hidden');
     if (paginationBar) paginationBar.classList.add('hidden');
     return;
@@ -588,165 +638,236 @@ function renderTable(participants) {
   if (prevBtn) prevBtn.disabled = currentPage <= 1;
   if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
 
-  const rowsHtml = pageItems.map((p, idx) => {
-    const absoluteIndex = startIndex + idx + 1;
-    const initials = (p.name || 'P')
-      .split(' ')
-      .filter(Boolean)
-      .map(n => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase() || 'TF';
+  // 1. Render Desktop Table Rows
+  if (tableBody) {
+    const desktopRowsHtml = pageItems.map((p, idx) => {
+      const absoluteIndex = startIndex + idx + 1;
+      const initials = (p.name || 'P')
+        .split(' ')
+        .filter(Boolean)
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || 'TF';
 
-    const formattedDate = p.registered_at 
-      ? new Date(p.registered_at).toLocaleDateString('en-IN', {
-          day: 'numeric', month: 'short', year: 'numeric'
-        })
-      : 'N/A';
+      const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
+      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
 
-    // WhatsApp Direct Link
-    const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
-    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
+      const hasMembers = p.team_members && p.team_members.length > 0;
+      const teamBadge = hasMembers 
+        ? `<button onclick="openDrawer('${p.id}')" class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 border border-sky-500/30 transition">
+            <i data-lucide="users" class="w-3 h-3"></i> ${p.team_members.length} Members
+           </button>`
+        : `<span class="text-[11px] text-slate-500">Solo Entry</span>`;
 
-    const hasMembers = p.team_members && p.team_members.length > 0;
-    const teamBadge = hasMembers 
-      ? `<button onclick="openDrawer('${p.id}')" class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 border border-sky-500/30 transition">
-          <i data-lucide="users" class="w-3 h-3"></i> ${p.team_members.length} Members
-         </button>`
-      : `<span class="text-[11px] text-slate-500">Solo Entry</span>`;
+      // Category styling
+      let catPill = 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
+      const evType = (p.event_type || '').toLowerCase();
+      if (evType.includes('quiz')) catPill = 'bg-amber-500/10 text-amber-300 border-amber-500/20';
+      else if (evType.includes('hack')) catPill = 'bg-purple-500/10 text-purple-300 border-purple-500/20';
+      else if (evType.includes('cultur')) catPill = 'bg-pink-500/10 text-pink-300 border-pink-500/20';
 
-    // Category styling
-    let catPill = 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
-    const evType = (p.event_type || '').toLowerCase();
-    if (evType.includes('quiz')) {
-      catPill = 'bg-amber-500/10 text-amber-300 border-amber-500/20';
-    } else if (evType.includes('hack')) {
-      catPill = 'bg-purple-500/10 text-purple-300 border-purple-500/20';
-    } else if (evType.includes('cultur')) {
-      catPill = 'bg-pink-500/10 text-pink-300 border-pink-500/20';
-    }
+      const amt = Number(p.amount) || 0;
+      const paymentBlock = amt > 0
+        ? `<div>
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <i data-lucide="check-check" class="w-3 h-3 text-emerald-400"></i> Paid ₹${amt.toLocaleString('en-IN')}
+            </span>
+          </div>`
+        : `<div>
+            <span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-[#141824] text-slate-300 border border-[#23293d]">
+              <i data-lucide="shield-check" class="w-3 h-3 text-sky-400"></i> Free Entry
+            </span>
+          </div>`;
 
-    // Payment formatting
-    const amt = Number(p.amount) || 0;
-    const paymentBlock = amt > 0
-      ? `<div>
-          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-            <i data-lucide="check-check" class="w-3 h-3 text-emerald-400"></i> Paid ₹${amt.toLocaleString('en-IN')}
-          </span>
-          <div class="text-[10px] text-emerald-400/80 font-mono mt-0.5">Gateway Verified</div>
-        </div>`
-      : `<div>
-          <span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-[#141824] text-slate-300 border border-[#23293d]">
-            <i data-lucide="shield-check" class="w-3 h-3 text-sky-400"></i> Free Entry
-          </span>
-          <div class="text-[10px] text-slate-500 font-mono mt-0.5">Verified Form</div>
-        </div>`;
+      return `
+        <tr class="hover:bg-[#121623] transition group border-b border-[#171c2b] cursor-pointer" onclick="openDrawer('${p.id}')">
+          <!-- Index -->
+          <td class="py-3 px-3 text-center font-mono text-[11px] text-slate-500 select-none">
+            ${absoluteIndex}
+          </td>
 
-    return `
-      <tr class="hover:bg-[#121623] transition group border-b border-[#171c2b] cursor-pointer" onclick="openDrawer('${p.id}')">
-        <!-- Index -->
-        <td class="py-2.5 px-3 text-center font-mono text-[11px] text-slate-500 select-none">
-          ${absoluteIndex}
-        </td>
-
-        <!-- Participant -->
-        <td class="py-2.5 px-4">
-          <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-[#141824] border border-[#23293d] flex items-center justify-center font-bold text-[11px] text-emerald-400 shrink-0">
-              ${initials}
-            </div>
-            <div class="min-w-0">
-              <div class="font-semibold text-slate-100 text-xs truncate group-hover:text-emerald-300 transition">
-                ${escapeHtml(p.name || 'Participant')}
+          <!-- Participant -->
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-[#141824] border border-[#23293d] flex items-center justify-center font-bold text-[11px] text-emerald-400 shrink-0">
+                ${initials}
               </div>
-              <div class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 truncate" onclick="event.stopPropagation()">
-                <span class="truncate">${escapeHtml(p.email || '')}</span>
-                ${p.email && p.email !== 'N/A' ? `
-                  <button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300 shrink-0">
-                    <i data-lucide="copy" class="w-3 h-3"></i>
-                  </button>
+              <div class="min-w-0">
+                <div class="font-semibold text-slate-100 text-xs truncate group-hover:text-emerald-300 transition">
+                  ${escapeHtml(p.name || 'Participant')}
+                </div>
+                <div class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 truncate" onclick="event.stopPropagation()">
+                  <span class="truncate">${escapeHtml(p.email || '')}</span>
+                  ${p.email && p.email !== 'N/A' ? `
+                    <button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300 shrink-0">
+                      <i data-lucide="copy" class="w-3 h-3"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Contact (Phone + WhatsApp) -->
+          <td class="py-3 px-3 text-[11px]" onclick="event.stopPropagation()">
+            ${p.phone && p.phone !== 'N/A' ? `
+              <div class="flex items-center gap-1.5 font-mono text-slate-300">
+                <span>${escapeHtml(p.phone)}</span>
+                ${waLink ? `
+                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="text-emerald-400 hover:text-emerald-300 p-0.5 rounded hover:bg-emerald-500/10">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  </a>
                 ` : ''}
               </div>
+            ` : `<span class="text-slate-500 font-mono">--</span>`}
+          </td>
+
+          <!-- College & Branch -->
+          <td class="py-3 px-4 max-w-[200px]">
+            <div class="text-xs font-medium text-slate-200 truncate" title="${escapeHtml(p.college)}">
+              ${escapeHtml(p.college || 'N/A')}
+            </div>
+            ${p.specialization ? `
+              <div class="text-[11px] text-slate-400 mt-0.5 truncate">
+                <span>${escapeHtml(p.specialization)}</span>
+                ${p.passing_year ? `<span class="text-slate-500 font-mono">• ${p.passing_year}</span>` : ''}
+              </div>
+            ` : ''}
+          </td>
+
+          <!-- Event & Track -->
+          <td class="py-3 px-3">
+            <div class="font-medium text-slate-100 text-xs truncate max-w-[160px]" title="${escapeHtml(p.event_name)}">
+              ${escapeHtml(p.event_name || 'Event')}
+            </div>
+            <div class="mt-0.5">
+              <span class="inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded border ${catPill}">
+                ${escapeHtml(p.event_type || 'Competition')}
+              </span>
+            </div>
+          </td>
+
+          <!-- Team Status -->
+          <td class="py-3 px-3" onclick="event.stopPropagation()">
+            <div class="text-xs text-slate-300 font-medium truncate max-w-[110px]" title="${escapeHtml(p.team_name)}">
+              ${escapeHtml(p.team_name || 'Individual')}
+            </div>
+            <div class="mt-0.5">
+              ${teamBadge}
+            </div>
+          </td>
+
+          <!-- Fee / Payment -->
+          <td class="py-3 px-3">
+            ${paymentBlock}
+          </td>
+
+          <!-- Action (View Drawer Button - Always Visible) -->
+          <td class="py-3 px-4 text-right" onclick="event.stopPropagation()">
+            <button onclick="openDrawer('${p.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold inline-flex items-center gap-1 transition shadow-sm active:scale-95 cursor-pointer">
+              <span>View</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tableBody.innerHTML = desktopRowsHtml;
+  }
+
+  // 2. Render Mobile Cards Feed (For Phones)
+  if (mobileContainer) {
+    const mobileCardsHtml = pageItems.map((p, idx) => {
+      const absoluteIndex = startIndex + idx + 1;
+      const initials = (p.name || 'P')
+        .split(' ')
+        .filter(Boolean)
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || 'TF';
+
+      const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
+      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
+      const telLink = p.phone && p.phone !== 'N/A' ? `tel:${p.phone}` : null;
+
+      const amt = Number(p.amount) || 0;
+      const feePill = amt > 0
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">₹${amt} Paid</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-[#141824] text-slate-300 border border-[#23293d]">Free Entry</span>`;
+
+      let trackColor = 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20';
+      const evType = (p.event_type || '').toLowerCase();
+      if (evType.includes('quiz')) trackColor = 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+      else if (evType.includes('hack')) trackColor = 'text-purple-400 bg-purple-500/10 border-purple-500/20';
+
+      return `
+        <div class="p-3.5 rounded-xl bg-[#0d1017] border border-[#1b2030] space-y-2.5 shadow-md" onclick="openDrawer('${p.id}')">
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-[#141824] border border-[#23293d] flex items-center justify-center font-bold text-xs text-emerald-400 shrink-0">
+                ${initials}
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-100 text-sm truncate">${escapeHtml(p.name)}</div>
+                <div class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">${escapeHtml(p.phone || p.email)}</div>
+              </div>
+            </div>
+            <div>
+              ${feePill}
             </div>
           </div>
-        </td>
 
-        <!-- Contact (Phone + WhatsApp) -->
-        <td class="py-2.5 px-3 text-[11px]" onclick="event.stopPropagation()">
-          ${p.phone && p.phone !== 'N/A' ? `
-            <div class="flex items-center gap-1.5 font-mono text-slate-300">
-              <span>${escapeHtml(p.phone)}</span>
+          <!-- Event & Track -->
+          <div class="text-xs bg-[#07090e] p-2.5 rounded-lg border border-[#171c2b] space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-semibold text-slate-200 truncate">${escapeHtml(p.event_name)}</span>
+              <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded border ${trackColor} shrink-0">
+                ${escapeHtml(p.event_type || 'Event')}
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-400 truncate">
+              ${escapeHtml(p.college || 'SLIET Longowal')}
+            </div>
+          </div>
+
+          <!-- Bottom Action Toolbar -->
+          <div class="flex items-center justify-between pt-1 border-t border-[#171c2b]" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-1.5">
               ${waLink ? `
-                <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" class="text-emerald-400 hover:text-emerald-300 p-0.5 rounded hover:bg-emerald-500/10">
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold inline-flex items-center gap-1 transition">
                   <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  <span>WhatsApp</span>
+                </a>
+              ` : ''}
+              ${telLink ? `
+                <a href="${telLink}" class="p-1.5 rounded-md bg-[#141824] text-slate-300 border border-[#23293d]">
+                  <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-400"></i>
                 </a>
               ` : ''}
             </div>
-          ` : `<span class="text-slate-500 font-mono text-[11px]">--</span>`}
-        </td>
 
-        <!-- Institution & Branch -->
-        <td class="py-2.5 px-4 max-w-[210px]">
-          <div class="text-xs font-medium text-slate-200 truncate" title="${escapeHtml(p.college)}">
-            ${escapeHtml(p.college || 'N/A')}
+            <!-- Prominent View Details Button -->
+            <button onclick="openDrawer('${p.id}')" class="px-3 py-1.5 rounded-md bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-xs inline-flex items-center gap-1 transition shadow-sm active:scale-95 cursor-pointer">
+              <span>View Details</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
-          ${p.specialization ? `
-            <div class="text-[11px] text-slate-400 mt-0.5 truncate">
-              <span>${escapeHtml(p.specialization)}</span>
-              ${p.passing_year ? `<span class="text-slate-500 font-mono">• ${p.passing_year}</span>` : ''}
-            </div>
-          ` : ''}
-        </td>
+        </div>
+      `;
+    }).join('');
 
-        <!-- Event & Track -->
-        <td class="py-2.5 px-4">
-          <div class="font-medium text-slate-100 text-xs truncate max-w-[170px]" title="${escapeHtml(p.event_name)}">
-            ${escapeHtml(p.event_name || 'Event')}
-          </div>
-          <div class="mt-0.5">
-            <span class="inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${catPill}">
-              ${escapeHtml(p.event_type || 'Competition')}
-            </span>
-          </div>
-        </td>
+    mobileContainer.innerHTML = mobileCardsHtml;
+  }
 
-        <!-- Team Status -->
-        <td class="py-2.5 px-3" onclick="event.stopPropagation()">
-          <div class="text-xs text-slate-300 font-medium truncate max-w-[120px]" title="${escapeHtml(p.team_name)}">
-            ${escapeHtml(p.team_name || 'Individual')}
-          </div>
-          <div class="mt-0.5">
-            ${teamBadge}
-          </div>
-        </td>
-
-        <!-- Payment & Fee -->
-        <td class="py-2.5 px-3">
-          ${paymentBlock}
-        </td>
-
-        <!-- Date -->
-        <td class="py-2.5 px-3 text-[11px] text-slate-400 whitespace-nowrap font-mono">
-          ${formattedDate}
-        </td>
-
-        <!-- Action / View Drawer Button -->
-        <td class="py-2.5 px-3 text-right" onclick="event.stopPropagation()">
-          <button onclick="openDrawer('${p.id}')" class="px-2.5 py-1 rounded bg-[#141824] hover:bg-[#1f2538] text-slate-300 hover:text-white text-xs font-medium border border-[#23293d] transition inline-flex items-center gap-1 shadow-sm">
-            <span>View</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  tableBody.innerHTML = rowsHtml;
   if (window.lucide) lucide.createIcons();
 }
 
 /**
- * Slide-over Candidate Drawer
+ * Slide-over Candidate Drawer (Full screen on mobile, right sheet on desktop)
  */
 function openDrawer(participantId) {
   const p = allParticipants.find(item => item.id == participantId);
@@ -835,7 +956,7 @@ function openDrawer(participantId) {
     ${paymentBadge}
 
     <!-- Candidate Profile Section -->
-    <div class="p-4 rounded-xl bg-[#07090e] border border-[#1b2030] space-y-2.5">
+    <div class="p-3.5 sm:p-4 rounded-xl bg-[#07090e] border border-[#1b2030] space-y-2">
       <div class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 pb-1 border-b border-[#1b2030]">
         Candidate Profile
       </div>
@@ -845,7 +966,7 @@ function openDrawer(participantId) {
       </div>
       <div class="flex justify-between py-1">
         <span class="text-slate-400">Email Address:</span>
-        <span class="font-medium text-slate-200 font-mono select-all">${escapeHtml(p.email)}</span>
+        <span class="font-medium text-slate-200 font-mono select-all truncate max-w-[200px] sm:max-w-none">${escapeHtml(p.email)}</span>
       </div>
       <div class="flex justify-between py-1">
         <span class="text-slate-400">Contact Number:</span>
@@ -853,7 +974,7 @@ function openDrawer(participantId) {
       </div>
       <div class="flex justify-between py-1">
         <span class="text-slate-400">College / Institute:</span>
-        <span class="font-medium text-slate-200 text-right max-w-[280px]">${escapeHtml(p.college)}</span>
+        <span class="font-medium text-slate-200 text-right max-w-[200px] sm:max-w-[280px]">${escapeHtml(p.college)}</span>
       </div>
       ${p.specialization ? `
         <div class="flex justify-between py-1">
