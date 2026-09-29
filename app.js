@@ -19,11 +19,9 @@ async function loadData() {
   if (tableBody) tableBody.innerHTML = '';
 
   try {
-    // Try loading combined data.json first, then fallback to individual files
-    let response;
     let data;
     try {
-      response = await fetch(`./data.json?t=${Date.now()}`);
+      const response = await fetch(`./data.json?t=${Date.now()}`);
       if (response.ok) {
         data = await response.json();
         summaryData = data.summary || {};
@@ -44,6 +42,7 @@ async function loadData() {
     }
 
     renderSummary(summaryData, allParticipants);
+    populateEventFilter(allParticipants, summaryData);
     populateCollegeFilter(allParticipants);
     applyFilters();
 
@@ -52,7 +51,7 @@ async function loadData() {
     if (tableBody) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="7" class="py-8 text-center text-rose-400 text-sm">
+          <td colspan="8" class="py-8 text-center text-rose-400 text-sm">
             <i data-lucide="alert-triangle" class="w-6 h-6 mx-auto mb-2 text-rose-400"></i>
             Failed to load data. Make sure data.json exists or run <code>python scripts/fetch_registrations.py</code>.
           </td>
@@ -117,13 +116,43 @@ function renderSummary(summary, participants) {
     modeBadge.textContent = 'Preview (Mock Data)';
     modeBadge.className = 'text-xs font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30';
   } else {
-    modeBadge.textContent = 'Status: Live Sync Active';
+    modeBadge.textContent = 'Status: Live Multi-Event Sync';
     modeBadge.className = 'text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+  }
+}
+
+function populateEventFilter(participants, summary) {
+  const select = document.getElementById('eventFilter');
+  if (!select) return;
+  const selectedVal = select.value;
+
+  // Group count by event
+  const eventCounts = {};
+  participants.forEach(p => {
+    const evName = p.event_name || 'Event';
+    eventCounts[evName] = (eventCounts[evName] || 0) + 1;
+  });
+
+  const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
+
+  select.innerHTML = `<option value="">All Events (${participants.length} paid across ${sortedEvents.length} events)</option>`;
+  sortedEvents.forEach(ev => {
+    const opt = document.createElement('option');
+    opt.value = ev;
+    opt.textContent = `${ev} (${eventCounts[ev]} paid)`;
+    if (ev === selectedVal) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  const activeEventsBadge = document.getElementById('activeEventsBadge');
+  if (activeEventsBadge) {
+    activeEventsBadge.textContent = sortedEvents.length;
   }
 }
 
 function populateCollegeFilter(participants) {
   const select = document.getElementById('collegeFilter');
+  if (!select) return;
   const selectedVal = select.value;
   const colleges = Array.from(new Set(participants.map(p => p.college).filter(Boolean))).sort();
 
@@ -131,7 +160,7 @@ function populateCollegeFilter(participants) {
   colleges.forEach(col => {
     const opt = document.createElement('option');
     opt.value = col;
-    opt.textContent = col.length > 45 ? col.substring(0, 42) + '...' : col;
+    opt.textContent = col.length > 40 ? col.substring(0, 38) + '...' : col;
     if (col === selectedVal) opt.selected = true;
     select.appendChild(opt);
   });
@@ -139,17 +168,22 @@ function populateCollegeFilter(participants) {
 
 function applyFilters() {
   const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+  const event = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
   const college = document.getElementById('collegeFilter').value;
   const sort = document.getElementById('sortSelect').value;
 
   const filterTag = document.getElementById('filterTag');
-  if (query) {
+  if (query || event || college) {
     filterTag.classList.remove('hidden');
   } else {
     filterTag.classList.add('hidden');
   }
 
   let filtered = allParticipants.filter(p => {
+    if (event && p.event_name !== event && String(p.event_id) !== event) {
+      return false;
+    }
+
     if (college && p.college !== college) {
       return false;
     }
@@ -160,13 +194,14 @@ function applyFilters() {
       const matchPhone = (p.phone || '').toLowerCase().includes(query);
       const matchCollege = (p.college || '').toLowerCase().includes(query);
       const matchTeam = (p.team_name || '').toLowerCase().includes(query);
+      const matchEvent = (p.event_name || '').toLowerCase().includes(query);
       const matchPayId = (p.payment_id || '').toLowerCase().includes(query);
       const matchMembers = (p.team_members || []).some(m => 
         (m.name || '').toLowerCase().includes(query) || 
         (m.email || '').toLowerCase().includes(query)
       );
 
-      if (!matchName && !matchEmail && !matchPhone && !matchCollege && !matchTeam && !matchPayId && !matchMembers) {
+      if (!matchName && !matchEmail && !matchPhone && !matchCollege && !matchTeam && !matchEvent && !matchPayId && !matchMembers) {
         return false;
       }
     }
@@ -180,6 +215,8 @@ function applyFilters() {
       return new Date(b.registered_at || 0) - new Date(a.registered_at || 0);
     } else if (sort === 'date-asc') {
       return new Date(a.registered_at || 0) - new Date(b.registered_at || 0);
+    } else if (sort === 'event-asc') {
+      return (a.event_name || '').localeCompare(b.event_name || '');
     } else if (sort === 'name-asc') {
       return (a.name || '').localeCompare(b.name || '');
     } else if (sort === 'amount-desc') {
@@ -194,6 +231,8 @@ function applyFilters() {
 
 function clearSearch() {
   document.getElementById('searchInput').value = '';
+  if (document.getElementById('eventFilter')) document.getElementById('eventFilter').value = '';
+  document.getElementById('collegeFilter').value = '';
   applyFilters();
 }
 
@@ -255,8 +294,8 @@ function renderTable(participants) {
                 <span>${escapeHtml(p.name || 'N/A')}</span>
               </div>
               <div class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                <span class="truncate max-w-[170px]" title="${escapeHtml(p.email)}">${escapeHtml(p.email || 'N/A')}</span>
-                ${p.email ? `<button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300"><i data-lucide="copy" class="w-3 h-3"></i></button>` : ''}
+                <span class="truncate max-w-[160px]" title="${escapeHtml(p.email)}">${escapeHtml(p.email || 'N/A')}</span>
+                ${p.email && p.email !== 'N/A' ? `<button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300"><i data-lucide="copy" class="w-3 h-3"></i></button>` : ''}
               </div>
               ${p.phone && p.phone !== 'N/A' ? `
                 <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
@@ -265,6 +304,14 @@ function renderTable(participants) {
                 </div>
               ` : ''}
             </div>
+          </div>
+        </td>
+
+        <!-- Event Name -->
+        <td class="py-4 px-4">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium text-xs">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span class="truncate max-w-[150px]" title="${escapeHtml(p.event_name || 'Event')}">${escapeHtml(p.event_name || 'Event')}</span>
           </div>
         </td>
 
@@ -279,7 +326,7 @@ function renderTable(participants) {
         </td>
 
         <!-- College -->
-        <td class="py-4 px-4 text-xs text-slate-300 max-w-[220px]">
+        <td class="py-4 px-4 text-xs text-slate-300 max-w-[200px]">
           <div class="truncate" title="${escapeHtml(p.college)}">
             ${escapeHtml(p.college || 'N/A')}
           </div>
@@ -350,15 +397,15 @@ function openModal(participantId) {
     <!-- Top Highlights -->
     <div class="grid grid-cols-2 gap-3">
       <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Payment Status</div>
-        <div class="mt-1 text-emerald-400 font-semibold text-sm flex items-center gap-1">
-          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Success (₹${Number(p.amount || 0).toLocaleString('en-IN')})
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Event</div>
+        <div class="mt-1 text-indigo-400 font-semibold text-sm truncate">
+          ${escapeHtml(p.event_name || 'Event')}
         </div>
       </div>
       <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Team Name</div>
-        <div class="mt-1 text-slate-200 font-semibold text-sm truncate">
-          ${escapeHtml(p.team_name || 'Individual')}
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Payment Status</div>
+        <div class="mt-1 text-emerald-400 font-semibold text-sm flex items-center gap-1">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Success (₹${Number(p.amount || 0).toLocaleString('en-IN')})
         </div>
       </div>
     </div>
@@ -426,7 +473,6 @@ function closeModal() {
   document.getElementById('detailModal').classList.add('hidden');
 }
 
-// Close modal on Escape
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
@@ -449,6 +495,8 @@ function exportToCSV() {
   }
 
   const headers = [
+    'Event Name',
+    'Event ID',
     'Registration ID',
     'Participant Name',
     'Email',
@@ -466,6 +514,8 @@ function exportToCSV() {
 
   currentFiltered.forEach(p => {
     const row = [
+      p.event_name,
+      p.event_id,
       p.id,
       p.name,
       p.email,
@@ -486,7 +536,9 @@ function exportToCSV() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `unstop_paid_participants_${new Date().toISOString().slice(0, 10)}.csv`);
+  const currentEvent = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
+  const filePrefix = currentEvent ? currentEvent.replace(/[^a-zA-Z0-9]/g, '_') : 'all_events';
+  link.setAttribute('download', `unstop_paid_${filePrefix}_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

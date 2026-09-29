@@ -183,10 +183,15 @@
           >
         </div>
 
-        <!-- Filter Dropdown & Sort -->
-        <div class="flex items-center gap-2">
+        <!-- Filter Dropdowns & Sort -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Event filter -->
+          <select id="eventFilter" onchange="applyFilters()" class="px-3 py-2.5 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500 font-medium max-w-[210px] truncate">
+            <option value="">All Events (All Competitions)</option>
+          </select>
+
           <!-- College filter -->
-          <select id="collegeFilter" onchange="applyFilters()" class="px-3 py-2.5 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500">
+          <select id="collegeFilter" onchange="applyFilters()" class="px-3 py-2.5 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500 max-w-[180px] truncate">
             <option value="">All Colleges</option>
           </select>
 
@@ -194,7 +199,8 @@
           <select id="sortSelect" onchange="applyFilters()" class="px-3 py-2.5 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-emerald-500">
             <option value="date-desc">Newest First</option>
             <option value="date-asc">Oldest First</option>
-            <option value="name-asc">Name (A-Z)</option>
+            <option value="event-asc">Event Name (A-Z)</option>
+            <option value="name-asc">Participant Name (A-Z)</option>
             <option value="amount-desc">Amount (High to Low)</option>
           </select>
         </div>
@@ -202,12 +208,12 @@
       </div>
 
       <!-- Quick status indicator -->
-      <div class="flex items-center justify-between text-xs text-slate-400 px-1 pt-1">
+      <div class="flex items-center justify-between text-xs text-slate-400 px-1 pt-1 flex-wrap gap-2">
         <div>
-          Showing <span id="visibleCount" class="font-semibold text-slate-200">0</span> of <span id="totalCount" class="font-semibold text-slate-200">0</span> paid registrations
+          Showing <span id="visibleCount" class="font-semibold text-slate-200">0</span> of <span id="totalCount" class="font-semibold text-slate-200">0</span> paid registrations across <span id="activeEventsBadge" class="font-semibold text-emerald-400">0</span> events
         </div>
         <div id="filterTag" class="hidden">
-          <button onclick="clearSearch()" class="text-emerald-400 hover:text-emerald-300 underline font-medium">Clear search filter</button>
+          <button onclick="clearSearch()" class="text-emerald-400 hover:text-emerald-300 underline font-medium">Clear search & filters</button>
         </div>
       </div>
     </div>
@@ -220,7 +226,8 @@
             <tr>
               <th scope="col" class="py-3.5 px-4 w-12 text-center">#</th>
               <th scope="col" class="py-3.5 px-4">Participant / Leader</th>
-              <th scope="col" class="py-3.5 px-4">Team / Event</th>
+              <th scope="col" class="py-3.5 px-4">Event Name</th>
+              <th scope="col" class="py-3.5 px-4">Team Info</th>
               <th scope="col" class="py-3.5 px-4">College / Organization</th>
               <th scope="col" class="py-3.5 px-4">Payment & Amount</th>
               <th scope="col" class="py-3.5 px-4">Registered Date</th>
