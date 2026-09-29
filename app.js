@@ -1,5 +1,7 @@
 // techFEST '26 • SLIET Central Organizer Desk Controller
-// Ultra-fast client-side rendering with instant memory cache & slide-over drawer
+// Ultra-fast client-side rendering with instant memory cache, slide-over drawer, token expiry tracking & password authentication
+
+const ACCESS_KEY = 'sliet@tf26';
 
 let allParticipants = [];
 let currentFiltered = [];
@@ -13,8 +15,90 @@ let pageSize = 50;
 
 document.addEventListener('DOMContentLoaded', () => {
   setupKeyboardShortcuts();
-  loadData();
+  checkAuthentication();
 });
+
+/**
+ * Gatekeeper Authentication
+ */
+function checkAuthentication() {
+  const isAuth = localStorage.getItem('tf26_authorized') === 'true';
+  const lockScreen = document.getElementById('lockScreen');
+  const appContainer = document.getElementById('authenticatedApp');
+
+  if (isAuth) {
+    if (lockScreen) lockScreen.classList.add('hidden');
+    if (appContainer) appContainer.classList.remove('hidden');
+    loadData();
+  } else {
+    if (lockScreen) lockScreen.classList.remove('hidden');
+    if (appContainer) appContainer.classList.add('hidden');
+    const passInput = document.getElementById('passInput');
+    if (passInput) setTimeout(() => passInput.focus(), 150);
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function handleAuthSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('passInput');
+  const errorMsg = document.getElementById('authErrorMsg');
+  const lockCard = document.getElementById('lockCard');
+  const val = (input.value || '').trim();
+
+  if (val === ACCESS_KEY) {
+    localStorage.setItem('tf26_authorized', 'true');
+    if (errorMsg) errorMsg.classList.add('hidden');
+    
+    // Unlock screen
+    const lockScreen = document.getElementById('lockScreen');
+    const appContainer = document.getElementById('authenticatedApp');
+    if (lockScreen) lockScreen.classList.add('hidden');
+    if (appContainer) appContainer.classList.remove('hidden');
+
+    loadData();
+    if (window.lucide) lucide.createIcons();
+  } else {
+    if (errorMsg) errorMsg.classList.remove('hidden');
+    if (lockCard) {
+      lockCard.classList.remove('shake-card');
+      void lockCard.offsetWidth; // trigger reflow
+      lockCard.classList.add('shake-card');
+    }
+    input.value = '';
+    input.focus();
+  }
+}
+
+function togglePassVisibility() {
+  const input = document.getElementById('passInput');
+  const icon = document.getElementById('passEyeIcon');
+  if (!input) return;
+
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) icon.setAttribute('data-lucide', 'eye-off');
+  } else {
+    input.type = 'password';
+    if (icon) icon.setAttribute('data-lucide', 'eye');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function lockDesk() {
+  localStorage.removeItem('tf26_authorized');
+  const lockScreen = document.getElementById('lockScreen');
+  const appContainer = document.getElementById('authenticatedApp');
+  const passInput = document.getElementById('passInput');
+  const errorMsg = document.getElementById('authErrorMsg');
+
+  if (errorMsg) errorMsg.classList.add('hidden');
+  if (passInput) passInput.value = '';
+  if (appContainer) appContainer.classList.add('hidden');
+  if (lockScreen) lockScreen.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+  if (passInput) setTimeout(() => passInput.focus(), 150);
+}
 
 function setupKeyboardShortcuts() {
   window.addEventListener('keydown', (e) => {
@@ -22,8 +106,8 @@ function setupKeyboardShortcuts() {
     if (e.key === 'Escape') {
       closeDrawer();
     }
-    // "/" focuses search input if not already inside an input
-    if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+    // "/" focuses search input if not inside password input
+    if (e.key === '/' && document.activeElement !== document.getElementById('searchInput') && document.activeElement !== document.getElementById('passInput')) {
       e.preventDefault();
       const input = document.getElementById('searchInput');
       if (input) input.focus();
@@ -91,6 +175,7 @@ async function loadData() {
     allParticipants = data.participants || [];
 
     renderSummary(summaryData, allParticipants);
+    renderTokenExpiry(summaryData);
     populateEventFilter(allParticipants);
     populateCollegeFilter(allParticipants);
     updateCategoryCounts(allParticipants);
@@ -127,6 +212,78 @@ async function loadData() {
     if (loading) loading.classList.add('hidden');
     if (refreshIcon) refreshIcon.classList.remove('animate-spin');
     if (window.lucide) lucide.createIcons();
+  }
+}
+
+/**
+ * Render Token Expiry Status
+ */
+function renderTokenExpiry(summary) {
+  const tokenExpiryIso = summary.token_expires_at;
+  const tokenBadge = document.getElementById('tokenBadge');
+  const tokenDot = document.getElementById('tokenDot');
+  const tokenText = document.getElementById('tokenText');
+
+  const bannerPill = document.getElementById('bannerTokenStatusPill');
+  const bannerDetails = document.getElementById('bannerTokenDetails');
+  const bannerIcon = document.getElementById('bannerTokenIcon');
+
+  if (!tokenExpiryIso) {
+    if (tokenText) tokenText.textContent = 'Token: Active';
+    return;
+  }
+
+  const expiryDate = new Date(tokenExpiryIso);
+  const now = new Date();
+  const diffMs = expiryDate - now;
+  const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+
+  const istFormatted = expiryDate.toLocaleString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Kolkata'
+  });
+
+  if (diffMs <= 0) {
+    // Expired
+    if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-rose-400 animate-pulse';
+    if (tokenText) tokenText.textContent = 'Token: Expired';
+    if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-rose-500/10 border border-rose-500/30 text-rose-300';
+
+    if (bannerPill) {
+      bannerPill.textContent = 'EXPIRED';
+      bannerPill.className = 'px-2 py-0.2 rounded text-[10px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30';
+    }
+    if (bannerDetails) bannerDetails.textContent = `Expired on: ${istFormatted} IST. Please update UNSTOP_TOKEN in GitHub secrets.`;
+    if (bannerIcon) bannerIcon.className = 'w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0';
+
+  } else if (diffHours < 6) {
+    // Expiring Soon
+    if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+    if (tokenText) tokenText.textContent = `Token: ${diffHours}h left`;
+    if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300';
+
+    if (bannerPill) {
+      bannerPill.textContent = 'EXPIRING SOON';
+      bannerPill.className = 'px-2 py-0.2 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+    }
+    if (bannerDetails) bannerDetails.textContent = `Expires on: ${istFormatted} IST (~${diffHours}h remaining). Update secret before expiration.`;
+    if (bannerIcon) bannerIcon.className = 'w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0';
+
+  } else {
+    // Healthy
+    if (tokenDot) tokenDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+    if (tokenText) tokenText.textContent = `Token: ~${diffHours}h left`;
+    if (tokenBadge) tokenBadge.className = 'hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-[#0e111a] border border-[#1e2436] text-slate-300';
+
+    if (bannerPill) {
+      bannerPill.textContent = 'ACTIVE';
+      bannerPill.className = 'px-2 py-0.2 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+    }
+    if (bannerDetails) bannerDetails.textContent = `Token valid until: ${istFormatted} IST (~${diffHours}h remaining). Auto-sync active.`;
+    if (bannerIcon) bannerIcon.className = 'w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0';
   }
 }
 
