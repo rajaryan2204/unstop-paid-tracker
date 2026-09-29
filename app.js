@@ -334,15 +334,21 @@ function renderTable(participants) {
 
         <!-- Payment & Amount -->
         <td class="py-4 px-4">
-          <div class="flex items-center gap-1.5">
-            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i data-lucide="check" class="w-3 h-3"></i> PAID
-            </span>
-            <span class="font-semibold text-white text-xs sm:text-sm">
-              ₹${Number(p.amount || 0).toLocaleString('en-IN')}
-            </span>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            ${Number(p.amount) > 0 ? `
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <i data-lucide="check-check" class="w-3 h-3"></i> PAID
+              </span>
+              <span class="font-semibold text-emerald-300 text-xs sm:text-sm">
+                ₹${Number(p.amount).toLocaleString('en-IN')}
+              </span>
+            ` : `
+              <span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                <i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Free / ₹0
+              </span>
+            `}
           </div>
-          <div class="text-[11px] font-mono text-slate-400 mt-1 truncate max-w-[140px]" title="${escapeHtml(p.payment_id)}">
+          <div class="text-[11px] font-mono text-slate-500 mt-1 truncate max-w-[140px]" title="${escapeHtml(p.payment_id)}">
             ${escapeHtml(p.payment_id || '--')}
           </div>
         </td>
