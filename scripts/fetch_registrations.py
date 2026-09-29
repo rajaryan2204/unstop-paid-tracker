@@ -3,13 +3,14 @@
 Unstop Paid Registrations Fetcher & Sync Script
 ------------------------------------------------
 Fetches registration data from Unstop internal API,
-filters participants with successful payment status,
+filters participants with successful payment / complete status,
 and outputs clean JSON files for the web dashboard.
 """
 
 import os
 import json
 import logging
+import base64
 from datetime import datetime, timezone
 import requests
 
@@ -24,31 +25,51 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 OUTPUT_FILE = os.path.join(DATA_DIR, "paid_participants.json")
 SUMMARY_FILE = os.path.join(DATA_DIR, "summary.json")
-
-# Root data file for simple frontend relative fetching
 ROOT_DATA_FILE = os.path.join(BASE_DIR, "data.json")
 
-# Configuration from environment variables
-UNSTOP_API_URL = os.environ.get("UNSTOP_API_URL", "").strip()
+# Default Opportunity ID (The Aqua-Epoch: 1744819)
+DEFAULT_OPPORTUNITY_ID = "1744819"
+OPPORTUNITY_ID = os.environ.get("OPPORTUNITY_ID", DEFAULT_OPPORTUNITY_ID).strip()
+
+# Default URL pattern for Unstop job-profiles paginated API
+DEFAULT_API_URL = f"https://unstop.com/api/opportunity/{OPPORTUNITY_ID}/job-profiles/paginated"
+UNSTOP_API_URL = os.environ.get("UNSTOP_API_URL", DEFAULT_API_URL).strip()
+
 UNSTOP_TOKEN = os.environ.get("UNSTOP_TOKEN", "").strip()
 UNSTOP_COOKIES = os.environ.get("UNSTOP_COOKIES", "").strip()
+UNSTOP_ACCOUNT_ID = os.environ.get("UNSTOP_ACCOUNT_ID", "2313619").strip()
 MOCK_MODE = os.environ.get("MOCK_MODE", "false").lower() in ("true", "1", "yes")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
 
+def parse_jwt_expiry(token: str):
+    """Extract expiry date from JWT token if available."""
+    try:
+        clean_token = token.replace("Bearer ", "").strip()
+        parts = clean_token.split(".")
+        if len(parts) >= 2:
+            payload_b64 = parts[1] + "==="
+            payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode("utf-8")))
+            if "exp" in payload:
+                return datetime.fromtimestamp(payload["exp"], timezone.utc).isoformat()
+    except Exception as e:
+        logging.debug(f"Could not parse JWT expiry: {e}")
+    return None
+
+
 def get_headers():
     """Build request headers with auth token and standard browser headers."""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://unstop.com/",
-        "Origin": "https://unstop.com"
+        "Accept-Language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Referer": f"https://unstop.com/manage/opportunity/{OPPORTUNITY_ID}/profiles/all-registrations",
+        "Origin": "https://unstop.com",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+        "selected-account": UNSTOP_ACCOUNT_ID
     }
 
     if UNSTOP_TOKEN:
-        # If token does not already have 'Bearer ', add it if it's a JWT
         if not UNSTOP_TOKEN.lower().startswith("bearer ") and not UNSTOP_TOKEN.lower().startswith("token "):
             headers["Authorization"] = f"Bearer {UNSTOP_TOKEN}"
         else:
@@ -62,372 +83,251 @@ def get_headers():
 
 def is_registration_paid(record: dict) -> bool:
     """
-    Check if a registration record represents a completed/successful payment.
-    Handles multiple common schema representations on Unstop / payment gateways.
+    Check if a registration record represents a completed/paid participant.
+    Unstop flags:
+      - regi_status == 'complete'
+      - registrationStatus == 'Complete Registration' (vs 'Registraition fee not paid')
+      - paid_amount > 0 or paidAmount > 0
     """
-    # 1. Direct boolean flags
-    if record.get("is_paid") is True or record.get("isPaid") is True:
+    # 1. Check Unstop specific regi_status
+    regi_status = str(record.get("regi_status", "")).strip().lower()
+    if regi_status == "complete":
         return True
 
-    # 2. Payment status strings
-    status_fields = [
-        "payment_status", "paymentStatus", "status", "order_status",
-        "payment_state", "transaction_status", "fee_status"
-    ]
-    for field in status_fields:
-        val = record.get(field)
-        if isinstance(val, str) and val.strip().lower() in ("paid", "success", "successful", "completed", "complete"):
-            return True
+    # 2. Check registrationStatus text
+    reg_status_text = str(record.get("registrationStatus", "")).strip().lower()
+    if "not paid" in reg_status_text:
+        return False
+    if "complete" in reg_status_text or "paid" in reg_status_text:
+        return True
 
-    # 3. Nested payment / order object
-    for nested_key in ("payment", "payment_details", "paymentDetails", "order", "transaction"):
-        nested = record.get(nested_key)
-        if isinstance(nested, dict):
-            nested_status = nested.get("status") or nested.get("payment_status") or nested.get("state")
-            if isinstance(nested_status, str) and nested_status.strip().lower() in ("paid", "success", "successful", "completed", "captured"):
+    # 3. Check paid amount fields
+    for amt_field in ("paid_amount", "paidAmount", "amount_paid", "amount"):
+        val = record.get(amt_field)
+        try:
+            if val is not None and float(val) > 0:
                 return True
-            if nested.get("is_paid") is True or nested.get("isPaid") is True:
-                return True
+        except (ValueError, TypeError):
+            pass
 
-    # 4. Amount paid check
-    amount_paid = record.get("amount_paid") or record.get("paid_amount") or record.get("amount")
-    try:
-        if amount_paid is not None and float(amount_paid) > 0 and record.get("payment_id"):
-            return True
-    except (ValueError, TypeError):
-        pass
+    # 4. Standard is_paid flags
+    if record.get("is_paid") is True or record.get("isPaid") is True:
+        return True
 
     return False
 
 
-def normalize_participant(record: dict, index: int) -> dict:
-    """Normalize inconsistent API response structures into a clean standard format."""
-    # User / Leader info
-    user_info = record.get("user") or record.get("leader") or record.get("participant") or {}
-    if not isinstance(user_info, dict):
-        user_info = {}
+def normalize_record(record: dict, index: int) -> dict:
+    """Normalize Unstop record into standard dashboard format."""
+    players = record.get("players") or []
+    primary_player = players[0] if players else {}
+    user_obj = record.get("user") or {}
 
+    # Name
     name = (
-        record.get("full_name")
-        or record.get("name")
-        or user_info.get("name")
-        or f"{user_info.get('first_name', '')} {user_info.get('last_name', '')}".strip()
-        or record.get("leader_name")
-        or "N/A"
+        primary_player.get("name")
+        or user_obj.get("name")
+        or record.get("full_name")
+        or f"Participant #{index}"
     )
 
+    # Email
     email = (
-        record.get("email")
-        or user_info.get("email")
-        or record.get("leader_email")
+        primary_player.get("unlock_email")
+        or record.get("email")
         or "N/A"
     )
 
+    # Phone
     phone = (
-        record.get("phone")
+        primary_player.get("unlock_mobile")
+        or record.get("phone")
         or record.get("mobile")
-        or user_info.get("phone")
-        or user_info.get("mobile")
-        or record.get("contact_number")
         or "N/A"
     )
 
+    # College
     college = (
-        record.get("college")
+        primary_player.get("organisation")
+        or record.get("college")
         or record.get("organisation")
-        or record.get("organization")
-        or record.get("institute")
-        or user_info.get("college")
-        or user_info.get("organisation")
         or "N/A"
     )
 
-    team_name = record.get("team_name") or record.get("teamName") or record.get("team")
+    # Team Name
+    team_name = record.get("team_name") or "Individual"
     if isinstance(team_name, dict):
         team_name = team_name.get("name") or "Individual"
-    elif not team_name:
-        team_name = "Individual"
 
     # Team members
     members = []
-    raw_members = record.get("team_members") or record.get("members") or record.get("users") or []
-    if isinstance(raw_members, list):
-        for m in raw_members:
-            if isinstance(m, dict):
-                m_name = m.get("name") or f"{m.get('first_name', '')} {m.get('last_name', '')}".strip()
-                m_email = m.get("email", "")
-                m_college = m.get("college") or m.get("organisation", "")
-                members.append({"name": m_name, "email": m_email, "college": m_college})
-            elif isinstance(m, str):
-                members.append({"name": m, "email": "", "college": ""})
+    if players:
+        for p in players:
+            m_name = p.get("name") or "Team Member"
+            m_email = p.get("unlock_email") or ""
+            m_phone = p.get("unlock_mobile") or ""
+            m_col = p.get("organisation") or college
+            m_course = p.get("course_specialization") or ""
+            members.append({
+                "name": m_name,
+                "email": m_email,
+                "phone": m_phone,
+                "college": m_col,
+                "course": m_course
+            })
 
-    # Payment details
-    payment_obj = record.get("payment") or record.get("payment_details") or {}
-    if not isinstance(payment_obj, dict):
-        payment_obj = {}
+    # Payment Amount
+    amount = 0.0
+    for amt_field in ("paid_amount", "paidAmount", "amount_paid", "amount"):
+        val = record.get(amt_field)
+        try:
+            if val is not None:
+                amount = float(val)
+                break
+        except (ValueError, TypeError):
+            pass
 
-    payment_id = (
-        record.get("payment_id")
-        or record.get("transaction_id")
-        or payment_obj.get("payment_id")
-        or payment_obj.get("transaction_id")
-        or payment_obj.get("id")
-        or f"TXN-{index:04d}"
-    )
-
-    amount = (
-        record.get("amount_paid")
-        or record.get("amount")
-        or payment_obj.get("amount")
-        or payment_obj.get("amount_paid")
-        or 0
-    )
-    try:
-        amount = float(amount)
-    except (ValueError, TypeError):
-        amount = 0.0
-
-    registered_at = (
-        record.get("created_at")
-        or record.get("registered_at")
-        or record.get("registration_date")
-        or payment_obj.get("created_at")
-        or datetime.now(timezone.utc).isoformat()
-    )
-
-    reg_id = (
-        str(record.get("id") or record.get("registration_id") or record.get("_id") or f"REG-{index:04d}")
-    )
+    regn_id = record.get("regn_id") or str(record.get("id")) or f"REG-{index:04d}"
+    registered_at = record.get("last_seen") or record.get("created_at") or datetime.now(timezone.utc).isoformat()
+    status_label = record.get("registrationStatus") or "Complete Registration"
 
     return {
-        "id": reg_id,
+        "id": regn_id,
+        "internal_id": record.get("id"),
         "name": name,
         "email": email,
         "phone": phone,
         "college": college,
         "team_name": team_name,
-        "team_size": max(1, len(members) if members else 1),
+        "team_size": max(1, len(members)),
         "team_members": members,
-        "payment_id": payment_id,
+        "payment_id": f"UNSTOP-{record.get('id')}",
         "amount": amount,
         "payment_status": "PAID",
+        "status_label": status_label,
         "registered_at": registered_at,
-        "raw": record if os.environ.get("INCLUDE_RAW", "").lower() == "true" else None
+        "resume_url": record.get("resume_url"),
+        "specialization": primary_player.get("course_specialization"),
+        "passing_year": primary_player.get("passing_out_year")
     }
 
 
-def fetch_from_api():
-    """Fetch all registrations from Unstop API handling pagination."""
-    if not UNSTOP_API_URL:
-        logging.warning("UNSTOP_API_URL is not set!")
-        return None
+def fetch_from_unstop():
+    """Fetch all registrations across all pages from Unstop API."""
+    if not UNSTOP_TOKEN:
+        logging.warning("UNSTOP_TOKEN is not provided. Cannot fetch from live API.")
+        return None, 0
 
     headers = get_headers()
-    all_registrations = []
+    cookies = {}
+    if UNSTOP_COOKIES:
+        for cookie_item in UNSTOP_COOKIES.split(";"):
+            if "=" in cookie_item:
+                k, v = cookie_item.strip().split("=", 1)
+                cookies[k] = v
+
+    all_raw_records = []
     page = 1
-    per_page = 100
+    total_found = 0
 
     logging.info(f"Connecting to Unstop API: {UNSTOP_API_URL}")
 
     while True:
         try:
-            params = {"page": page, "per_page": per_page, "limit": per_page}
-            response = requests.get(
+            params = {
+                "page": page,
+                "per_page": 50,
+                "filterName": "status",
+                "filterValue": ""
+            }
+
+            resp = requests.get(
                 UNSTOP_API_URL,
                 headers=headers,
+                cookies=cookies,
                 params=params,
                 timeout=30
             )
 
-            if response.status_code in (401, 403):
-                logging.error(f"Authentication failed (HTTP {response.status_code})! Token might be expired.")
-                print("::error::Unstop Token is expired or invalid. Please update UNSTOP_TOKEN secret in GitHub repository settings!")
-                break
+            if resp.status_code in (401, 403):
+                logging.error(f"Authentication failed (HTTP {resp.status_code})! Token expired.")
+                print("::error::Unstop Token has expired. Please update UNSTOP_TOKEN secret in GitHub repository settings!")
+                return None, 0
 
-            response.raise_for_status()
-            data = response.json()
+            resp.raise_for_status()
+            data = resp.json()
 
-            # Handle different JSON envelope types: { data: [...] } or { results: [...] } or direct list [...]
+            # Handle pagination response envelope { data: { data: [...], last_page: 2, total: 63 } }
+            container = data.get("data") if isinstance(data, dict) else None
             items = []
-            if isinstance(data, list):
+            last_page = 1
+
+            if isinstance(container, dict):
+                items = container.get("data", [])
+                last_page = container.get("last_page", 1)
+                total_found = container.get("total", len(items))
+            elif isinstance(container, list):
+                items = container
+            elif isinstance(data, list):
                 items = data
-            elif isinstance(data, dict):
-                for candidate_key in ("data", "results", "registrations", "participants", "users", "items"):
-                    if candidate_key in data and isinstance(data[candidate_key], list):
-                        items = data[candidate_key]
-                        break
-                    elif candidate_key in data and isinstance(data[candidate_key], dict):
-                        inner = data[candidate_key].get("data") or data[candidate_key].get("results")
-                        if isinstance(inner, list):
-                            items = inner
-                            break
 
             if not items:
-                logging.info(f"No items found on page {page}. Completed pagination.")
+                logging.info(f"No records found on page {page}.")
                 break
 
-            logging.info(f"Page {page}: Fetched {len(items)} records.")
-            all_registrations.extend(items)
+            logging.info(f"Page {page}/{last_page}: Fetched {len(items)} records.")
+            all_raw_records.extend(items)
 
-            # Check pagination stopping condition
-            if len(items) < per_page:
-                break
-
-            # If there's an explicit last_page or total_pages
-            pagination_info = data.get("meta") or data.get("pagination") or {}
-            total_pages = pagination_info.get("last_page") or pagination_info.get("total_pages")
-            if total_pages and page >= total_pages:
+            if page >= last_page:
                 break
 
             page += 1
-            if page > 100:  # Safety guardrail
-                logging.warning("Hit 100 page safety limit.")
-                break
 
         except requests.exceptions.RequestException as e:
             logging.error(f"Network / API Error on page {page}: {e}")
             break
 
-    return all_registrations
-
-
-def generate_mock_data():
-    """Generates realistic mock data so dashboard works immediately before token is linked."""
-    logging.info("Generating realistic mock data for preview...")
-    sample_colleges = [
-        "Sant Longowal Institute of Engineering & Technology (SLIET)",
-        "Thapar Institute of Engineering and Technology",
-        "IIT Ropar",
-        "NIT Jalandhar",
-        "PEC Chandigarh",
-        "Chandigarh University",
-        "TIET Patiala"
-    ]
-    
-    mock_participants = [
-        {
-            "id": "UNSTOP-89211",
-            "name": "Aarav Sharma",
-            "email": "aarav.sharma@gmail.com",
-            "phone": "+91 98765 43210",
-            "college": sample_colleges[0],
-            "team_name": "CodeCrafters",
-            "team_size": 3,
-            "team_members": [
-                {"name": "Aarav Sharma", "email": "aarav.sharma@gmail.com", "college": sample_colleges[0]},
-                {"name": "Priya Verma", "email": "priya.v@gmail.com", "college": sample_colleges[0]},
-                {"name": "Rohan Das", "email": "rohan.d@gmail.com", "college": sample_colleges[0]}
-            ],
-            "payment_id": "pay_O7dKa9xYZaB1",
-            "amount": 499.0,
-            "payment_status": "PAID",
-            "registered_at": "2026-09-29T14:32:00Z"
-        },
-        {
-            "id": "UNSTOP-89215",
-            "name": "Simran Kaur",
-            "email": "simran.kaur@yahoo.com",
-            "phone": "+91 98123 76540",
-            "college": sample_colleges[1],
-            "team_name": "ByteBrigade",
-            "team_size": 2,
-            "team_members": [
-                {"name": "Simran Kaur", "email": "simran.kaur@yahoo.com", "college": sample_colleges[1]},
-                {"name": "Jaspreet Singh", "email": "jassi.singh@gmail.com", "college": sample_colleges[1]}
-            ],
-            "payment_id": "pay_O7dMm12kLpQ9",
-            "amount": 399.0,
-            "payment_status": "PAID",
-            "registered_at": "2026-09-29T15:10:40Z"
-        },
-        {
-            "id": "UNSTOP-89222",
-            "name": "Devansh Singla",
-            "email": "devansh.tech@sliet.ac.in",
-            "phone": "+91 97800 11223",
-            "college": sample_colleges[0],
-            "team_name": "Solo Hacker",
-            "team_size": 1,
-            "team_members": [],
-            "payment_id": "pay_O7dPp45rTxW3",
-            "amount": 199.0,
-            "payment_status": "PAID",
-            "registered_at": "2026-09-29T16:05:12Z"
-        },
-        {
-            "id": "UNSTOP-89230",
-            "name": "Ananya Gupta",
-            "email": "ananya.gupta@nitj.ac.in",
-            "phone": "+91 94170 99887",
-            "college": sample_colleges[3],
-            "team_name": "AlgoWarriors",
-            "team_size": 4,
-            "team_members": [
-                {"name": "Ananya Gupta", "email": "ananya.gupta@nitj.ac.in", "college": sample_colleges[3]},
-                {"name": "Kunal Sen", "email": "kunal.sen@nitj.ac.in", "college": sample_colleges[3]},
-                {"name": "Neha Mehra", "email": "neha.m@nitj.ac.in", "college": sample_colleges[3]},
-                {"name": "Tanmay Bhatia", "email": "tanmay.b@gmail.com", "college": sample_colleges[3]}
-            ],
-            "payment_id": "pay_O7dZz88wEwN0",
-            "amount": 599.0,
-            "payment_status": "PAID",
-            "registered_at": "2026-09-29T17:45:29Z"
-        },
-        {
-            "id": "UNSTOP-89241",
-            "name": "Rahul Verma",
-            "email": "rahul.verma@pec.edu.in",
-            "phone": "+91 99881 22334",
-            "college": sample_colleges[4],
-            "team_name": "CircuitBreakers",
-            "team_size": 2,
-            "team_members": [
-                {"name": "Rahul Verma", "email": "rahul.verma@pec.edu.in", "college": sample_colleges[4]},
-                {"name": "Sahil Kapoor", "email": "sahil.k@pec.edu.in", "college": sample_colleges[4]}
-            ],
-            "payment_id": "pay_O7eaB33tYyK7",
-            "amount": 399.0,
-            "payment_status": "PAID",
-            "registered_at": "2026-09-29T18:22:15Z"
-        }
-    ]
-    return mock_participants
+    return all_raw_records, total_found
 
 
 def main():
     sync_time = datetime.now(timezone.utc).isoformat()
+    token_expiry = parse_jwt_expiry(UNSTOP_TOKEN) if UNSTOP_TOKEN else None
+
     raw_records = None
+    total_unstop_records = 0
 
-    if not MOCK_MODE and UNSTOP_API_URL and UNSTOP_TOKEN:
-        raw_records = fetch_from_api()
+    if not MOCK_MODE and UNSTOP_TOKEN:
+        raw_records, total_unstop_records = fetch_from_unstop()
 
-    # If API not configured or failed, check if we already have existing data
     if raw_records is None:
-        if os.path.exists(OUTPUT_FILE) and os.path.getsize(OUTPUT_FILE) > 10:
-            logging.info(f"API returned no data, retaining existing cached data from {OUTPUT_FILE}")
+        if os.path.exists(OUTPUT_FILE) and os.path.getsize(OUTPUT_FILE) > 20:
+            logging.info(f"Retaining existing cached data from {OUTPUT_FILE}")
             with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
                 paid_list = json.load(f)
         else:
-            logging.info("Using mock data as initial bootstrap dataset.")
-            paid_list = generate_mock_data()
+            logging.warning("No data returned and no cache found. Initializing empty list.")
+            paid_list = []
     else:
         # Filter paid records
         paid_records = [r for r in raw_records if is_registration_paid(r)]
-        logging.info(f"Filtered {len(paid_records)} paid registrations out of {len(raw_records)} total.")
-        paid_list = [normalize_participant(r, i + 1) for i, r in enumerate(paid_records)]
+        logging.info(f"Filtered {len(paid_records)} paid/complete registrations out of {len(raw_records)} total.")
+        paid_list = [normalize_record(r, i + 1) for i, r in enumerate(paid_records)]
 
     # Compute summary stats
     total_paid_count = len(paid_list)
     total_revenue = sum(p.get("amount", 0) for p in paid_list)
     colleges = list({p.get("college") for p in paid_list if p.get("college") and p.get("college") != "N/A"})
-    
+
     summary = {
         "last_synced_at": sync_time,
+        "token_expires_at": token_expiry,
+        "total_unstop_registrations": total_unstop_records or len(raw_records or []),
         "total_paid_registrations": total_paid_count,
         "total_amount_collected": round(total_revenue, 2),
         "total_colleges": len(colleges),
-        "is_mock": raw_records is None and not os.path.exists(OUTPUT_FILE),
-        "status": "HEALTHY"
+        "status": "HEALTHY",
+        "opportunity_id": OPPORTUNITY_ID
     }
 
     # Save to data directory
@@ -439,7 +339,7 @@ def main():
         json.dump(summary, f, indent=2, ensure_ascii=False)
     logging.info(f"Saved summary to {SUMMARY_FILE}")
 
-    # Also save to root data.json for convenient static web hosting
+    # Combined web data for dashboard
     combined_web_data = {
         "summary": summary,
         "participants": paid_list
@@ -449,7 +349,10 @@ def main():
     logging.info(f"Saved combined web data to {ROOT_DATA_FILE}")
 
     print("\n✅ Sync Completed Successfully!")
-    print(f"📊 Total Paid: {total_paid_count} | Revenue: ₹{total_revenue:,.2f} | Unique Colleges: {len(colleges)}")
+    print(f"📊 Total Unstop Registrations: {summary['total_unstop_registrations']}")
+    print(f"🎯 Total Paid/Completed: {total_paid_count} | Revenue: ₹{total_revenue:,.2f} | Colleges: {len(colleges)}")
+    if token_expiry:
+        print(f"⏳ Current Token Expires At: {token_expiry}")
 
 
 if __name__ == "__main__":

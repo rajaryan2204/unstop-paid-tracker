@@ -68,7 +68,7 @@ async function loadData() {
 
 function renderSummary(summary, participants) {
   const totalPaid = participants.length;
-  const totalRev = participants.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const totalApplicants = summary.total_unstop_registrations || participants.length;
   const colleges = new Set(participants.map(p => p.college).filter(c => c && c !== 'N/A'));
   
   let totalMembers = 0;
@@ -76,13 +76,19 @@ function renderSummary(summary, participants) {
     totalMembers += (p.team_members && p.team_members.length > 0) ? p.team_members.length : 1;
   });
 
-  document.getElementById('statTotalPaid').textContent = totalPaid.toLocaleString();
-  document.getElementById('statTotalRevenue').textContent = '₹' + totalRev.toLocaleString('en-IN', { maximumFractionDigits: 0 });
-  document.getElementById('statColleges').textContent = colleges.size;
-  document.getElementById('statTotalMembers').textContent = totalMembers;
+  const statTotalPaidEl = document.getElementById('statTotalPaid');
+  const statTotalApplicantsEl = document.getElementById('statTotalApplicants');
+  const statCollegesEl = document.getElementById('statColleges');
+  const statTotalMembersEl = document.getElementById('statTotalMembers');
+
+  if (statTotalPaidEl) statTotalPaidEl.textContent = totalPaid.toLocaleString();
+  if (statTotalApplicantsEl) statTotalApplicantsEl.textContent = totalApplicants.toLocaleString();
+  if (statCollegesEl) statCollegesEl.textContent = colleges.size;
+  if (statTotalMembersEl) statTotalMembersEl.textContent = totalMembers;
 
   // Last sync time
   const lastSyncEl = document.getElementById('lastSyncTime');
+  const tokenExpiryEl = document.getElementById('tokenExpiryTime');
   const modeBadge = document.getElementById('modeBadge');
 
   if (summary && summary.last_synced_at) {
@@ -95,12 +101,24 @@ function renderSummary(summary, participants) {
     lastSyncEl.textContent = 'Recent';
   }
 
+  // Token expiry time
+  if (tokenExpiryEl) {
+    if (summary && summary.token_expires_at) {
+      const expDate = new Date(summary.token_expires_at);
+      tokenExpiryEl.textContent = expDate.toLocaleString('en-IN', {
+        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    } else {
+      tokenExpiryEl.textContent = 'Active';
+    }
+  }
+
   if (summary && summary.is_mock) {
     modeBadge.textContent = 'Preview (Mock Data)';
     modeBadge.className = 'text-xs font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30';
   } else {
-    modeBadge.textContent = 'Status: Synchronized';
-    modeBadge.className = 'text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+    modeBadge.textContent = 'Status: Live Sync Active';
+    modeBadge.className = 'text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
   }
 }
 
@@ -363,10 +381,30 @@ function openModal(participantId) {
         <span class="text-slate-400">College / Institute:</span>
         <span class="font-medium text-slate-200 text-right max-w-[240px] truncate">${escapeHtml(p.college)}</span>
       </div>
+      ${p.specialization ? `
+        <div class="flex justify-between py-1 border-b border-slate-800/50">
+          <span class="text-slate-400">Course / Branch:</span>
+          <span class="font-medium text-slate-200 text-right max-w-[240px] truncate">${escapeHtml(p.specialization)}</span>
+        </div>
+      ` : ''}
+      ${p.passing_year ? `
+        <div class="flex justify-between py-1 border-b border-slate-800/50">
+          <span class="text-slate-400">Graduation Year:</span>
+          <span class="font-medium text-slate-200">${escapeHtml(p.passing_year)}</span>
+        </div>
+      ` : ''}
       <div class="flex justify-between py-1">
         <span class="text-slate-400">Registration Date:</span>
-        <span class="font-medium text-slate-200">${new Date(p.registered_at).toLocaleString('en-IN')}</span>
+        <span class="font-medium text-slate-200">${p.registered_at ? new Date(p.registered_at).toLocaleString('en-IN') : 'N/A'}</span>
       </div>
+      ${p.resume_url ? `
+        <div class="pt-2 border-t border-slate-800/50 flex justify-end">
+          <a href="${p.resume_url.startsWith('http') ? p.resume_url : 'https://d8it4huxumps7.cloudfront.net/' + p.resume_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-medium transition">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>View Resume PDF</span>
+          </a>
+        </div>
+      ` : ''}
     </div>
 
     <!-- Team Members Section -->
