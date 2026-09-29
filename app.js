@@ -1,24 +1,38 @@
-// techFEST '26 • SLIET Longowal Organizer Registration Desk
-// High-performance client-side controller
+// techFEST '26 • SLIET Central Organizer Desk Controller
+// Ultra-fast client-side rendering with instant memory cache & slide-over drawer
 
 let allParticipants = [];
 let currentFiltered = [];
 let summaryData = {};
 let currentCategory = 'all';
-let currentPaymentFilter = 'all'; // 'all' | 'paid' | 'free'
+let currentPaymentFilter = 'all';
 
 // Pagination state
 let currentPage = 1;
 let pageSize = 50;
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupKeyboardShortcuts();
   loadData();
 });
 
+function setupKeyboardShortcuts() {
+  window.addEventListener('keydown', (e) => {
+    // Escape closes drawer
+    if (e.key === 'Escape') {
+      closeDrawer();
+    }
+    // "/" focuses search input if not already inside an input
+    if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+      e.preventDefault();
+      const input = document.getElementById('searchInput');
+      if (input) input.focus();
+    }
+  });
+}
+
 /**
- * Robust data loader:
- * 1. Immediate synchronous load from window.__TECHFEST_DATA__ (via data.js)
- * 2. Multi-URL fallback fetch if needed
+ * High resilience data loader
  */
 async function loadData() {
   const loading = document.getElementById('loadingState');
@@ -34,16 +48,14 @@ async function loadData() {
   try {
     let data = null;
 
-    // Check if pre-bundled via data.js
+    // 1. Instant Synchronous Load from window.__TECHFEST_DATA__
     if (window.__TECHFEST_DATA__ && window.__TECHFEST_DATA__.participants && window.__TECHFEST_DATA__.participants.length > 0) {
       data = window.__TECHFEST_DATA__;
     }
 
-    // If data not yet in memory, try network candidates
+    // 2. Network Fallback Candidates
     if (!data) {
-      // Determine base URL dynamically
       const pathname = window.location.pathname;
-      const origin = window.location.origin;
       const dirPath = pathname.substring(0, pathname.lastIndexOf('/') + 1) || '/';
 
       const fetchUrls = [
@@ -51,6 +63,7 @@ async function loadData() {
         './data.json',
         `${dirPath}data.json`,
         '/unstop-paid-tracker/data.json',
+        'data/paid_participants.json',
         'https://raw.githubusercontent.com/rajaryan2204/unstop-paid-tracker/main/data.json'
       ];
 
@@ -71,7 +84,7 @@ async function loadData() {
     }
 
     if (!data || !data.participants || data.participants.length === 0) {
-      throw new Error('Registration records could not be retrieved.');
+      throw new Error('No registration records found.');
     }
 
     summaryData = data.summary || {};
@@ -84,20 +97,26 @@ async function loadData() {
     updatePaymentFilterCounts(allParticipants);
     applyFilters();
 
+    const timestampEl = document.getElementById('syncTimestamp');
+    if (timestampEl) {
+      const now = new Date();
+      timestampEl.textContent = `Live as of ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
   } catch (err) {
     console.error('Data load exception:', err);
     if (tableBody) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="8" class="py-14 text-center">
+          <td colspan="9" class="py-14 text-center">
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 mb-3 border border-rose-500/20">
               <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
             <h4 class="text-sm font-semibold text-slate-100">Unable to load participant database</h4>
             <p class="text-xs text-slate-400 max-w-md mx-auto mt-1">${escapeHtml(err.message || String(err))}</p>
             <div class="mt-4">
-              <button onclick="window.location.reload()" class="px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg shadow-sm transition">
-                Refresh Page
+              <button onclick="window.location.reload()" class="px-4 py-2 text-xs font-semibold text-white bg-[#141824] hover:bg-[#1a2030] border border-[#23293d] rounded-lg shadow-sm transition">
+                Retry Connection
               </button>
             </div>
           </td>
@@ -112,7 +131,7 @@ async function loadData() {
 }
 
 /**
- * Render Executive KPI cards
+ * Render Executive Summary Bar
  */
 function renderSummary(summary, participants) {
   const totalVerified = participants.length;
@@ -120,34 +139,30 @@ function renderSummary(summary, participants) {
   const colleges = new Set(participants.map(p => p.college).filter(c => c && c !== 'N/A'));
   
   const activeEventsCount = summary.events_with_paid || new Set(participants.map(p => p.event_name)).size;
-  const totalEventsScanned = summary.total_events_scanned || 62;
-  
   const totalRevenue = participants.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
   const paidCount = participants.filter(p => Number(p.amount) > 0).length;
   const freeCount = totalVerified - paidCount;
 
   // Primary Metrics
   document.getElementById('statTotalPaid').textContent = totalVerified.toLocaleString('en-IN');
+  document.getElementById('statTotalApplicants').textContent = totalApplicants.toLocaleString('en-IN');
   document.getElementById('statTotalRevenue').textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
-  document.getElementById('statActiveEvents').innerHTML = `${activeEventsCount} <span class="text-xs font-normal text-slate-400">/ ${totalEventsScanned}</span>`;
+  document.getElementById('statActiveEvents').textContent = activeEventsCount;
   document.getElementById('statColleges').textContent = colleges.size;
 
-  // Subtitles / Badges
+  // Subtitles
   const subPaid = document.getElementById('subTotalPaid');
   if (subPaid) subPaid.textContent = `${freeCount} Free Entry • ${paidCount} Gateway Paid`;
 
   const subRevenue = document.getElementById('subTotalRevenue');
   if (subRevenue) subRevenue.textContent = `RC Boat (₹2,995) + Ghost Code (₹200)`;
 
-  const subEvents = document.getElementById('subActiveEvents');
-  if (subEvents) subEvents.textContent = `Scanned from 62 official Unstop listings`;
-
   const subColleges = document.getElementById('subColleges');
   if (subColleges) subColleges.textContent = `SLIET, IITs, NITs, LPU & State Univs`;
 }
 
 /**
- * Update Category pill numbers
+ * Update Track Tab numbers
  */
 function updateCategoryCounts(participants) {
   const counts = { all: participants.length, competitions: 0, quizzes: 0, hackathons: 0, cultural: 0 };
@@ -171,7 +186,7 @@ function updateCategoryCounts(participants) {
 }
 
 /**
- * Update Payment Filter pill counts
+ * Update Payment Filter counts
  */
 function updatePaymentFilterCounts(participants) {
   const paidCount = participants.filter(p => Number(p.amount) > 0).length;
@@ -181,7 +196,7 @@ function updatePaymentFilterCounts(participants) {
   const btnPaid = document.getElementById('payFilterPaid');
   const btnFree = document.getElementById('payFilterFree');
 
-  if (btnAll) btnAll.textContent = `All Registrations (${participants.length})`;
+  if (btnAll) btnAll.textContent = `All (${participants.length})`;
   if (btnPaid) btnPaid.textContent = `💰 Gateway Paid (${paidCount})`;
   if (btnFree) btnFree.textContent = `Free Entry (${freeCount})`;
 }
@@ -199,9 +214,9 @@ function setPaymentFilter(type) {
     const el = document.getElementById(b.id);
     if (!el) return;
     if (b.val === type) {
-      el.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 transition';
+      el.className = 'px-2.5 py-1.5 rounded-md font-semibold bg-[#1a2032] text-emerald-400 border border-emerald-500/30 transition';
     } else {
-      el.className = 'px-3 py-1 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent transition';
+      el.className = 'px-2.5 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 hover:bg-[#121624] border border-transparent transition';
     }
   });
 
@@ -215,9 +230,9 @@ function setCategoryFilter(category) {
   buttons.forEach(btn => {
     const isSelected = btn.getAttribute('data-cat') === category;
     if (isSelected) {
-      btn.className = 'cat-tab px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30';
+      btn.className = 'cat-tab px-3 py-1.5 rounded-md bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30 whitespace-nowrap transition';
     } else {
-      btn.className = 'cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition';
+      btn.className = 'cat-tab px-3 py-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-[#121624] border border-transparent whitespace-nowrap transition';
     }
   });
 
@@ -238,11 +253,11 @@ function populateEventFilter(participants) {
 
   const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
 
-  select.innerHTML = `<option value="">All Events (All ${sortedEvents.length} Competitions)</option>`;
+  select.innerHTML = `<option value="">All Competitions (${sortedEvents.length} Active)</option>`;
   sortedEvents.forEach(ev => {
     const opt = document.createElement('option');
     opt.value = ev;
-    opt.textContent = `${ev} (${eventCounts[ev]} verified)`;
+    opt.textContent = `${ev} (${eventCounts[ev]})`;
     if (ev === selectedVal) opt.selected = true;
     select.appendChild(opt);
   });
@@ -258,7 +273,7 @@ function populateCollegeFilter(participants) {
   colleges.forEach(col => {
     const opt = document.createElement('option');
     opt.value = col;
-    opt.textContent = col.length > 40 ? col.substring(0, 38) + '...' : col;
+    opt.textContent = col.length > 36 ? col.substring(0, 34) + '...' : col;
     if (col === selectedVal) opt.selected = true;
     select.appendChild(opt);
   });
@@ -283,7 +298,7 @@ function applyFilters() {
     if (currentPaymentFilter === 'paid' && amt <= 0) return false;
     if (currentPaymentFilter === 'free' && amt > 0) return false;
 
-    // Category tab filter
+    // Track tab filter
     if (currentCategory !== 'all') {
       const pType = (p.event_type || 'competitions').toLowerCase();
       if (currentCategory === 'quizzes' && !pType.includes('quiz')) return false;
@@ -302,7 +317,7 @@ function applyFilters() {
       return false;
     }
 
-    // Live Search
+    // Search query
     if (query) {
       const matchName = (p.name || '').toLowerCase().includes(query);
       const matchEmail = (p.email || '').toLowerCase().includes(query);
@@ -378,7 +393,7 @@ function nextPage() {
 }
 
 /**
- * Render Table Rows with High Polish
+ * Render High Polish Data Grid
  */
 function renderTable(participants) {
   const tableBody = document.getElementById('tableBody');
@@ -428,140 +443,141 @@ function renderTable(participants) {
 
     const formattedDate = p.registered_at 
       ? new Date(p.registered_at).toLocaleDateString('en-IN', {
-          day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          day: 'numeric', month: 'short', year: 'numeric'
         })
       : 'N/A';
 
+    // WhatsApp Direct Link
+    const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
+    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
+
     const hasMembers = p.team_members && p.team_members.length > 0;
     const teamBadge = hasMembers 
-      ? `<button onclick="openModal('${p.id}')" class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 border border-sky-500/30 transition">
+      ? `<button onclick="openDrawer('${p.id}')" class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 border border-sky-500/30 transition">
           <i data-lucide="users" class="w-3 h-3"></i> ${p.team_members.length} Members
          </button>`
-      : `<span class="inline-flex items-center gap-1 text-[11px] text-slate-400">Solo Entry</span>`;
+      : `<span class="text-[11px] text-slate-500">Solo Entry</span>`;
 
-    // Category badge styling
-    let catClass = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
+    // Category styling
+    let catPill = 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
     const evType = (p.event_type || '').toLowerCase();
     if (evType.includes('quiz')) {
-      catClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      catPill = 'bg-amber-500/10 text-amber-300 border-amber-500/20';
     } else if (evType.includes('hack')) {
-      catClass = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+      catPill = 'bg-purple-500/10 text-purple-300 border-purple-500/20';
     } else if (evType.includes('cultur')) {
-      catClass = 'bg-pink-500/10 text-pink-400 border-pink-500/30';
+      catPill = 'bg-pink-500/10 text-pink-300 border-pink-500/20';
     }
 
-    // Payment display: Free Event vs Paid Fee
+    // Payment formatting
     const amt = Number(p.amount) || 0;
-    let paymentBlock = '';
-    if (amt > 0) {
-      paymentBlock = `
-        <div>
-          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+    const paymentBlock = amt > 0
+      ? `<div>
+          <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
             <i data-lucide="check-check" class="w-3 h-3 text-emerald-400"></i> Paid ₹${amt.toLocaleString('en-IN')}
           </span>
-          <div class="text-[10px] text-emerald-400/80 font-mono mt-0.5 select-all">
-            Txn: ${escapeHtml(p.payment_id)}
-          </div>
-        </div>
-      `;
-    } else {
-      paymentBlock = `
-        <div>
-          <span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-800/90 text-slate-300 border border-slate-700/80">
-            <i data-lucide="shield-check" class="w-3 h-3 text-sky-400"></i> Free Entry • Verified
+          <div class="text-[10px] text-emerald-400/80 font-mono mt-0.5">Gateway Verified</div>
+        </div>`
+      : `<div>
+          <span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-[#141824] text-slate-300 border border-[#23293d]">
+            <i data-lucide="shield-check" class="w-3 h-3 text-sky-400"></i> Free Entry
           </span>
-          <div class="text-[10px] text-slate-500 font-mono mt-0.5 select-all">
-            ID: ${escapeHtml(p.id)}
-          </div>
-        </div>
-      `;
-    }
+          <div class="text-[10px] text-slate-500 font-mono mt-0.5">Verified Form</div>
+        </div>`;
 
     return `
-      <tr class="hover:bg-slate-800/40 transition group border-b border-slate-800/60">
+      <tr class="hover:bg-[#121623] transition group border-b border-[#171c2b] cursor-pointer" onclick="openDrawer('${p.id}')">
         <!-- Index -->
-        <td class="py-3 px-3 text-center font-mono text-xs text-slate-500 select-none">
+        <td class="py-2.5 px-3 text-center font-mono text-[11px] text-slate-500 select-none">
           ${absoluteIndex}
         </td>
 
-        <!-- Candidate / Team Leader -->
-        <td class="py-3 px-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-semibold text-xs text-slate-200 shrink-0">
+        <!-- Participant -->
+        <td class="py-2.5 px-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-[#141824] border border-[#23293d] flex items-center justify-center font-bold text-[11px] text-emerald-400 shrink-0">
               ${initials}
             </div>
-            <div>
-              <div class="font-semibold text-white text-xs sm:text-sm group-hover:text-emerald-300 transition">
+            <div class="min-w-0">
+              <div class="font-semibold text-slate-100 text-xs truncate group-hover:text-emerald-300 transition">
                 ${escapeHtml(p.name || 'Participant')}
               </div>
-              <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 flex-wrap">
-                <span class="text-slate-300 select-all">${escapeHtml(p.email || '')}</span>
+              <div class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 truncate" onclick="event.stopPropagation()">
+                <span class="truncate">${escapeHtml(p.email || '')}</span>
                 ${p.email && p.email !== 'N/A' ? `
-                  <button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300">
+                  <button onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="text-slate-500 hover:text-slate-300 shrink-0">
                     <i data-lucide="copy" class="w-3 h-3"></i>
                   </button>
                 ` : ''}
               </div>
-              ${p.phone && p.phone !== 'N/A' ? `
-                <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 select-all">
-                  <i data-lucide="phone" class="w-3 h-3 text-slate-500"></i>
-                  <span>${escapeHtml(p.phone)}</span>
-                </div>
-              ` : ''}
             </div>
           </div>
         </td>
 
-        <!-- Institution / College -->
-        <td class="py-3 px-4 max-w-[220px]">
-          <div class="text-xs font-medium text-slate-200 leading-snug line-clamp-2" title="${escapeHtml(p.college)}">
+        <!-- Contact (Phone + WhatsApp) -->
+        <td class="py-2.5 px-3 text-[11px]" onclick="event.stopPropagation()">
+          ${p.phone && p.phone !== 'N/A' ? `
+            <div class="flex items-center gap-1.5 font-mono text-slate-300">
+              <span>${escapeHtml(p.phone)}</span>
+              ${waLink ? `
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" class="text-emerald-400 hover:text-emerald-300 p-0.5 rounded hover:bg-emerald-500/10">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                </a>
+              ` : ''}
+            </div>
+          ` : `<span class="text-slate-500 font-mono text-[11px]">--</span>`}
+        </td>
+
+        <!-- Institution & Branch -->
+        <td class="py-2.5 px-4 max-w-[210px]">
+          <div class="text-xs font-medium text-slate-200 truncate" title="${escapeHtml(p.college)}">
             ${escapeHtml(p.college || 'N/A')}
           </div>
           ${p.specialization ? `
-            <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 truncate">
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">
               <span>${escapeHtml(p.specialization)}</span>
-              ${p.passing_year ? `<span class="text-slate-500">• ${p.passing_year}</span>` : ''}
+              ${p.passing_year ? `<span class="text-slate-500 font-mono">• ${p.passing_year}</span>` : ''}
             </div>
           ` : ''}
         </td>
 
         <!-- Event & Track -->
-        <td class="py-3 px-4">
-          <div class="font-semibold text-white text-xs sm:text-sm">
+        <td class="py-2.5 px-4">
+          <div class="font-medium text-slate-100 text-xs truncate max-w-[170px]" title="${escapeHtml(p.event_name)}">
             ${escapeHtml(p.event_name || 'Event')}
           </div>
-          <div class="mt-1">
-            <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${catClass}">
+          <div class="mt-0.5">
+            <span class="inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${catPill}">
               ${escapeHtml(p.event_type || 'Competition')}
             </span>
           </div>
         </td>
 
         <!-- Team Status -->
-        <td class="py-3 px-4">
-          <div class="text-xs font-medium text-slate-300">
+        <td class="py-2.5 px-3" onclick="event.stopPropagation()">
+          <div class="text-xs text-slate-300 font-medium truncate max-w-[120px]" title="${escapeHtml(p.team_name)}">
             ${escapeHtml(p.team_name || 'Individual')}
           </div>
-          <div class="mt-1">
+          <div class="mt-0.5">
             ${teamBadge}
           </div>
         </td>
 
-        <!-- Fee / Payment -->
-        <td class="py-3 px-4">
+        <!-- Payment & Fee -->
+        <td class="py-2.5 px-3">
           ${paymentBlock}
         </td>
 
-        <!-- Registration Date -->
-        <td class="py-3 px-4 text-xs text-slate-400 whitespace-nowrap">
+        <!-- Date -->
+        <td class="py-2.5 px-3 text-[11px] text-slate-400 whitespace-nowrap font-mono">
           ${formattedDate}
         </td>
 
-        <!-- Action / View Button -->
-        <td class="py-3 px-3 text-center">
-          <button onclick="openModal('${p.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-medium transition inline-flex items-center gap-1 border border-slate-700 shadow-sm">
-            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+        <!-- Action / View Drawer Button -->
+        <td class="py-2.5 px-3 text-right" onclick="event.stopPropagation()">
+          <button onclick="openDrawer('${p.id}')" class="px-2.5 py-1 rounded bg-[#141824] hover:bg-[#1f2538] text-slate-300 hover:text-white text-xs font-medium border border-[#23293d] transition inline-flex items-center gap-1 shadow-sm">
             <span>View</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           </button>
         </td>
       </tr>
@@ -573,129 +589,175 @@ function renderTable(participants) {
 }
 
 /**
- * Open Candidate Details Drawer/Modal
+ * Slide-over Candidate Drawer
  */
-function openModal(participantId) {
+function openDrawer(participantId) {
   const p = allParticipants.find(item => item.id == participantId);
   if (!p) return;
 
-  const modal = document.getElementById('detailModal');
-  const title = document.getElementById('modalTitle');
-  const regId = document.getElementById('modalRegId');
-  const eventBadge = document.getElementById('modalEventBadge');
-  const body = document.getElementById('modalBody');
+  const initials = (p.name || 'P')
+    .split(' ')
+    .filter(Boolean)
+    .map(n => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'TF';
 
-  title.textContent = p.name || 'Candidate Details';
-  regId.textContent = `Reg ID: ${p.id} • Txn: ${p.payment_id}`;
-  eventBadge.textContent = p.event_name || 'Event';
+  document.getElementById('drawerInitials').textContent = initials;
+  document.getElementById('drawerName').textContent = p.name || 'Participant';
+  document.getElementById('drawerRegId').textContent = `Reg ID: ${p.id} • Txn: ${p.payment_id}`;
+  document.getElementById('drawerTrackBadge').textContent = p.event_name || 'Event';
+
+  const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
+  const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
+  const telLink = p.phone && p.phone !== 'N/A' ? `tel:${p.phone}` : null;
+  const mailLink = p.email && p.email !== 'N/A' ? `mailto:${p.email}` : null;
 
   const amt = Number(p.amount) || 0;
-  const statusBadge = amt > 0
-    ? `<span class="text-emerald-400 font-semibold flex items-center gap-1"><i data-lucide="check-check" class="w-4 h-4"></i> Paid ₹${amt} (Gateway Verified)</span>`
-    : `<span class="text-sky-400 font-medium flex items-center gap-1"><i data-lucide="shield-check" class="w-4 h-4"></i> Free Entry (Form Completed)</span>`;
+  const paymentBadge = amt > 0
+    ? `<div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+        <div class="text-[10px] uppercase tracking-wider font-semibold text-emerald-400">Payment Status</div>
+        <div class="text-sm font-bold mt-0.5 flex items-center gap-1.5">
+          <i data-lucide="check-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>Paid ₹${amt.toLocaleString('en-IN')} (Gateway Confirmed)</span>
+        </div>
+        <div class="text-[11px] font-mono text-emerald-400/80 mt-1 select-all">Reference: ${escapeHtml(p.payment_id)}</div>
+       </div>`
+    : `<div class="p-3 rounded-lg bg-[#141824] border border-[#23293d] text-slate-300">
+        <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Registration Status</div>
+        <div class="text-sm font-semibold mt-0.5 flex items-center gap-1.5 text-sky-400">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Free Competition Entry (Form Verified)</span>
+        </div>
+        <div class="text-[11px] font-mono text-slate-400 mt-1 select-all">Unstop Entry ID: ${escapeHtml(p.id)}</div>
+       </div>`;
 
   const membersHtml = (p.team_members && p.team_members.length > 0)
     ? p.team_members.map((m, idx) => `
-        <div class="p-3 rounded-lg bg-slate-950/70 border border-slate-800/80 flex items-center justify-between text-xs">
+        <div class="p-3 rounded-lg bg-[#07090e] border border-[#1e2436] flex items-center justify-between text-xs">
           <div>
-            <div class="font-medium text-slate-200">${idx + 1}. ${escapeHtml(m.name || 'Member')}</div>
-            <div class="text-slate-400 select-all">${escapeHtml(m.email || 'No email')} ${m.phone ? `• ${m.phone}` : ''}</div>
+            <div class="font-semibold text-slate-100 flex items-center gap-1.5">
+              <span>${idx + 1}. ${escapeHtml(m.name || 'Member')}</span>
+              ${idx === 0 ? `<span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/30">LEADER</span>` : ''}
+            </div>
+            <div class="text-slate-400 select-all mt-0.5">${escapeHtml(m.email || '')} ${m.phone ? `• ${m.phone}` : ''}</div>
           </div>
-          <div class="text-slate-400 text-right max-w-[200px] text-xs">
+          <div class="text-slate-400 text-right max-w-[180px] text-[11px] truncate" title="${escapeHtml(m.college || '')}">
             ${escapeHtml(m.college || '')}
           </div>
         </div>
       `).join('')
-    : '<div class="text-xs text-slate-400 italic">Solo Registration (No additional team members).</div>';
+    : `<div class="p-3 rounded-lg bg-[#07090e] border border-[#1e2436] text-slate-400 italic text-center">
+        Solo Registration (Individual Participant)
+       </div>`;
 
-  body.innerHTML = `
-    <!-- Top Summary Highlights -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
-        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Registered Competition</div>
-        <div class="mt-1 text-white font-semibold text-sm truncate" title="${escapeHtml(p.event_name)}">
-          ${escapeHtml(p.event_name || 'Event')}
-        </div>
-      </div>
-      <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
-        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Registration Status</div>
-        <div class="mt-1 text-sm">
-          ${statusBadge}
-        </div>
-      </div>
+  const drawerBody = document.getElementById('drawerBody');
+  drawerBody.innerHTML = `
+    <!-- Quick Contact Actions -->
+    <div class="flex items-center gap-2">
+      ${waLink ? `
+        <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold transition text-xs">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>WhatsApp Leader</span>
+        </a>
+      ` : ''}
+      ${mailLink ? `
+        <a href="${mailLink}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-[#141824] hover:bg-[#1a2030] text-slate-200 border border-[#23293d] font-semibold transition text-xs">
+          <i data-lucide="mail" class="w-4 h-4 text-sky-400"></i>
+          <span>Send Email</span>
+        </a>
+      ` : ''}
+      ${telLink ? `
+        <a href="${telLink}" class="inline-flex items-center justify-center p-2 rounded-lg bg-[#141824] hover:bg-[#1a2030] text-slate-200 border border-[#23293d] transition">
+          <i data-lucide="phone" class="w-4 h-4 text-emerald-400"></i>
+        </a>
+      ` : ''}
     </div>
 
-    <!-- Candidate Profile Details -->
-    <div class="space-y-2 p-4 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
-      <div class="flex justify-between py-1 border-b border-slate-800/70">
+    <!-- Payment / Registration Status Card -->
+    ${paymentBadge}
+
+    <!-- Candidate Profile Section -->
+    <div class="p-4 rounded-xl bg-[#07090e] border border-[#1b2030] space-y-2.5">
+      <div class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 pb-1 border-b border-[#1b2030]">
+        Candidate Profile
+      </div>
+      <div class="flex justify-between py-1">
         <span class="text-slate-400">Candidate Name:</span>
         <span class="font-semibold text-slate-100">${escapeHtml(p.name)}</span>
       </div>
-      <div class="flex justify-between py-1 border-b border-slate-800/70">
+      <div class="flex justify-between py-1">
         <span class="text-slate-400">Email Address:</span>
         <span class="font-medium text-slate-200 font-mono select-all">${escapeHtml(p.email)}</span>
       </div>
-      <div class="flex justify-between py-1 border-b border-slate-800/70">
+      <div class="flex justify-between py-1">
         <span class="text-slate-400">Contact Number:</span>
-        <span class="font-medium text-slate-200 select-all">${escapeHtml(p.phone)}</span>
+        <span class="font-medium text-slate-200 select-all font-mono">${escapeHtml(p.phone)}</span>
       </div>
-      <div class="flex justify-between py-1 border-b border-slate-800/70">
+      <div class="flex justify-between py-1">
         <span class="text-slate-400">College / Institute:</span>
         <span class="font-medium text-slate-200 text-right max-w-[280px]">${escapeHtml(p.college)}</span>
       </div>
       ${p.specialization ? `
-        <div class="flex justify-between py-1 border-b border-slate-800/70">
+        <div class="flex justify-between py-1">
           <span class="text-slate-400">Course / Branch:</span>
           <span class="font-medium text-slate-200">${escapeHtml(p.specialization)}</span>
         </div>
       ` : ''}
       ${p.passing_year ? `
-        <div class="flex justify-between py-1 border-b border-slate-800/70">
+        <div class="flex justify-between py-1">
           <span class="text-slate-400">Graduation Year:</span>
-          <span class="font-medium text-slate-200">${escapeHtml(p.passing_year)}</span>
+          <span class="font-medium text-slate-200 font-mono">${escapeHtml(p.passing_year)}</span>
         </div>
       ` : ''}
       <div class="flex justify-between py-1">
-        <span class="text-slate-400">Registration Timestamp:</span>
+        <span class="text-slate-400">Registration Date:</span>
         <span class="font-medium text-slate-200">${p.registered_at ? new Date(p.registered_at).toLocaleString('en-IN') : 'N/A'}</span>
       </div>
       ${p.resume_url ? `
-        <div class="pt-2.5 border-t border-slate-800/70 flex justify-end">
+        <div class="pt-2 border-t border-[#1b2030] flex justify-end">
           <a href="${p.resume_url.startsWith('http') ? p.resume_url : 'https://d8it4huxumps7.cloudfront.net/' + p.resume_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition">
             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-            <span>Download Uploaded Resume</span>
+            <span>Download Uploaded Resume PDF</span>
           </a>
         </div>
       ` : ''}
     </div>
 
-    <!-- Team Members Roster -->
+    <!-- Team Members Section -->
     <div class="space-y-2">
-      <h4 class="text-xs uppercase font-semibold tracking-wider text-slate-400">
-        Team Roster (${p.team_name || 'Individual'})
-      </h4>
+      <div class="flex items-center justify-between">
+        <h4 class="text-xs uppercase font-semibold tracking-wider text-slate-400">
+          Team Roster (${escapeHtml(p.team_name || 'Individual')})
+        </h4>
+        <span class="text-[11px] text-slate-400 font-mono">${(p.team_members || []).length} registered member(s)</span>
+      </div>
       <div class="space-y-1.5">
         ${membersHtml}
       </div>
     </div>
   `;
 
-  modal.classList.remove('hidden');
+  const footerTimestamp = document.getElementById('drawerFooterTimestamp');
+  if (footerTimestamp) {
+    footerTimestamp.textContent = `Unstop ID: ${p.internal_id || p.id}`;
+  }
+
+  // Open drawer
+  document.body.classList.remove('drawer-closed');
+  document.body.classList.add('drawer-open');
   if (window.lucide) lucide.createIcons();
 }
 
-function closeModal() {
-  document.getElementById('detailModal').classList.add('hidden');
+function closeDrawer() {
+  document.body.classList.remove('drawer-open');
+  document.body.classList.add('drawer-closed');
 }
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
 
 function copyToClipboard(text, el) {
   navigator.clipboard.writeText(text).then(() => {
     const original = el.innerHTML;
-    el.innerHTML = '<span class="text-emerald-400 text-[10px]">Copied!</span>';
+    el.innerHTML = '<span class="text-emerald-400 text-[10px] font-mono">Copied!</span>';
     setTimeout(() => {
       el.innerHTML = original;
       if (window.lucide) lucide.createIcons();
@@ -711,7 +773,7 @@ function exportToCSV() {
 
   const headers = [
     'Event Name',
-    'Event Category',
+    'Event Track',
     'Registration ID',
     'Participant Name',
     'Email',
@@ -722,7 +784,7 @@ function exportToCSV() {
     'Team Name',
     'Team Size',
     'Fee Paid (INR)',
-    'Payment Status',
+    'Payment Type',
     'Registration Status',
     'Registered At'
   ];
@@ -757,7 +819,7 @@ function exportToCSV() {
   link.setAttribute('href', url);
   const currentEvent = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
   const filePrefix = currentEvent ? currentEvent.replace(/[^a-zA-Z0-9]/g, '_') : 'techfest26_master';
-  link.setAttribute('download', `${filePrefix}_registrations_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute('download', `${filePrefix}_attendees_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
