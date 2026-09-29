@@ -1,0 +1,49 @@
+name: Sync Unstop Paid Registrations
+
+on:
+  schedule:
+    # Runs every 8 hours (00:00, 08:00, 16:00 UTC)
+    - cron: '0 */8 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+permissions:
+  contents: write
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch and Filter Paid Registrations
+        env:
+          UNSTOP_API_URL: ${{ secrets.UNSTOP_API_URL }}
+          UNSTOP_TOKEN: ${{ secrets.UNSTOP_TOKEN }}
+          UNSTOP_COOKIES: ${{ secrets.UNSTOP_COOKIES }}
+        run: |
+          python scripts/fetch_registrations.py
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ data.json
+          if git diff --staged --quiet; then
+            echo "No changes in registration data."
+          else
+            git commit -m "chore(data): auto-sync unstop paid registrations [skip ci]"
+            git push
+          fi

@@ -1,0 +1,141 @@
+{
+  "summary": {
+    "last_synced_at": "2026-09-29T16:54:55.325550+00:00",
+    "total_paid_registrations": 5,
+    "total_amount_collected": 2095.0,
+    "total_colleges": 4,
+    "is_mock": true,
+    "status": "HEALTHY"
+  },
+  "participants": [
+    {
+      "id": "UNSTOP-89211",
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@gmail.com",
+      "phone": "+91 98765 43210",
+      "college": "Sant Longowal Institute of Engineering & Technology (SLIET)",
+      "team_name": "CodeCrafters",
+      "team_size": 3,
+      "team_members": [
+        {
+          "name": "Aarav Sharma",
+          "email": "aarav.sharma@gmail.com",
+          "college": "Sant Longowal Institute of Engineering & Technology (SLIET)"
+        },
+        {
+          "name": "Priya Verma",
+          "email": "priya.v@gmail.com",
+          "college": "Sant Longowal Institute of Engineering & Technology (SLIET)"
+        },
+        {
+          "name": "Rohan Das",
+          "email": "rohan.d@gmail.com",
+          "college": "Sant Longowal Institute of Engineering & Technology (SLIET)"
+        }
+      ],
+      "payment_id": "pay_O7dKa9xYZaB1",
+      "amount": 499.0,
+      "payment_status": "PAID",
+      "registered_at": "2026-09-29T14:32:00Z"
+    },
+    {
+      "id": "UNSTOP-89215",
+      "name": "Simran Kaur",
+      "email": "simran.kaur@yahoo.com",
+      "phone": "+91 98123 76540",
+      "college": "Thapar Institute of Engineering and Technology",
+      "team_name": "ByteBrigade",
+      "team_size": 2,
+      "team_members": [
+        {
+          "name": "Simran Kaur",
+          "email": "simran.kaur@yahoo.com",
+          "college": "Thapar Institute of Engineering and Technology"
+        },
+        {
+          "name": "Jaspreet Singh",
+          "email": "jassi.singh@gmail.com",
+          "college": "Thapar Institute of Engineering and Technology"
+        }
+      ],
+      "payment_id": "pay_O7dMm12kLpQ9",
+      "amount": 399.0,
+      "payment_status": "PAID",
+      "registered_at": "2026-09-29T15:10:40Z"
+    },
+    {
+      "id": "UNSTOP-89222",
+      "name": "Devansh Singla",
+      "email": "devansh.tech@sliet.ac.in",
+      "phone": "+91 97800 11223",
+      "college": "Sant Longowal Institute of Engineering & Technology (SLIET)",
+      "team_name": "Solo Hacker",
+      "team_size": 1,
+      "team_members": [],
+      "payment_id": "pay_O7dPp45rTxW3",
+      "amount": 199.0,
+      "payment_status": "PAID",
+      "registered_at": "2026-09-29T16:05:12Z"
+    },
+    {
+      "id": "UNSTOP-89230",
+      "name": "Ananya Gupta",
+      "email": "ananya.gupta@nitj.ac.in",
+      "phone": "+91 94170 99887",
+      "college": "NIT Jalandhar",
+      "team_name": "AlgoWarriors",
+      "team_size": 4,
+      "team_members": [
+        {
+          "name": "Ananya Gupta",
+          "email": "ananya.gupta@nitj.ac.in",
+          "college": "NIT Jalandhar"
+        },
+        {
+          "name": "Kunal Sen",
+          "email": "kunal.sen@nitj.ac.in",
+          "college": "NIT Jalandhar"
+        },
+        {
+          "name": "Neha Mehra",
+          "email": "neha.m@nitj.ac.in",
+          "college": "NIT Jalandhar"
+        },
+        {
+          "name": "Tanmay Bhatia",
+          "email": "tanmay.b@gmail.com",
+          "college": "NIT Jalandhar"
+        }
+      ],
+      "payment_id": "pay_O7dZz88wEwN0",
+      "amount": 599.0,
+      "payment_status": "PAID",
+      "registered_at": "2026-09-29T17:45:29Z"
+    },
+    {
+      "id": "UNSTOP-89241",
+      "name": "Rahul Verma",
+      "email": "rahul.verma@pec.edu.in",
+      "phone": "+91 99881 22334",
+      "college": "PEC Chandigarh",
+      "team_name": "CircuitBreakers",
+      "team_size": 2,
+      "team_members": [
+        {
+          "name": "Rahul Verma",
+          "email": "rahul.verma@pec.edu.in",
+          "college": "PEC Chandigarh"
+        },
+        {
+          "name": "Sahil Kapoor",
+          "email": "sahil.k@pec.edu.in",
+          "college": "PEC Chandigarh"
+        }
+      ],
+      "payment_id": "pay_O7eaB33tYyK7",
+      "amount": 399.0,
+      "payment_status": "PAID",
+      "registered_at": "2026-09-29T18:22:15Z"
+    }
+  ]
+}
