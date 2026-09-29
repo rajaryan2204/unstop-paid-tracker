@@ -33,6 +33,7 @@ jobs:
           UNSTOP_API_URL: ${{ secrets.UNSTOP_API_URL }}
           UNSTOP_TOKEN: ${{ secrets.UNSTOP_TOKEN }}
           UNSTOP_COOKIES: ${{ secrets.UNSTOP_COOKIES }}
+          UNSTOP_ACCOUNT_ID: ${{ secrets.UNSTOP_ACCOUNT_ID }}
         run: |
           python scripts/fetch_registrations.py
 

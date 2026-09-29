@@ -250,8 +250,8 @@ def fetch_from_unstop():
             )
 
             if resp.status_code in (401, 403):
-                logging.error(f"Authentication failed (HTTP {resp.status_code})! Token expired.")
-                print("::error::Unstop Token has expired. Please update UNSTOP_TOKEN secret in GitHub repository settings!")
+                logging.error(f"Authentication failed (HTTP {resp.status_code})! Response: {resp.text[:300]}")
+                print(f"::error::Unstop API returned HTTP {resp.status_code}: {resp.text[:200]}")
                 return None, 0
 
             resp.raise_for_status()
