@@ -1,8 +1,8 @@
 {
-  "last_synced_at": "2026-09-30T17:24:50.806046+00:00",
-  "token_expires_at": "2026-09-30T19:09:31.752260+00:00",
+  "last_synced_at": "2026-09-30T21:45:29.132496+00:00",
+  "token_expires_at": "2026-10-01T21:45:30.041660+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3601,
+  "total_unstop_registrations": 3605,
   "total_paid_registrations": 629,
   "total_amount_collected": 3793.0,
   "total_colleges": 43,
@@ -83,7 +83,7 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 69,
+      "total_registrations": 70,
       "paid_registrations": 8
     },
     {
@@ -202,7 +202,7 @@
       "id": 1744223,
       "title": "Aerostrike",
       "type": "competitions",
-      "total_registrations": 56,
+      "total_registrations": 57,
       "paid_registrations": 3
     },
     {
@@ -335,7 +335,7 @@
       "id": 1744172,
       "title": "Grid Masters-SLD Challenge",
       "type": "competitions",
-      "total_registrations": 50,
+      "total_registrations": 51,
       "paid_registrations": 1
     },
     {
@@ -391,7 +391,7 @@
       "id": 1744160,
       "title": "Splash Rocket",
       "type": "competitions",
-      "total_registrations": 50,
+      "total_registrations": 51,
       "paid_registrations": 0
     },
     {
