@@ -227,7 +227,7 @@ async function loadData() {
 
     renderSummary(summaryData, allParticipants);
     renderTokenExpiry(summaryData);
-    populateEventFilter(allParticipants);
+    populateEventFilter(allParticipants, summaryData);
     populateCollegeFilter(allParticipants);
     updateCategoryCounts(allParticipants);
     updatePaymentFilterCounts(allParticipants);
@@ -343,7 +343,10 @@ function renderSummary(summary, participants) {
   const totalApplicants = summary.total_unstop_registrations || 3501;
   const colleges = new Set(participants.map(p => p.college).filter(c => c && c !== 'N/A'));
   
-  const activeEventsCount = summary.events_with_paid || new Set(participants.map(p => p.event_name)).size;
+  const totalEvents = summary.total_events_scanned || (summary.events_list ? summary.events_list.length : 62);
+  const eventsWithPaid = summary.events_with_paid || new Set(participants.map(p => p.event_name)).size;
+  const zeroPaidCount = Math.max(0, totalEvents - eventsWithPaid);
+
   const totalRevenue = participants.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
   const paidCount = participants.filter(p => Number(p.amount) > 0).length;
   const freeCount = totalVerified - paidCount;
@@ -352,7 +355,15 @@ function renderSummary(summary, participants) {
   document.getElementById('statTotalPaid').textContent = totalVerified.toLocaleString('en-IN');
   document.getElementById('statTotalApplicants').textContent = totalApplicants.toLocaleString('en-IN');
   document.getElementById('statTotalRevenue').textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
-  document.getElementById('statActiveEvents').textContent = activeEventsCount;
+  
+  const statActiveEventsEl = document.getElementById('statActiveEvents');
+  if (statActiveEventsEl) statActiveEventsEl.textContent = totalEvents;
+
+  const subActiveEventsEl = document.getElementById('subActiveEvents');
+  if (subActiveEventsEl) {
+    subActiveEventsEl.textContent = `${eventsWithPaid} with entries • ${zeroPaidCount} awaiting`;
+  }
+
   document.getElementById('statColleges').textContent = colleges.size;
 
   // Subtitles
@@ -445,27 +456,96 @@ function setCategoryFilter(category) {
   applyFilters();
 }
 
-function populateEventFilter(participants) {
+function populateEventFilter(participants, summary) {
   const select = document.getElementById('eventFilter');
   if (!select) return;
   const selectedVal = select.value;
 
+  // Compute verified counts from participants
   const eventCounts = {};
   participants.forEach(p => {
-    const evName = p.event_name || 'Event';
+    const evName = (p.event_name || 'Event').trim();
     eventCounts[evName] = (eventCounts[evName] || 0) + 1;
   });
 
-  const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
+  const masterList = (summary && Array.isArray(summary.events_list) && summary.events_list.length > 0)
+    ? summary.events_list
+    : (summaryData && Array.isArray(summaryData.events_list) && summaryData.events_list.length > 0)
+      ? summaryData.events_list
+      : null;
 
-  select.innerHTML = `<option value="">All Competitions (${sortedEvents.length} Active)</option>`;
-  sortedEvents.forEach(ev => {
-    const opt = document.createElement('option');
-    opt.value = ev;
-    opt.textContent = `${ev} (${eventCounts[ev]})`;
-    if (ev === selectedVal) opt.selected = true;
-    select.appendChild(opt);
-  });
+  select.innerHTML = '';
+
+  if (masterList) {
+    const totalEvents = masterList.length;
+    const eventsWithEntries = masterList.filter(e => {
+      const t = (e.title || '').trim();
+      return (eventCounts[t] !== undefined ? eventCounts[t] : (e.paid_registrations || 0)) > 0;
+    });
+    const eventsAwaiting = masterList.filter(e => {
+      const t = (e.title || '').trim();
+      return (eventCounts[t] !== undefined ? eventCounts[t] : (e.paid_registrations || 0)) === 0;
+    });
+
+    // Sort eventsWithEntries by verified count descending
+    eventsWithEntries.sort((a, b) => {
+      const cntA = eventCounts[(a.title || '').trim()] || a.paid_registrations || 0;
+      const cntB = eventCounts[(b.title || '').trim()] || b.paid_registrations || 0;
+      return cntB - cntA;
+    });
+
+    // Sort eventsAwaiting by total unstop registrations descending
+    eventsAwaiting.sort((a, b) => (b.total_registrations || 0) - (a.total_registrations || 0));
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = `All Competitions & Events (${totalEvents} Total • ${eventsWithEntries.length} with entries)`;
+    select.appendChild(defaultOpt);
+
+    // Group 1: Events with verified entries
+    if (eventsWithEntries.length > 0) {
+      const grpWithEntries = document.createElement('optgroup');
+      grpWithEntries.label = `── Competitions With Entries (${eventsWithEntries.length}) ──`;
+      eventsWithEntries.forEach(ev => {
+        const title = (ev.title || '').trim();
+        const verifiedCount = eventCounts[title] !== undefined ? eventCounts[title] : (ev.paid_registrations || 0);
+        const opt = document.createElement('option');
+        opt.value = title;
+        opt.textContent = `${title} (${verifiedCount} verified)`;
+        if (title === selectedVal) opt.selected = true;
+        grpWithEntries.appendChild(opt);
+      });
+      select.appendChild(grpWithEntries);
+    }
+
+    // Group 2: Events awaiting verified entries
+    if (eventsAwaiting.length > 0) {
+      const grpAwaiting = document.createElement('optgroup');
+      grpAwaiting.label = `── Awaiting Paid Submissions (${eventsAwaiting.length}) ──`;
+      eventsAwaiting.forEach(ev => {
+        const title = (ev.title || '').trim();
+        const totalReg = ev.total_registrations || 0;
+        const opt = document.createElement('option');
+        opt.value = title;
+        opt.textContent = `${title} (0 verified • ${totalReg} applicants)`;
+        if (title === selectedVal) opt.selected = true;
+        grpAwaiting.appendChild(opt);
+      });
+      select.appendChild(grpAwaiting);
+    }
+
+  } else {
+    // Fallback if master list not available
+    const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
+    select.innerHTML = `<option value="">All Competitions (${sortedEvents.length} Active)</option>`;
+    sortedEvents.forEach(ev => {
+      const opt = document.createElement('option');
+      opt.value = ev;
+      opt.textContent = `${ev} (${eventCounts[ev]})`;
+      if (ev === selectedVal) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
 }
 
 function populateCollegeFilter(participants) {
@@ -614,7 +694,24 @@ function renderDataViews(participants) {
   if (participants.length === 0) {
     if (tableBody) tableBody.innerHTML = '';
     if (mobileContainer) mobileContainer.innerHTML = '';
-    if (emptyState) emptyState.classList.remove('hidden');
+    if (emptyState) {
+      emptyState.classList.remove('hidden');
+      const selectedEvent = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
+      const eventObj = summaryData && summaryData.events_list ? summaryData.events_list.find(e => (e.title || '').trim() === (selectedEvent || '').trim()) : null;
+      
+      const emptyTitle = emptyState.querySelector('h3');
+      const emptyDesc = emptyState.querySelector('p');
+      if (selectedEvent && eventObj && (eventObj.paid_registrations || 0) === 0) {
+        if (emptyTitle) emptyTitle.textContent = `No Verified Paid Entries for "${selectedEvent}" Yet`;
+        if (emptyDesc) emptyDesc.textContent = `Unstop shows ${eventObj.total_registrations || 0} registered applicant(s) for this event awaiting payment / verification.`;
+      } else if (selectedEvent) {
+        if (emptyTitle) emptyTitle.textContent = `No verified participants match your filters for "${selectedEvent}"`;
+        if (emptyDesc) emptyDesc.textContent = 'Try adjusting search terms or toggling the payment filter.';
+      } else {
+        if (emptyTitle) emptyTitle.textContent = 'No attendees found';
+        if (emptyDesc) emptyDesc.textContent = 'Try resetting search filters or selecting another track.';
+      }
+    }
     if (paginationBar) paginationBar.classList.add('hidden');
     return;
   }
