@@ -26,6 +26,42 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
 });
 
+// Deterministic Soft Vibrant Avatar Colors (Linear / Stripe inspired)
+const AVATAR_PALETTES = [
+  { bg: 'rgba(56, 189, 248, 0.15)', text: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' }, // Cyan
+  { bg: 'rgba(52, 211, 153, 0.15)', text: '#34d399', border: 'rgba(52, 211, 153, 0.3)' }, // Emerald
+  { bg: 'rgba(192, 132, 252, 0.15)', text: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' }, // Purple
+  { bg: 'rgba(251, 191, 36, 0.15)', text: '#fbbf24', border: 'rgba(251, 191, 36, 0.3)' }, // Amber
+  { bg: 'rgba(251, 113, 133, 0.15)', text: '#fb7185', border: 'rgba(251, 113, 133, 0.3)' }, // Rose
+  { bg: 'rgba(129, 140, 248, 0.15)', text: '#818cf8', border: 'rgba(129, 140, 248, 0.3)' }, // Indigo
+  { bg: 'rgba(45, 212, 191, 0.15)', text: '#2dd4bf', border: 'rgba(45, 212, 191, 0.3)' }, // Teal
+  { bg: 'rgba(251, 146, 60, 0.15)', text: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' }  // Orange
+];
+
+function getAvatarStyle(name) {
+  let hash = 0;
+  const str = String(name || 'Participant');
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const p = AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length];
+  return `background-color: ${p.bg} !important; color: ${p.text} !important; border: 1px solid ${p.border} !important;`;
+}
+
+function getTrackBadgeHtml(eventType) {
+  const type = String(eventType || 'Competitions').toLowerCase();
+  if (type.includes('quiz')) {
+    return `<span class="tag-track tag-quiz"><span class="track-dot dot-quiz"></span>Quizzes</span>`;
+  } else if (type.includes('hack')) {
+    return `<span class="tag-track tag-hackathon"><span class="track-dot dot-hack"></span>Hackathons</span>`;
+  } else if (type.includes('cultur')) {
+    return `<span class="tag-track tag-cultural"><span class="track-dot dot-cult"></span>Cultural</span>`;
+  } else {
+    return `<span class="tag-track tag-competition"><span class="track-dot dot-comp"></span>Competition</span>`;
+  }
+}
+
 /**
  * Theme Manager: Dark / Light Mode Toggle
  */
@@ -264,10 +300,16 @@ function renderSummary(summary, participants) {
   if (statApp) statApp.textContent = totalApplicants.toLocaleString('en-IN');
 
   const statRev = document.getElementById('statTotalRevenue');
-  if (statRev) statRev.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+  if (statRev) {
+    statRev.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+    statRev.style.color = '#10b981';
+  }
   
   const statActiveEventsEl = document.getElementById('statActiveEvents');
-  if (statActiveEventsEl) statActiveEventsEl.textContent = totalEvents;
+  if (statActiveEventsEl) {
+    statActiveEventsEl.textContent = totalEvents;
+    statActiveEventsEl.style.color = '#c084fc';
+  }
 
   const subActiveEventsEl = document.getElementById('subActiveEvents');
   if (subActiveEventsEl) {
@@ -275,7 +317,10 @@ function renderSummary(summary, participants) {
   }
 
   const statCol = document.getElementById('statColleges');
-  if (statCol) statCol.textContent = colleges.size;
+  if (statCol) {
+    statCol.textContent = colleges.size;
+    statCol.style.color = '#fbbf24';
+  }
 
   // Subtitles
   const subPaid = document.getElementById('subTotalPaid');
@@ -348,8 +393,9 @@ function renderEventOverviewChart(participants, summary) {
     const counts = sortedDates.map(d => dateCounts[d]);
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 180);
-    gradient.addColorStop(0, isDark ? 'rgba(78, 168, 255, 0.12)' : 'rgba(78, 168, 255, 0.08)');
-    gradient.addColorStop(1, 'rgba(78, 168, 255, 0.0)');
+    gradient.addColorStop(0, isDark ? 'rgba(56, 189, 248, 0.28)' : 'rgba(2, 132, 199, 0.2)');
+    gradient.addColorStop(0.6, isDark ? 'rgba(56, 189, 248, 0.08)' : 'rgba(2, 132, 199, 0.05)');
+    gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
     overviewChartInstance = new Chart(ctx, {
       type: 'line',
@@ -358,16 +404,16 @@ function renderEventOverviewChart(participants, summary) {
         datasets: [{
           label: 'Registrations',
           data: counts,
-          borderColor: accentColor,
-          borderWidth: 1.5,
-          pointBackgroundColor: accentColor,
+          borderColor: '#38bdf8',
+          borderWidth: 2,
+          pointBackgroundColor: '#38bdf8',
           pointBorderColor: isDark ? '#0B0D10' : '#ffffff',
           pointBorderWidth: 1.5,
-          pointRadius: 0,
-          pointHoverRadius: 4,
+          pointRadius: 2.5,
+          pointHoverRadius: 5.5,
           fill: true,
           backgroundColor: gradient,
-          tension: 0.3
+          tension: 0.32
         }]
       },
       options: {
@@ -485,11 +531,11 @@ function updateCategoryCounts(participants) {
   const buttons = document.querySelectorAll('.cat-tab');
   buttons.forEach(btn => {
     const cat = btn.getAttribute('data-cat');
-    if (cat === 'all') btn.innerHTML = `All Events <span class="tab-count">${counts.all}</span>`;
-    if (cat === 'competitions') btn.innerHTML = `Competitions <span class="tab-count">${counts.competitions}</span>`;
-    if (cat === 'quizzes') btn.innerHTML = `Quizzes <span class="tab-count">${counts.quizzes}</span>`;
-    if (cat === 'hackathons') btn.innerHTML = `Hackathons <span class="tab-count">${counts.hackathons}</span>`;
-    if (cat === 'cultural') btn.innerHTML = `Cultural & Jam <span class="tab-count">${counts.cultural}</span>`;
+    if (cat === 'all') btn.innerHTML = `All Events <span class="tab-count count-all">${counts.all}</span>`;
+    if (cat === 'competitions') btn.innerHTML = `Competitions <span class="tab-count count-comp">${counts.competitions}</span>`;
+    if (cat === 'quizzes') btn.innerHTML = `Quizzes <span class="tab-count count-quiz">${counts.quizzes}</span>`;
+    if (cat === 'hackathons') btn.innerHTML = `Hackathons <span class="tab-count count-hack">${counts.hackathons}</span>`;
+    if (cat === 'cultural') btn.innerHTML = `Cultural & Jam <span class="tab-count count-cult">${counts.cultural}</span>`;
   });
 }
 
@@ -505,8 +551,8 @@ function updatePaymentFilterCounts(participants) {
   const btnFree = document.getElementById('payFilterFree');
 
   if (btnAll) btnAll.innerHTML = `All <span class="tab-count">${participants.length}</span>`;
-  if (btnPaid) btnPaid.innerHTML = `Paid <span class="tab-count">${paidCount}</span>`;
-  if (btnFree) btnFree.innerHTML = `Free <span class="tab-count">${freeCount}</span>`;
+  if (btnPaid) btnPaid.innerHTML = `Paid <span class="tab-count count-paid">${paidCount}</span>`;
+  if (btnFree) btnFree.innerHTML = `Free <span class="tab-count count-free">${freeCount}</span>`;
 }
 
 function setPaymentFilter(type) {
@@ -857,6 +903,8 @@ function renderDataViews(participants) {
         .join('')
         .toUpperCase() || 'TF';
 
+      const avatarStyle = getAvatarStyle(p.name);
+
       const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
       const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
       const telLink = p.phone && p.phone !== 'N/A' ? `tel:${p.phone}` : null;
@@ -868,8 +916,7 @@ function renderDataViews(participants) {
            </button>`
         : `<span class="text-muted" style="font-size: 11px;">Solo</span>`;
 
-      // Neutral, unified track badge - part of one cohesive design system
-      const trackClass = 'tag-track';
+      const trackBadgeHtml = getTrackBadgeHtml(p.event_type);
 
       const amt = Number(p.amount) || 0;
       const paymentBlock = amt > 0
@@ -886,7 +933,7 @@ function renderDataViews(participants) {
           <!-- Participant -->
           <td>
             <div class="d-flex align-items-center gap-2">
-              <span class="user-avatar-sm">${initials}</span>
+              <span class="user-avatar-sm" style="${avatarStyle}">${initials}</span>
               <div class="min-w-0">
                 <div class="fw-medium text-reset text-truncate" style="max-width: 190px; font-size: 13px;">${escapeHtml(p.name || 'Participant')}</div>
                 <div class="font-monospace d-flex align-items-center gap-1 mt-0.5" style="font-size: 11px; color: var(--tf-text-secondary);" onclick="event.stopPropagation()">
@@ -904,16 +951,17 @@ function renderDataViews(participants) {
           <!-- Contact (Phone + WhatsApp + Call) -->
           <td onclick="event.stopPropagation()">
             ${p.phone && p.phone !== 'N/A' ? `
-              <div class="d-flex align-items-center gap-1 font-monospace" style="font-size: 11.5px; color: var(--tf-text-secondary);">
+              <div class="d-flex align-items-center gap-1.5 font-monospace" style="font-size: 11.5px; color: var(--tf-text-secondary);">
                 <span>${escapeHtml(p.phone)}</span>
                 ${waLink ? `
-                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="btn btn-icon p-0 border-0 ms-1" style="width: 18px; height: 18px; color: var(--tf-accent-green); opacity: 0.85;">
-                    <i class="ti ti-brand-whatsapp" style="font-size: 13px;"></i>
+                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" class="btn-wa-pill">
+                    <i class="ti ti-brand-whatsapp"></i>
+                    <span>WA</span>
                   </a>
                 ` : ''}
                 ${telLink ? `
-                  <a href="${telLink}" title="Call" class="btn btn-icon p-0 border-0" style="width: 18px; height: 18px; color: var(--tf-text-muted);">
-                    <i class="ti ti-phone" style="font-size: 11px;"></i>
+                  <a href="${telLink}" title="Call" class="btn-call-pill">
+                    <i class="ti ti-phone"></i>
                   </a>
                 ` : ''}
               </div>
@@ -939,9 +987,7 @@ function renderDataViews(participants) {
               ${escapeHtml(p.event_name || 'Event')}
             </div>
             <div class="mt-1">
-              <span class="${trackClass}">
-                ${escapeHtml(p.event_type || 'Competition')}
-              </span>
+              ${trackBadgeHtml}
             </div>
           </td>
 
@@ -962,9 +1008,9 @@ function renderDataViews(participants) {
 
           <!-- Action -->
           <td class="text-end" onclick="event.stopPropagation()">
-            <button onclick="openDrawer('${p.id}')" class="btn-view-action">
+            <button onclick="openDrawer('${p.id}')" class="btn-view-pill">
               <span>View</span>
-              <i class="ti ti-arrow-right ms-0.5" style="font-size: 11px;"></i>
+              <i class="ti ti-arrow-right" style="font-size: 11px;"></i>
             </button>
           </td>
         </tr>
@@ -985,6 +1031,8 @@ function renderDataViews(participants) {
         .join('')
         .toUpperCase() || 'TF';
 
+      const avatarStyle = getAvatarStyle(p.name);
+
       const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
       const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
       const telLink = p.phone && p.phone !== 'N/A' ? `tel:${p.phone}` : null;
@@ -994,14 +1042,14 @@ function renderDataViews(participants) {
         ? `<span class="tag-paid">Paid ₹${amt}</span>`
         : `<span class="tag-free">Free</span>`;
 
-      const trackClass = 'tag-track';
+      const trackBadgeHtml = getTrackBadgeHtml(p.event_type);
 
       return `
         <div class="mobile-attendee-card cursor-pointer" onclick="openDrawer('${p.id}')">
           <!-- Top Row -->
           <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
             <div class="d-flex align-items-center gap-2 min-w-0">
-              <span class="user-avatar-sm" style="width: 26px; height: 26px; font-size: 11px;">${initials}</span>
+              <span class="user-avatar-sm" style="${avatarStyle}; width: 28px; height: 28px;">${initials}</span>
               <div class="min-w-0">
                 <div class="fw-medium text-reset text-truncate" style="font-size: 13px;">${escapeHtml(p.name)}</div>
                 <div class="font-monospace text-truncate" style="font-size: 11px; color: var(--tf-text-secondary);">${escapeHtml(p.phone || p.email)}</div>
@@ -1016,7 +1064,7 @@ function renderDataViews(participants) {
           <div class="p-2 rounded mb-2" style="background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); font-size: 12px;">
             <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
               <span class="fw-medium text-truncate text-reset">${escapeHtml(p.event_name)}</span>
-              <span class="${trackClass}">${escapeHtml(p.event_type || 'Event')}</span>
+              ${trackBadgeHtml}
             </div>
             <div class="text-truncate" style="font-size: 11.5px; color: var(--tf-text-secondary);">${escapeHtml(p.college || 'SLIET')}</div>
           </div>
@@ -1025,20 +1073,20 @@ function renderDataViews(participants) {
           <div class="d-flex align-items-center justify-content-between pt-1.5 border-top" style="border-color: var(--tf-border) !important;" onclick="event.stopPropagation()">
             <div class="d-flex gap-1.5">
               ${waLink ? `
-                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm py-0.5 px-2 d-inline-flex align-items-center gap-1" style="font-size: 11px; background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); color: var(--tf-accent-green);">
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-wa-pill">
                   <i class="ti ti-brand-whatsapp"></i> WhatsApp
                 </a>
               ` : ''}
               ${telLink ? `
-                <a href="${telLink}" class="btn btn-sm btn-icon" style="width: 24px; height: 24px; background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); color: var(--tf-text-muted);">
-                  <i class="ti ti-phone" style="font-size: 11px;"></i>
+                <a href="${telLink}" class="btn-call-pill" style="width: 24px; height: 24px;">
+                  <i class="ti ti-phone"></i>
                 </a>
               ` : ''}
             </div>
 
-            <button onclick="openDrawer('${p.id}')" class="btn-view-action d-inline-flex align-items-center">
+            <button onclick="openDrawer('${p.id}')" class="btn-view-pill">
               <span>View</span>
-              <i class="ti ti-arrow-right ms-1" style="font-size: 11px;"></i>
+              <i class="ti ti-arrow-right" style="font-size: 11px;"></i>
             </button>
           </div>
         </div>
@@ -1064,10 +1112,18 @@ function openDrawer(participantId) {
     .join('')
     .toUpperCase() || 'TF';
 
-  document.getElementById('drawerInitials').textContent = initials;
+  const drawerInitialsEl = document.getElementById('drawerInitials');
+  if (drawerInitialsEl) {
+    drawerInitialsEl.textContent = initials;
+    drawerInitialsEl.style.cssText = `${getAvatarStyle(p.name)}; width: 34px; height: 34px; font-size: 13px; font-weight: 600;`;
+  }
   document.getElementById('drawerName').textContent = p.name || 'Participant';
   document.getElementById('drawerRegId').textContent = `Reg ID: ${p.id} • Txn: ${p.payment_id}`;
-  document.getElementById('drawerTrackBadge').textContent = p.event_name || 'Event';
+  
+  const drawerTrackBadge = document.getElementById('drawerTrackBadge');
+  if (drawerTrackBadge) {
+    drawerTrackBadge.outerHTML = `<span id="drawerTrackBadge">${getTrackBadgeHtml(p.event_type || p.event_name)}</span>`;
+  }
 
   const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
   const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
