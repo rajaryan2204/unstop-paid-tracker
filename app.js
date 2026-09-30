@@ -1,7 +1,5 @@
 // techFEST '26 • SLIET Central Organizer Desk Controller
-// Tabler UI High-Performance Engine with Instant Cache, Offcanvas & Gatekeeper
-
-
+// Linear / Vercel 2026 Dark Operations Theme with Instant Cache, Real Activity Analytics & Offcanvas
 
 let allParticipants = [];
 let currentFiltered = [];
@@ -16,6 +14,11 @@ let pageSize = 50;
 // Bootstrap modal and offcanvas instances
 let offcanvasInstance = null;
 let bookmarkletModalInstance = null;
+let tokenHealthModalInstance = null;
+
+// Chart state
+let overviewChartInstance = null;
+let currentChartMode = 'timeline'; // 'timeline' or 'events'
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -48,6 +51,11 @@ function setTheme(theme) {
       icon.setAttribute('title', 'Switch to dark mode');
     }
   }
+
+  // Re-render chart on theme change to update colors
+  if (allParticipants.length > 0) {
+    renderEventOverviewChart(allParticipants, summaryData);
+  }
 }
 
 function toggleTheme() {
@@ -57,10 +65,11 @@ function toggleTheme() {
 
 function setupKeyboardShortcuts() {
   window.addEventListener('keydown', (e) => {
-    // Escape closes offcanvas drawer
+    // Escape closes offcanvas drawer or modals
     if (e.key === 'Escape') {
       closeDrawer();
       closeBookmarkletModal();
+      closeTokenHealthModal();
     }
     // "/" focuses search input if not inside another text input
     if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
@@ -140,6 +149,7 @@ async function loadData() {
     updateCategoryCounts(allParticipants);
     updatePaymentFilterCounts(allParticipants);
     applyFilters();
+    renderEventOverviewChart(allParticipants, summaryData);
 
     const timestampEl = document.getElementById('syncTimestamp');
     if (timestampEl) {
@@ -186,9 +196,48 @@ function renderTokenExpiry(summary) {
     bannerContainer.remove();
   }
 
-  if (tokenText) tokenText.textContent = 'Cloud Sync: Active';
-  if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-green me-1.5';
-  if (tokenBadge) tokenBadge.className = 'badge bg-green-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace text-green';
+  const expiry = summary.token_expires_at;
+  if (expiry) {
+    const expDate = new Date(expiry);
+    const now = new Date();
+    const diffHours = Math.round((expDate - now) / (1000 * 60 * 60));
+    if (tokenText) {
+      tokenText.textContent = diffHours > 0 ? `Token: ${diffHours}h left` : 'Token: Active';
+    }
+    if (tokenBadge) {
+      tokenBadge.setAttribute('title', `Unstop OAuth: Valid until ${expDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST • Click to view health`);
+    }
+  } else {
+    if (tokenText) tokenText.textContent = 'Token: Active';
+  }
+
+  if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-green me-1';
+}
+
+function openTokenHealthModal() {
+  const modalEl = document.getElementById('tokenHealthModal');
+  if (!modalEl) return;
+  if (window.bootstrap && window.bootstrap.Modal) {
+    if (!tokenHealthModalInstance) {
+      tokenHealthModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    }
+    tokenHealthModalInstance.show();
+  } else {
+    modalEl.classList.add('show');
+    modalEl.style.display = 'block';
+  }
+}
+
+function closeTokenHealthModal() {
+  const modalEl = document.getElementById('tokenHealthModal');
+  if (!modalEl) return;
+  if (window.bootstrap && window.bootstrap.Modal) {
+    const inst = bootstrap.Modal.getInstance(modalEl);
+    if (inst) inst.hide();
+  } else {
+    modalEl.classList.remove('show');
+    modalEl.style.display = 'none';
+  }
 }
 
 /**
@@ -196,7 +245,7 @@ function renderTokenExpiry(summary) {
  */
 function renderSummary(summary, participants) {
   const totalVerified = participants.length;
-  const totalApplicants = summary.total_unstop_registrations || 3501;
+  const totalApplicants = summary.total_unstop_registrations || 3549;
   const colleges = new Set(participants.map(p => p.college).filter(c => c && c !== 'N/A'));
   
   const totalEvents = summary.total_events_scanned || (summary.events_list ? summary.events_list.length : 62);
@@ -237,6 +286,184 @@ function renderSummary(summary, participants) {
 
   const subColleges = document.getElementById('subColleges');
   if (subColleges) subColleges.textContent = `PAN-India (${colleges.size} Colleges)`;
+}
+
+/**
+ * Event Overview Real-Data Chart (Chart.js 4.4)
+ */
+function switchOverviewChart(mode) {
+  currentChartMode = mode;
+  const btnTimeline = document.getElementById('chartViewTimelineBtn');
+  const btnEvents = document.getElementById('chartViewEventsBtn');
+
+  if (btnTimeline) {
+    if (mode === 'timeline') btnTimeline.classList.add('active');
+    else btnTimeline.classList.remove('active');
+  }
+  if (btnEvents) {
+    if (mode === 'events') btnEvents.classList.add('active');
+    else btnEvents.classList.remove('active');
+  }
+
+  renderEventOverviewChart(allParticipants, summaryData);
+}
+
+function renderEventOverviewChart(participants, summary) {
+  const canvas = document.getElementById('overviewChartCanvas');
+  if (!canvas || !window.Chart) return;
+
+  const isDark = (document.body.getAttribute('data-bs-theme') || 'dark') === 'dark';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+  const textColor = isDark ? '#94a3b8' : '#64748b';
+
+  if (overviewChartInstance) {
+    overviewChartInstance.destroy();
+    overviewChartInstance = null;
+  }
+
+  const ctx = canvas.getContext('2d');
+
+  if (currentChartMode === 'timeline') {
+    // Process real registration timestamps
+    const dateCounts = {};
+    participants.forEach(p => {
+      if (p.registered_at) {
+        const d = p.registered_at.substring(0, 10);
+        dateCounts[d] = (dateCounts[d] || 0) + 1;
+      }
+    });
+
+    const sortedDates = Object.keys(dateCounts).sort();
+    const labels = sortedDates.map(d => {
+      const parts = d.split('-');
+      if (parts.length === 3) {
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const m = parseInt(parts[1], 10) - 1;
+        return `${monthNames[m] || parts[1]} ${parts[2]}`;
+      }
+      return d;
+    });
+
+    const counts = sortedDates.map(d => dateCounts[d]);
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, isDark ? 'rgba(56, 189, 248, 0.35)' : 'rgba(2, 132, 199, 0.25)');
+    gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+    overviewChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Registrations',
+          data: counts,
+          borderColor: '#38bdf8',
+          borderWidth: 2,
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: isDark ? '#090a0f' : '#ffffff',
+          pointBorderWidth: 1.5,
+          pointRadius: 3.5,
+          pointHoverRadius: 6,
+          fill: true,
+          backgroundColor: gradient,
+          tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDark ? '#141824' : '#ffffff',
+            titleColor: isDark ? '#f8fafc' : '#0f172a',
+            bodyColor: isDark ? '#94a3b8' : '#475569',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 6,
+            displayColors: false,
+            callbacks: {
+              label: function(context) {
+                return ` ${context.parsed.y} verified entries`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 } }
+          },
+          y: {
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 }, precision: 0 }
+          }
+        }
+      }
+    });
+
+  } else {
+    // Process top 8 competitions
+    const eventCounts = {};
+    participants.forEach(p => {
+      const ev = (p.event_name || 'Event').trim();
+      eventCounts[ev] = (eventCounts[ev] || 0) + 1;
+    });
+
+    const sortedEvents = Object.keys(eventCounts)
+      .sort((a, b) => eventCounts[b] - eventCounts[a])
+      .slice(0, 8);
+
+    const labels = sortedEvents.map(e => e.length > 20 ? e.substring(0, 18) + '...' : e);
+    const counts = sortedEvents.map(e => eventCounts[e]);
+
+    overviewChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Verified Entries',
+          data: counts,
+          backgroundColor: isDark ? 'rgba(56, 189, 248, 0.75)' : 'rgba(2, 132, 199, 0.75)',
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDark ? '#141824' : '#ffffff',
+            titleColor: isDark ? '#f8fafc' : '#0f172a',
+            bodyColor: isDark ? '#94a3b8' : '#475569',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 6,
+            displayColors: false,
+            callbacks: {
+              label: function(context) {
+                return ` ${context.parsed.y} verified entries`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: textColor, font: { family: 'Inter', size: 10.5 } }
+          },
+          y: {
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 }, precision: 0 }
+          }
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -292,9 +519,9 @@ function setPaymentFilter(type) {
     const el = document.getElementById(b.id);
     if (!el) return;
     if (b.val === type) {
-      el.className = 'btn btn-primary fw-semibold';
+      el.classList.add('active');
     } else {
-      el.className = 'btn btn-outline-secondary';
+      el.classList.remove('active');
     }
   });
 
@@ -323,7 +550,6 @@ function populateEventFilter(participants, summary) {
   if (!select) return;
   const selectedVal = select.value;
 
-  // Compute verified counts from participants
   const eventCounts = {};
   participants.forEach(p => {
     const evName = (p.event_name || 'Event').trim();
@@ -349,14 +575,12 @@ function populateEventFilter(participants, summary) {
       return (eventCounts[t] !== undefined ? eventCounts[t] : (e.paid_registrations || 0)) === 0;
     });
 
-    // Sort eventsWithEntries by verified count descending
     eventsWithEntries.sort((a, b) => {
       const cntA = eventCounts[(a.title || '').trim()] || a.paid_registrations || 0;
       const cntB = eventCounts[(b.title || '').trim()] || b.paid_registrations || 0;
       return cntB - cntA;
     });
 
-    // Sort eventsAwaiting by total unstop registrations descending
     eventsAwaiting.sort((a, b) => (b.total_registrations || 0) - (a.total_registrations || 0));
 
     const defaultOpt = document.createElement('option');
@@ -397,7 +621,6 @@ function populateEventFilter(participants, summary) {
     }
 
   } else {
-    // Fallback if master list not available
     const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
     select.innerHTML = `<option value="">All Competitions (${sortedEvents.length} Active)</option>`;
     sortedEvents.forEach(ev => {
@@ -428,58 +651,54 @@ function populateCollegeFilter(participants) {
 
 function applyFilters() {
   const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-  const event = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
-  const college = document.getElementById('collegeFilter') ? document.getElementById('collegeFilter').value : '';
-  const sort = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'date-desc';
+  const selectedEvent = (document.getElementById('eventFilter').value || '').trim();
+  const selectedCollege = (document.getElementById('collegeFilter').value || '').trim();
+  const sortBy = document.getElementById('sortSelect').value || 'date-desc';
 
-  const filterTag = document.getElementById('filterTag');
-  if (query || event || college || currentCategory !== 'all' || currentPaymentFilter !== 'all') {
-    if (filterTag) filterTag.classList.remove('d-none');
-  } else {
-    if (filterTag) filterTag.classList.add('d-none');
-  }
-
-  let filtered = allParticipants.filter(p => {
-    // Payment filter
-    const amt = Number(p.amount) || 0;
-    if (currentPaymentFilter === 'paid' && amt <= 0) return false;
-    if (currentPaymentFilter === 'free' && amt > 0) return false;
-
-    // Track tab filter
+  currentFiltered = allParticipants.filter(p => {
+    // 1. Category Filter
     if (currentCategory !== 'all') {
-      const pType = (p.event_type || 'competitions').toLowerCase();
-      if (currentCategory === 'quizzes' && !pType.includes('quiz')) return false;
-      if (currentCategory === 'hackathons' && !pType.includes('hack')) return false;
-      if (currentCategory === 'cultural' && !pType.includes('cultur') && !pType.includes('jam')) return false;
-      if (currentCategory === 'competitions' && (pType.includes('quiz') || pType.includes('hack') || pType.includes('cultur'))) return false;
+      const t = (p.event_type || 'competitions').toLowerCase();
+      if (currentCategory === 'quizzes' && !t.includes('quiz')) return false;
+      if (currentCategory === 'hackathons' && !t.includes('hack')) return false;
+      if (currentCategory === 'cultural' && !t.includes('cultur')) return false;
+      if (currentCategory === 'competitions' && (t.includes('quiz') || t.includes('hack') || t.includes('cultur'))) return false;
     }
 
-    // Event filter
-    if (event && p.event_name !== event && String(p.event_id) !== event) {
+    // 2. Payment Filter
+    if (currentPaymentFilter === 'paid') {
+      if (Number(p.amount) <= 0) return false;
+    } else if (currentPaymentFilter === 'free') {
+      if (Number(p.amount) > 0) return false;
+    }
+
+    // 3. Specific Event Dropdown
+    if (selectedEvent && (p.event_name || '').trim() !== selectedEvent) {
       return false;
     }
 
-    // College filter
-    if (college && p.college !== college) {
+    // 4. Specific College Dropdown
+    if (selectedCollege && (p.college || '').trim() !== selectedCollege) {
       return false;
     }
 
-    // Search query
+    // 5. Global Search query
     if (query) {
       const matchName = (p.name || '').toLowerCase().includes(query);
       const matchEmail = (p.email || '').toLowerCase().includes(query);
       const matchPhone = (p.phone || '').toLowerCase().includes(query);
       const matchCollege = (p.college || '').toLowerCase().includes(query);
-      const matchTeam = (p.team_name || '').toLowerCase().includes(query);
       const matchEvent = (p.event_name || '').toLowerCase().includes(query);
-      const matchPayId = (p.payment_id || '').toLowerCase().includes(query);
+      const matchTeam = (p.team_name || '').toLowerCase().includes(query);
+      const matchId = (p.id || '').toLowerCase().includes(query);
+
       const matchMembers = (p.team_members || []).some(m => 
-        (m.name || '').toLowerCase().includes(query) || 
+        (m.name || '').toLowerCase().includes(query) ||
         (m.email || '').toLowerCase().includes(query) ||
         (m.phone || '').toLowerCase().includes(query)
       );
 
-      if (!matchName && !matchEmail && !matchPhone && !matchCollege && !matchTeam && !matchEvent && !matchPayId && !matchMembers) {
+      if (!matchName && !matchEmail && !matchPhone && !matchCollege && !matchEvent && !matchTeam && !matchId && !matchMembers) {
         return false;
       }
     }
@@ -488,36 +707,62 @@ function applyFilters() {
   });
 
   // Sorting
-  filtered.sort((a, b) => {
-    if (sort === 'date-desc') {
+  currentFiltered.sort((a, b) => {
+    if (sortBy === 'date-desc') {
       return new Date(b.registered_at || 0) - new Date(a.registered_at || 0);
-    } else if (sort === 'date-asc') {
+    }
+    if (sortBy === 'date-asc') {
       return new Date(a.registered_at || 0) - new Date(b.registered_at || 0);
-    } else if (sort === 'event-asc') {
-      return (a.event_name || '').localeCompare(b.event_name || '');
-    } else if (sort === 'name-asc') {
+    }
+    if (sortBy === 'name-asc') {
       return (a.name || '').localeCompare(b.name || '');
-    } else if (sort === 'amount-desc') {
+    }
+    if (sortBy === 'event-asc') {
+      return (a.event_name || '').localeCompare(b.event_name || '');
+    }
+    if (sortBy === 'amount-desc') {
       return (Number(b.amount) || 0) - (Number(a.amount) || 0);
     }
     return 0;
   });
 
-  currentFiltered = filtered;
-  renderDataViews(filtered);
+  // Toggle Clear Filter tag
+  const isFiltering = query || selectedEvent || selectedCollege || currentCategory !== 'all' || currentPaymentFilter !== 'all';
+  const filterTag = document.getElementById('filterTag');
+  if (filterTag) {
+    if (isFiltering) filterTag.classList.remove('d-none');
+    else filterTag.classList.add('d-none');
+  }
+
+  currentPage = 1;
+  renderDataViews(currentFiltered);
 }
 
 function clearSearch() {
-  document.getElementById('searchInput').value = '';
-  if (document.getElementById('eventFilter')) document.getElementById('eventFilter').value = '';
-  if (document.getElementById('collegeFilter')) document.getElementById('collegeFilter').value = '';
-  setCategoryFilter('all');
+  const sInput = document.getElementById('searchInput');
+  if (sInput) sInput.value = '';
+
+  const evFilter = document.getElementById('eventFilter');
+  if (evFilter) evFilter.value = '';
+
+  const colFilter = document.getElementById('collegeFilter');
+  if (colFilter) colFilter.value = '';
+
+  currentCategory = 'all';
+  const buttons = document.querySelectorAll('.cat-tab');
+  buttons.forEach(btn => {
+    if (btn.getAttribute('data-cat') === 'all') btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+
   setPaymentFilter('all');
 }
 
 function changePageSize() {
-  const val = document.getElementById('pageSizeSelect').value;
-  pageSize = val === 'all' ? 99999 : parseInt(val, 10);
+  const select = document.getElementById('pageSizeSelect');
+  if (!select) return;
+  const val = select.value;
+  pageSize = val === 'all' ? 999999 : parseInt(val, 10);
   currentPage = 1;
   renderDataViews(currentFiltered);
 }
@@ -526,21 +771,21 @@ function prevPage() {
   if (currentPage > 1) {
     currentPage--;
     renderDataViews(currentFiltered);
-    window.scrollTo({ top: 220, behavior: 'smooth' });
+    window.scrollTo({ top: 380, behavior: 'smooth' });
   }
 }
 
 function nextPage() {
-  const totalPages = Math.ceil(currentFiltered.length / pageSize);
+  const totalPages = Math.max(1, Math.ceil(currentFiltered.length / pageSize));
   if (currentPage < totalPages) {
     currentPage++;
     renderDataViews(currentFiltered);
-    window.scrollTo({ top: 220, behavior: 'smooth' });
+    window.scrollTo({ top: 380, behavior: 'smooth' });
   }
 }
 
 /**
- * Render Both Desktop Table & Mobile Cards Feed
+ * Render High-Density Desktop Table and Mobile Cards Feed
  */
 function renderDataViews(participants) {
   const tableBody = document.getElementById('tableBody');
@@ -561,7 +806,7 @@ function renderDataViews(participants) {
       const selectedEvent = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
       const eventObj = summaryData && summaryData.events_list ? summaryData.events_list.find(e => (e.title || '').trim() === (selectedEvent || '').trim()) : null;
       
-      const emptyTitle = emptyState.querySelector('h3');
+      const emptyTitle = emptyState.querySelector('h4');
       const emptyDesc = emptyState.querySelector('p');
       if (selectedEvent && eventObj && (eventObj.paid_registrations || 0) === 0) {
         if (emptyTitle) emptyTitle.textContent = `No Verified Paid Entries for "${selectedEvent}" Yet`;
@@ -615,47 +860,43 @@ function renderDataViews(participants) {
 
       const hasMembers = p.team_members && p.team_members.length > 0;
       const teamBadge = hasMembers 
-        ? `<button onclick="openDrawer('${p.id}')" class="btn btn-sm btn-outline-info py-0 px-2 d-inline-flex align-items-center">
+        ? `<button onclick="openDrawer('${p.id}')" class="btn btn-sm btn-outline-info py-0 px-1.5 d-inline-flex align-items-center" style="font-size: 11px; height: 22px;">
             <i class="ti ti-users me-1"></i> ${p.team_members.length} Members
            </button>`
-        : `<span class="badge bg-secondary-lt text-secondary">Solo Entry</span>`;
+        : `<span class="tag-track text-secondary" style="font-size: 10.5px;">Solo</span>`;
 
-      // Category styling in Tabler
-      let catPill = 'badge bg-azure-lt';
+      let trackClass = 'tag-track';
       const evType = (p.event_type || '').toLowerCase();
-      if (evType.includes('quiz')) catPill = 'badge bg-warning-lt';
-      else if (evType.includes('hack')) catPill = 'badge bg-purple-lt';
-      else if (evType.includes('cultur')) catPill = 'badge bg-pink-lt';
+      if (evType.includes('quiz')) trackClass = 'tag-track text-warning';
+      else if (evType.includes('hack')) trackClass = 'tag-track text-purple';
 
       const amt = Number(p.amount) || 0;
       const paymentBlock = amt > 0
-        ? `<span class="badge bg-success-lt fw-bold">
-            <i class="ti ti-check me-1"></i> Paid ₹${amt.toLocaleString('en-IN')}
+        ? `<span class="tag-track tag-paid">
+            <i class="ti ti-check me-0.5"></i> Paid ₹${amt.toLocaleString('en-IN')}
            </span>`
-        : `<span class="badge bg-secondary-lt text-secondary">
-            <i class="ti ti-shield-check me-1 text-info"></i> Free Entry
+        : `<span class="tag-track tag-free">
+            Free Entry
            </span>`;
 
       return `
-        <tr class="cursor-pointer" onclick="openDrawer('${p.id}')">
+        <tr onclick="openDrawer('${p.id}')">
           <!-- Index -->
-          <td class="text-center font-monospace text-secondary small select-none">
+          <td class="text-center font-monospace text-secondary" style="font-size: 11.5px;">
             ${absoluteIndex}
           </td>
 
           <!-- Participant -->
           <td>
-            <div class="d-flex align-items-center">
-              <span class="avatar avatar-sm rounded-circle bg-primary-lt text-primary fw-bold font-monospace me-2">
-                ${initials}
-              </span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="user-avatar-sm">${initials}</span>
               <div class="min-w-0">
-                <div class="fw-bold text-reset">${escapeHtml(p.name || 'Participant')}</div>
-                <div class="text-secondary small d-flex align-items-center gap-1 font-monospace mt-0.5" onclick="event.stopPropagation()">
-                  <span class="text-truncate" style="max-width: 170px;">${escapeHtml(p.email || '')}</span>
+                <div class="fw-semibold text-reset text-truncate" style="max-width: 190px;">${escapeHtml(p.name || 'Participant')}</div>
+                <div class="text-secondary font-monospace d-flex align-items-center gap-1 mt-0.5" style="font-size: 11px;" onclick="event.stopPropagation()">
+                  <span class="text-truncate" style="max-width: 155px;">${escapeHtml(p.email || '')}</span>
                   ${p.email && p.email !== 'N/A' ? `
-                    <button type="button" onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="btn btn-sm btn-icon btn-ghost-secondary p-0 border-0" style="width: 18px; height: 18px;">
-                      <i class="ti ti-copy" style="font-size: 11px;"></i>
+                    <button type="button" onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="btn btn-icon btn-ghost-secondary p-0 border-0" style="width: 15px; height: 15px;">
+                      <i class="ti ti-copy" style="font-size: 10px;"></i>
                     </button>
                   ` : ''}
                 </div>
@@ -663,45 +904,45 @@ function renderDataViews(participants) {
             </div>
           </td>
 
-          <!-- Contact (Phone + WhatsApp) -->
+          <!-- Contact (Phone + WhatsApp + Call) -->
           <td onclick="event.stopPropagation()">
             ${p.phone && p.phone !== 'N/A' ? `
-              <div class="d-flex align-items-center gap-1 font-monospace text-secondary small">
+              <div class="d-flex align-items-center gap-1 font-monospace text-secondary" style="font-size: 11.5px;">
                 <span>${escapeHtml(p.phone)}</span>
                 ${waLink ? `
-                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="btn btn-sm btn-icon btn-ghost-success p-0 border-0" style="width: 22px; height: 22px;">
-                    <i class="ti ti-brand-whatsapp text-success" style="font-size: 15px;"></i>
+                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="btn btn-icon btn-ghost-success p-0 border-0 ms-1" style="width: 20px; height: 20px;">
+                    <i class="ti ti-brand-whatsapp text-success" style="font-size: 14px;"></i>
                   </a>
                 ` : ''}
                 ${telLink ? `
-                  <a href="${telLink}" title="Call" class="btn btn-sm btn-icon btn-ghost-secondary p-0 border-0" style="width: 20px; height: 20px;">
-                    <i class="ti ti-phone text-secondary" style="font-size: 13px;"></i>
+                  <a href="${telLink}" title="Call" class="btn btn-icon btn-ghost-secondary p-0 border-0" style="width: 18px; height: 18px;">
+                    <i class="ti ti-phone text-secondary" style="font-size: 12px;"></i>
                   </a>
                 ` : ''}
               </div>
-            ` : `<span class="text-secondary font-monospace">--</span>`}
+            ` : `<span class="text-secondary font-monospace" style="font-size: 11.5px;">--</span>`}
           </td>
 
           <!-- College & Branch -->
           <td>
-            <div class="fw-semibold text-truncate" style="max-width: 220px;" title="${escapeHtml(p.college)}">
+            <div class="fw-medium text-truncate text-reset" style="max-width: 210px; font-size: 12.5px;" title="${escapeHtml(p.college)}">
               ${escapeHtml(p.college || 'N/A')}
             </div>
             ${p.specialization ? `
-              <div class="text-secondary small text-truncate mt-0.5" style="max-width: 220px;">
+              <div class="text-secondary text-truncate mt-0.5 font-monospace" style="max-width: 210px; font-size: 11px;">
                 <span>${escapeHtml(p.specialization)}</span>
-                ${p.passing_year ? `<span class="text-secondary font-monospace">• ${p.passing_year}</span>` : ''}
+                ${p.passing_year ? `<span class="opacity-75">• ${p.passing_year}</span>` : ''}
               </div>
             ` : ''}
           </td>
 
           <!-- Event & Track -->
           <td>
-            <div class="fw-semibold text-truncate" style="max-width: 180px;" title="${escapeHtml(p.event_name)}">
+            <div class="fw-medium text-truncate text-reset" style="max-width: 170px; font-size: 12.5px;" title="${escapeHtml(p.event_name)}">
               ${escapeHtml(p.event_name || 'Event')}
             </div>
             <div class="mt-1">
-              <span class="${catPill} text-uppercase">
+              <span class="${trackClass}">
                 ${escapeHtml(p.event_type || 'Competition')}
               </span>
             </div>
@@ -709,7 +950,7 @@ function renderDataViews(participants) {
 
           <!-- Team Status -->
           <td onclick="event.stopPropagation()">
-            <div class="text-secondary small fw-medium text-truncate mb-1" style="max-width: 120px;" title="${escapeHtml(p.team_name)}">
+            <div class="text-secondary text-truncate mb-1" style="max-width: 120px; font-size: 11.5px;" title="${escapeHtml(p.team_name)}">
               ${escapeHtml(p.team_name || 'Individual')}
             </div>
             <div>
@@ -717,16 +958,16 @@ function renderDataViews(participants) {
             </div>
           </td>
 
-          <!-- Fee / Payment -->
+          <!-- Fee / Status -->
           <td>
             ${paymentBlock}
           </td>
 
           <!-- Action -->
           <td class="text-end" onclick="event.stopPropagation()">
-            <button onclick="openDrawer('${p.id}')" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center">
+            <button onclick="openDrawer('${p.id}')" class="btn-view-action d-inline-flex align-items-center">
               <span>View</span>
-              <i class="ti ti-chevron-right ms-1"></i>
+              <i class="ti ti-chevron-right ms-0.5" style="font-size: 12px;"></i>
             </button>
           </td>
         </tr>
@@ -739,7 +980,6 @@ function renderDataViews(participants) {
   // 2. Render Mobile Cards Feed (For Phones)
   if (mobileContainer) {
     const mobileCardsHtml = pageItems.map((p, idx) => {
-      const absoluteIndex = startIndex + idx + 1;
       const initials = (p.name || 'P')
         .split(' ')
         .filter(Boolean)
@@ -754,62 +994,58 @@ function renderDataViews(participants) {
 
       const amt = Number(p.amount) || 0;
       const feePill = amt > 0
-        ? `<span class="badge bg-success-lt fw-bold">₹${amt} Paid</span>`
-        : `<span class="badge bg-secondary-lt text-secondary">Free Entry</span>`;
+        ? `<span class="tag-track tag-paid">₹${amt} Paid</span>`
+        : `<span class="tag-track tag-free">Free Entry</span>`;
 
-      let trackPill = 'badge bg-azure-lt';
+      let trackClass = 'tag-track';
       const evType = (p.event_type || '').toLowerCase();
-      if (evType.includes('quiz')) trackPill = 'badge bg-warning-lt';
-      else if (evType.includes('hack')) trackPill = 'badge bg-purple-lt';
+      if (evType.includes('quiz')) trackClass = 'tag-track text-warning';
+      else if (evType.includes('hack')) trackClass = 'tag-track text-purple';
 
       return `
-        <div class="card mb-2 shadow-sm cursor-pointer" onclick="openDrawer('${p.id}')">
-          <div class="card-body p-3">
-            <!-- Header -->
-            <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-              <div class="d-flex align-items-center gap-2 min-w-0">
-                <span class="avatar avatar-sm rounded-3 bg-primary-lt text-primary fw-bold font-monospace">
-                  ${initials}
-                </span>
-                <div class="min-w-0">
-                  <div class="fw-bold text-reset text-truncate">${escapeHtml(p.name)}</div>
-                  <div class="text-secondary small font-monospace text-truncate">${escapeHtml(p.phone || p.email)}</div>
-                </div>
-              </div>
-              <div class="flex-shrink-0">
-                ${feePill}
+        <div class="mobile-attendee-card cursor-pointer" onclick="openDrawer('${p.id}')">
+          <!-- Top Row -->
+          <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+              <span class="user-avatar-sm" style="width: 28px; height: 28px; font-size: 11.5px;">${initials}</span>
+              <div class="min-w-0">
+                <div class="fw-semibold text-reset text-truncate" style="font-size: 13px;">${escapeHtml(p.name)}</div>
+                <div class="text-secondary font-monospace text-truncate" style="font-size: 11px;">${escapeHtml(p.phone || p.email)}</div>
               </div>
             </div>
+            <div class="flex-shrink-0">
+              ${feePill}
+            </div>
+          </div>
 
-            <!-- Event & Track -->
-            <div class="bg-body-tertiary p-2.5 rounded border mb-2 small">
-              <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
-                <span class="fw-semibold text-truncate">${escapeHtml(p.event_name)}</span>
-                <span class="${trackPill} text-uppercase">${escapeHtml(p.event_type || 'Event')}</span>
-              </div>
-              <div class="text-secondary text-truncate">${escapeHtml(p.college || 'SLIET')}</div>
+          <!-- Event & College Details -->
+          <div class="p-2 rounded border mb-2" style="background: var(--tf-bg-well); border-color: var(--tf-border-subtle) !important; font-size: 12px;">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+              <span class="fw-medium text-truncate text-reset">${escapeHtml(p.event_name)}</span>
+              <span class="${trackClass}">${escapeHtml(p.event_type || 'Event')}</span>
+            </div>
+            <div class="text-secondary text-truncate" style="font-size: 11.5px;">${escapeHtml(p.college || 'SLIET')}</div>
+          </div>
+
+          <!-- Contact & View Details -->
+          <div class="d-flex align-items-center justify-content-between pt-1.5 border-top" style="border-color: var(--tf-border-subtle) !important;" onclick="event.stopPropagation()">
+            <div class="d-flex gap-1.5">
+              ${waLink ? `
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success py-0.5 px-2 d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                  <i class="ti ti-brand-whatsapp"></i> WhatsApp
+                </a>
+              ` : ''}
+              ${telLink ? `
+                <a href="${telLink}" class="btn btn-sm btn-icon btn-outline-secondary" style="width: 24px; height: 24px;">
+                  <i class="ti ti-phone" style="font-size: 11px;"></i>
+                </a>
+              ` : ''}
             </div>
 
-            <!-- Bottom Actions -->
-            <div class="d-flex align-items-center justify-content-between pt-2 border-top" onclick="event.stopPropagation()">
-              <div class="d-flex gap-1">
-                ${waLink ? `
-                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success d-inline-flex align-items-center">
-                    <i class="ti ti-brand-whatsapp me-1"></i> WhatsApp
-                  </a>
-                ` : ''}
-                ${telLink ? `
-                  <a href="${telLink}" class="btn btn-sm btn-icon btn-outline-secondary">
-                    <i class="ti ti-phone text-secondary"></i>
-                  </a>
-                ` : ''}
-              </div>
-
-              <button onclick="openDrawer('${p.id}')" class="btn btn-sm btn-primary d-inline-flex align-items-center">
-                <span>View Details</span>
-                <i class="ti ti-arrow-right ms-1"></i>
-              </button>
-            </div>
+            <button onclick="openDrawer('${p.id}')" class="btn-view-action d-inline-flex align-items-center">
+              <span>Details</span>
+              <i class="ti ti-arrow-right ms-1" style="font-size: 11px;"></i>
+            </button>
           </div>
         </div>
       `;
@@ -846,45 +1082,41 @@ function openDrawer(participantId) {
 
   const amt = Number(p.amount) || 0;
   const paymentBadge = amt > 0
-    ? `<div class="card card-sm mb-3 border-success-subtle bg-success-lt shadow-sm">
-        <div class="card-body p-3">
-          <div class="text-uppercase tracking-wider fw-bold text-success small">Payment Status</div>
-          <div class="h3 fw-bold my-1 text-success d-flex align-items-center gap-1.5">
-            <i class="ti ti-check fs-2"></i>
-            <span>Paid ₹${amt.toLocaleString('en-IN')} (Gateway Confirmed)</span>
-          </div>
-          <div class="text-secondary small font-monospace user-select-all mt-1">Reference: ${escapeHtml(p.payment_id)}</div>
+    ? `<div class="p-3 rounded border mb-3" style="background: var(--tf-accent-green-dim); border-color: rgba(16, 185, 129, 0.25) !important;">
+        <div class="text-uppercase tracking-wider fw-bold text-success" style="font-size: 10px;">Payment Status</div>
+        <div class="fw-bold my-1 text-success d-flex align-items-center gap-1.5" style="font-size: 15px;">
+          <i class="ti ti-check fs-2"></i>
+          <span>Paid ₹${amt.toLocaleString('en-IN')} (Gateway Confirmed)</span>
         </div>
+        <div class="text-secondary small font-monospace user-select-all mt-1" style="font-size: 11px;">Reference: ${escapeHtml(p.payment_id)}</div>
        </div>`
-    : `<div class="card card-sm mb-3 border-info-subtle bg-info-lt shadow-sm">
-        <div class="card-body p-3">
-          <div class="text-uppercase tracking-wider fw-bold text-info small">Registration Status</div>
-          <div class="h3 fw-semibold my-1 text-info d-flex align-items-center gap-1.5">
-            <i class="ti ti-shield-check fs-2"></i>
-            <span>Free Competition Entry (Form Verified)</span>
-          </div>
-          <div class="text-secondary small font-monospace user-select-all mt-1">Unstop Entry ID: ${escapeHtml(p.id)}</div>
+    : `<div class="p-3 rounded border mb-3" style="background: rgba(255, 255, 255, 0.03); border-color: var(--tf-border-subtle) !important;">
+        <div class="text-uppercase tracking-wider fw-bold text-info" style="font-size: 10px;">Registration Status</div>
+        <div class="fw-semibold my-1 text-info d-flex align-items-center gap-1.5" style="font-size: 15px;">
+          <i class="ti ti-shield-check fs-2"></i>
+          <span>Free Competition Entry (Form Verified)</span>
         </div>
+        <div class="text-secondary small font-monospace user-select-all mt-1" style="font-size: 11px;">Unstop Entry ID: ${escapeHtml(p.id)}</div>
        </div>`;
 
   const membersHtml = (p.team_members && p.team_members.length > 0)
     ? p.team_members.map((m, idx) => `
-        <div class="list-group-item p-3">
+        <div class="p-2.5 rounded border mb-2" style="background: var(--tf-bg-well); border-color: var(--tf-border-subtle) !important;">
           <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="fw-bold text-reset d-flex align-items-center gap-1.5">
+            <div class="fw-semibold text-reset d-flex align-items-center gap-1.5" style="font-size: 12.5px;">
               <span>${idx + 1}. ${escapeHtml(m.name || 'Member')}</span>
-              ${idx === 0 ? `<span class="badge bg-green-lt text-green font-monospace ms-1">LEADER</span>` : ''}
+              ${idx === 0 ? `<span class="tag-track tag-paid ms-1" style="font-size: 9.5px;">LEADER</span>` : ''}
             </div>
-            <div class="text-secondary small text-truncate" style="max-width: 180px;" title="${escapeHtml(m.college || '')}">
+            <div class="text-secondary small text-truncate" style="max-width: 170px; font-size: 11.5px;" title="${escapeHtml(m.college || '')}">
               ${escapeHtml(m.college || '')}
             </div>
           </div>
-          <div class="text-secondary small font-monospace user-select-all">
+          <div class="text-secondary font-monospace user-select-all" style="font-size: 11px;">
             ${escapeHtml(m.email || '')} ${m.phone ? `• ${m.phone}` : ''}
           </div>
         </div>
       `).join('')
-    : `<div class="p-3 text-secondary text-center fst-italic">
+    : `<div class="p-3 text-secondary text-center fst-italic" style="font-size: 12px;">
         Solo Registration (Individual Participant)
        </div>`;
 
@@ -894,21 +1126,21 @@ function openDrawer(participantId) {
     <div class="row g-2 mb-3">
       ${waLink ? `
         <div class="col">
-          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success w-100 d-inline-flex align-items-center justify-content-center">
-            <i class="ti ti-brand-whatsapp me-1"></i> WhatsApp Leader
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-contact w-100">
+            <i class="ti ti-brand-whatsapp"></i> WhatsApp Leader
           </a>
         </div>
       ` : ''}
       ${mailLink ? `
         <div class="col">
-          <a href="${mailLink}" class="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center">
-            <i class="ti ti-mail me-1"></i> Send Email
+          <a href="${mailLink}" class="btn btn-outline-primary btn-contact w-100">
+            <i class="ti ti-mail"></i> Send Email
           </a>
         </div>
       ` : ''}
       ${telLink ? `
         <div class="col-auto">
-          <a href="${telLink}" class="btn btn-icon btn-outline-secondary" title="Call">
+          <a href="${telLink}" class="btn btn-icon btn-outline-secondary btn-contact" style="width: 32px;" title="Call">
             <i class="ti ti-phone"></i>
           </a>
         </div>
@@ -919,68 +1151,66 @@ function openDrawer(participantId) {
     ${paymentBadge}
 
     <!-- Candidate Profile Section -->
-    <div class="card mb-3 shadow-sm">
-      <div class="card-header py-2.5">
-        <h4 class="card-title fs-4 mb-0 d-flex align-items-center">
-          <i class="ti ti-user me-2 text-primary"></i> Candidate Profile
-        </h4>
+    <div class="drawer-card mb-3">
+      <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom" style="border-color: var(--tf-border-subtle) !important;">
+        <i class="ti ti-user text-primary" style="font-size: 14px;"></i>
+        <span class="fw-semibold text-reset" style="font-size: 13px;">Candidate Profile</span>
       </div>
-      <div class="card-body p-0">
-        <table class="table table-sm table-vcenter card-table table-borderless">
-          <tbody>
+      <table class="drawer-table">
+        <tbody>
+          <tr>
+            <td>Candidate Name:</td>
+            <td class="fw-semibold text-reset">${escapeHtml(p.name)}</td>
+          </tr>
+          <tr>
+            <td>Email Address:</td>
+            <td class="font-monospace user-select-all">${escapeHtml(p.email)}</td>
+          </tr>
+          <tr>
+            <td>Contact Number:</td>
+            <td class="font-monospace user-select-all">${escapeHtml(p.phone)}</td>
+          </tr>
+          <tr>
+            <td>College / Institute:</td>
+            <td class="fw-medium">${escapeHtml(p.college)}</td>
+          </tr>
+          ${p.specialization ? `
             <tr>
-              <td class="text-secondary" style="width: 140px;">Candidate Name:</td>
-              <td class="fw-bold text-reset">${escapeHtml(p.name)}</td>
+              <td>Course / Branch:</td>
+              <td>${escapeHtml(p.specialization)}</td>
             </tr>
+          ` : ''}
+          ${p.passing_year ? `
             <tr>
-              <td class="text-secondary">Email Address:</td>
-              <td class="font-monospace user-select-all">${escapeHtml(p.email)}</td>
+              <td>Graduation Year:</td>
+              <td class="font-monospace">${escapeHtml(p.passing_year)}</td>
             </tr>
-            <tr>
-              <td class="text-secondary">Contact Number:</td>
-              <td class="font-monospace user-select-all">${escapeHtml(p.phone)}</td>
-            </tr>
-            <tr>
-              <td class="text-secondary">College / Institute:</td>
-              <td class="fw-medium">${escapeHtml(p.college)}</td>
-            </tr>
-            ${p.specialization ? `
-              <tr>
-                <td class="text-secondary">Course / Branch:</td>
-                <td>${escapeHtml(p.specialization)}</td>
-              </tr>
-            ` : ''}
-            ${p.passing_year ? `
-              <tr>
-                <td class="text-secondary">Graduation Year:</td>
-                <td class="font-monospace">${escapeHtml(p.passing_year)}</td>
-              </tr>
-            ` : ''}
-            <tr>
-              <td class="text-secondary">Registration Date:</td>
-              <td>${p.registered_at ? new Date(p.registered_at).toLocaleString('en-IN') : 'N/A'}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          ` : ''}
+          <tr>
+            <td>Registration Date:</td>
+            <td class="font-monospace">${p.registered_at ? new Date(p.registered_at).toLocaleString('en-IN') : 'N/A'}</td>
+          </tr>
+        </tbody>
+      </table>
       ${p.resume_url ? `
-        <div class="card-footer py-2 text-end">
-          <a href="${p.resume_url.startsWith('http') ? p.resume_url : 'https://d8it4huxumps7.cloudfront.net/' + p.resume_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center">
-            <i class="ti ti-file-text me-1"></i> Download Uploaded Resume PDF
+        <div class="mt-3 pt-2.5 border-top text-end" style="border-color: var(--tf-border-subtle) !important;">
+          <a href="${p.resume_url.startsWith('http') ? p.resume_url : 'https://d8it4huxumps7.cloudfront.net/' + p.resume_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 py-1 px-2.5" style="font-size: 11.5px;">
+            <i class="ti ti-file-text"></i> Download Uploaded Resume PDF
           </a>
         </div>
       ` : ''}
     </div>
 
     <!-- Team Members Section -->
-    <div class="card shadow-sm">
-      <div class="card-header py-2.5 d-flex align-items-center justify-content-between">
-        <h4 class="card-title fs-4 mb-0 d-flex align-items-center">
-          <i class="ti ti-users me-2 text-azure"></i> Team Roster (${escapeHtml(p.team_name || 'Individual')})
-        </h4>
-        <span class="badge bg-secondary-lt font-monospace">${(p.team_members || []).length} registered member(s)</span>
+    <div class="drawer-card mb-0">
+      <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom" style="border-color: var(--tf-border-subtle) !important;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="ti ti-users text-azure" style="font-size: 14px;"></i>
+          <span class="fw-semibold text-reset" style="font-size: 13px;">Team Roster (${escapeHtml(p.team_name || 'Individual')})</span>
+        </div>
+        <span class="tag-track font-monospace">${(p.team_members || []).length} member(s)</span>
       </div>
-      <div class="list-group list-group-flush">
+      <div>
         ${membersHtml}
       </div>
     </div>
@@ -1017,69 +1247,73 @@ function closeDrawer() {
 
 function copyToClipboard(text, el) {
   navigator.clipboard.writeText(text).then(() => {
-    const original = el.innerHTML;
-    el.innerHTML = '<span class="text-success font-monospace" style="font-size: 10px;">Copied!</span>';
+    const origClass = el.innerHTML;
+    el.innerHTML = '<i class="ti ti-check text-success" style="font-size: 11px;"></i>';
     setTimeout(() => {
-      el.innerHTML = original;
+      el.innerHTML = origClass;
     }, 1500);
   });
 }
 
 function exportToCSV() {
-  if (!currentFiltered || currentFiltered.length === 0) {
-    alert('No records available to export.');
+  const dataToExport = currentFiltered.length > 0 ? currentFiltered : allParticipants;
+  if (!dataToExport || dataToExport.length === 0) {
+    alert('No participants available to export.');
     return;
   }
 
   const headers = [
-    'Event Name',
-    'Event Track',
     'Registration ID',
-    'Participant Name',
-    'Email',
-    'Phone',
-    'College',
-    'Specialization',
+    'Unstop ID',
+    'Candidate Name',
+    'Email Address',
+    'Phone Number',
+    'College / Institute',
+    'Branch / Specialization',
     'Passing Year',
+    'Event Name',
+    'Track / Type',
     'Team Name',
     'Team Size',
-    'Fee Paid (INR)',
-    'Payment Type',
-    'Registration Status',
-    'Registered At'
+    'Payment Status',
+    'Amount Paid (INR)',
+    'Payment Transaction ID',
+    'Registration Timestamp',
+    'Resume URL'
   ];
 
-  const csvRows = [headers.join(',')];
+  const rows = dataToExport.map(p => [
+    p.id || '',
+    p.internal_id || '',
+    p.name || '',
+    p.email || '',
+    p.phone || '',
+    p.college || '',
+    p.specialization || '',
+    p.passing_year || '',
+    p.event_name || '',
+    p.event_type || '',
+    p.team_name || 'Individual',
+    p.team_size || 1,
+    p.payment_status || 'PAID',
+    p.amount || 0,
+    p.payment_id || '',
+    p.registered_at || '',
+    p.resume_url || ''
+  ]);
 
-  currentFiltered.forEach(p => {
-    const row = [
-      p.event_name,
-      p.event_type || 'competitions',
-      p.id,
-      p.name,
-      p.email,
-      p.phone,
-      p.college,
-      p.specialization || '',
-      p.passing_year || '',
-      p.team_name,
-      p.team_size || 1,
-      p.amount || 0,
-      Number(p.amount) > 0 ? 'Gateway Paid' : 'Free Entry',
-      p.status_label || 'Complete Registration',
-      p.registered_at
-    ].map(val => `"${String(val || '').replace(/"/g, '""')}"`);
-    
-    csvRows.push(row.join(','));
-  });
+  const csvContent = [
+    headers.map(h => `"${h.replace(/"/g, '""')}"`).join(','),
+    ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+  ].join('\r\n');
 
-  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  const currentEvent = document.getElementById('eventFilter') ? document.getElementById('eventFilter').value : '';
-  const filePrefix = currentEvent ? currentEvent.replace(/[^a-zA-Z0-9]/g, '_') : 'techfest26_master';
-  link.setAttribute('download', `${filePrefix}_attendees_${new Date().toISOString().slice(0, 10)}.csv`);
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+  link.setAttribute('download', `techFEST_26_Verified_Participants_${dateStr}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1127,7 +1361,7 @@ function closeBookmarkletModal() {
 function copyBookmarkletCode(btn) {
   navigator.clipboard.writeText(BOOKMARKLET_RAW).then(() => {
     const orig = btn.innerHTML;
-    btn.innerHTML = '<span class="text-success font-bold font-monospace">Copied!</span>';
+    btn.innerHTML = '<span class="text-success font-monospace">Copied!</span>';
     setTimeout(() => { 
       btn.innerHTML = orig; 
     }, 1500);
