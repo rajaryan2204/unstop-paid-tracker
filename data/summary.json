@@ -1,19 +1,19 @@
 {
-  "last_synced_at": "2026-09-30T04:26:31.593445+00:00",
+  "last_synced_at": "2026-09-30T10:37:36.704070+00:00",
   "token_expires_at": "2026-09-30T19:09:31.752260+00:00",
-  "total_unstop_registrations": 3506,
-  "total_paid_registrations": 596,
-  "total_amount_collected": 3195.0,
-  "total_colleges": 42,
+  "total_unstop_registrations": 3545,
+  "total_paid_registrations": 621,
+  "total_amount_collected": 3793.0,
+  "total_colleges": 43,
   "total_events_scanned": 62,
-  "events_with_paid": 41,
+  "events_with_paid": 43,
   "events_list": [
     {
       "id": 1744819,
       "title": "The Aqua-Epoch",
       "type": "competitions",
-      "total_registrations": 63,
-      "paid_registrations": 1
+      "total_registrations": 67,
+      "paid_registrations": 3
     },
     {
       "id": 1744818,
@@ -47,15 +47,15 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 85,
-      "paid_registrations": 12
+      "total_registrations": 87,
+      "paid_registrations": 14
     },
     {
       "id": 1744778,
       "title": "Foodprint",
       "type": "competitions",
-      "total_registrations": 61,
-      "paid_registrations": 5
+      "total_registrations": 64,
+      "paid_registrations": 8
     },
     {
       "id": 1744777,
@@ -68,8 +68,8 @@
       "id": 1744776,
       "title": "Food Forensics",
       "type": "competitions",
-      "total_registrations": 57,
-      "paid_registrations": 1
+      "total_registrations": 59,
+      "paid_registrations": 4
     },
     {
       "id": 1744774,
@@ -82,14 +82,14 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 62,
+      "total_registrations": 63,
       "paid_registrations": 6
     },
     {
       "id": 1744772,
       "title": "Smart Agriculture (SM-Agri)",
       "type": "competitions",
-      "total_registrations": 52,
+      "total_registrations": 53,
       "paid_registrations": 3
     },
     {
@@ -110,7 +110,7 @@
       "id": 1744769,
       "title": "CAD Design Challenge",
       "type": "competitions",
-      "total_registrations": 49,
+      "total_registrations": 50,
       "paid_registrations": 1
     },
     {
@@ -131,8 +131,8 @@
       "id": 1744757,
       "title": "Chess",
       "type": "competitions",
-      "total_registrations": 67,
-      "paid_registrations": 9
+      "total_registrations": 68,
+      "paid_registrations": 10
     },
     {
       "id": 1744238,
@@ -153,13 +153,13 @@
       "title": "Brand Blitz",
       "type": "competitions",
       "total_registrations": 54,
-      "paid_registrations": 51
+      "paid_registrations": 52
     },
     {
       "id": 1744231,
       "title": "Case Ethical Crosstalk",
       "type": "competitions",
-      "total_registrations": 127,
+      "total_registrations": 129,
       "paid_registrations": 0
     },
     {
@@ -180,8 +180,8 @@
       "id": 1744228,
       "title": "Pixel Wizard",
       "type": "competitions",
-      "total_registrations": 55,
-      "paid_registrations": 52
+      "total_registrations": 57,
+      "paid_registrations": 54
     },
     {
       "id": 1744227,
@@ -194,7 +194,7 @@
       "id": 1744224,
       "title": "The Neural Nexus",
       "type": "competitions",
-      "total_registrations": 76,
+      "total_registrations": 81,
       "paid_registrations": 5
     },
     {
@@ -215,8 +215,8 @@
       "id": 1744220,
       "title": "Debug and Deploy",
       "type": "competitions",
-      "total_registrations": 104,
-      "paid_registrations": 6
+      "total_registrations": 108,
+      "paid_registrations": 8
     },
     {
       "id": 1744219,
@@ -243,8 +243,8 @@
       "id": 1744215,
       "title": "Heuristic Havoc",
       "type": "competitions",
-      "total_registrations": 49,
-      "paid_registrations": 0
+      "total_registrations": 50,
+      "paid_registrations": 1
     },
     {
       "id": 1744214,
@@ -306,8 +306,8 @@
       "id": 1744180,
       "title": "Truss Load",
       "type": "competitions",
-      "total_registrations": 52,
-      "paid_registrations": 49
+      "total_registrations": 53,
+      "paid_registrations": 50
     },
     {
       "id": 1744178,
@@ -320,15 +320,15 @@
       "id": 1744177,
       "title": "Chemi-Thone",
       "type": "competitions",
-      "total_registrations": 49,
+      "total_registrations": 50,
       "paid_registrations": 0
     },
     {
       "id": 1744174,
       "title": "Soldering Speedrun",
       "type": "competitions",
-      "total_registrations": 51,
-      "paid_registrations": 1
+      "total_registrations": 52,
+      "paid_registrations": 2
     },
     {
       "id": 1744172,
@@ -355,15 +355,15 @@
       "id": 1744167,
       "title": "Poster and Paper Presentation",
       "type": "competitions",
-      "total_registrations": 47,
-      "paid_registrations": 0
+      "total_registrations": 49,
+      "paid_registrations": 1
     },
     {
       "id": 1744166,
       "title": "Soap Making",
       "type": "competitions",
-      "total_registrations": 51,
-      "paid_registrations": 2
+      "total_registrations": 52,
+      "paid_registrations": 3
     },
     {
       "id": 1744165,
@@ -390,7 +390,7 @@
       "id": 1744160,
       "title": "Splash Rocket",
       "type": "competitions",
-      "total_registrations": 48,
+      "total_registrations": 49,
       "paid_registrations": 0
     },
     {
@@ -418,8 +418,8 @@
       "id": 1744147,
       "title": "Free Fire",
       "type": "competitions",
-      "total_registrations": 88,
-      "paid_registrations": 4
+      "total_registrations": 91,
+      "paid_registrations": 8
     },
     {
       "id": 1743774,
