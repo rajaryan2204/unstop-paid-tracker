@@ -1,7 +1,9 @@
+// src/components/CandidateDrawer.jsx
 import React, { useEffect } from 'react';
 import { 
   X, 
   Phone, 
+  PhoneCall, 
   Mail, 
   CheckCircle2, 
   ShieldCheck, 
@@ -9,11 +11,16 @@ import {
   Users, 
   Download, 
   ExternalLink,
-  Crown
+  Crown,
+  Clock,
+  MessageSquare,
+  AlertTriangle,
+  History
 } from 'lucide-react';
 import { getAvatarStyle, getInitials } from '../utils/avatar';
+import { getParticipantCallRecord, CALL_STATUSES } from '../utils/callStore';
 
-export default function CandidateDrawer({ participant, onClose }) {
+export default function CandidateDrawer({ participant, onClose, onTriggerCall }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -29,11 +36,16 @@ export default function CandidateDrawer({ participant, onClose }) {
 
   const cleanPhone = (participant.phone || '').replace(/[^0-9]/g, '');
   const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
-  const telLink = participant.phone && participant.phone !== 'N/A' ? `tel:${participant.phone}` : null;
   const mailLink = participant.email && participant.email !== 'N/A' ? `mailto:${participant.email}` : null;
 
   const amt = Number(participant.amount) || 0;
   const hasMembers = participant.team_members && Array.isArray(participant.team_members) && participant.team_members.length > 0;
+
+  // Retrieve call history & timeline
+  const callRecord = getParticipantCallRecord(participant.id);
+  const callCount = callRecord?.callCount || 0;
+  const history = callRecord?.history || [];
+  const latestStatusDef = callRecord?.lastStatus ? CALL_STATUSES[callRecord.lastStatus] : null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -45,7 +57,7 @@ export default function CandidateDrawer({ participant, onClose }) {
 
       {/* Slide-over Right Sheet */}
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md lg:max-w-lg bg-[#11141A] border-l border-white/[0.08] shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
+        <div className="w-screen max-w-md lg:max-w-xl bg-[#11141A] border-l border-white/[0.08] shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
           
           {/* Header */}
           <div className="p-4 border-b border-white/[0.08] flex items-center justify-between bg-[#161A22]">
@@ -84,7 +96,18 @@ export default function CandidateDrawer({ participant, onClose }) {
           <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
             
             {/* Quick Contact Actions Bar */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
+              {participant.phone && participant.phone !== 'N/A' && (
+                <button
+                  onClick={() => onTriggerCall && onTriggerCall(participant)}
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all shadow-[0_0_15px_-3px_rgba(56,189,248,0.2)]"
+                  title="Call via phone and log remarks"
+                >
+                  <PhoneCall className="w-3.5 h-3.5" />
+                  <span>Call ({callCount})</span>
+                </button>
+              )}
+
               {waLink && (
                 <a
                   href={waLink}
@@ -92,21 +115,22 @@ export default function CandidateDrawer({ participant, onClose }) {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all shadow-[0_0_15px_-3px_rgba(37,211,102,0.2)]"
                 >
-                  <span>WhatsApp Leader</span>
+                  <span>WhatsApp</span>
                 </a>
               )}
+
               {mailLink && (
                 <a
                   href={mailLink}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all"
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>Send Email</span>
+                  <span>Email</span>
                 </a>
               )}
             </div>
 
-            {/* Payment Verification Status Banner */}
+            {/* Payment & Verification Status Banner */}
             {amt > 0 ? (
               <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-300/80 mb-0.5">
@@ -118,6 +142,19 @@ export default function CandidateDrawer({ participant, onClose }) {
                 </div>
                 <div className="text-[11px] font-mono text-emerald-300/70 mt-1 select-all">
                   Txn ID: {participant.payment_id}
+                </div>
+              </div>
+            ) : callRecord?.lastStatus === 'PAYMENT_CLAIMED' ? (
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-amber-300/80 mb-0.5">
+                  Verification Status
+                </div>
+                <div className="flex items-center gap-2 font-semibold text-sm">
+                  <Clock className="w-4 h-4 text-amber-400" />
+                  <span>Payment Claimed by Caller • Pending Gateway Sync</span>
+                </div>
+                <div className="text-[11px] font-mono text-amber-300/70 mt-1">
+                  Claimed: {new Date(callRecord.lastCalledAt).toLocaleString('en-IN')}
                 </div>
               </div>
             ) : (
@@ -134,6 +171,86 @@ export default function CandidateDrawer({ participant, onClose }) {
                 </div>
               </div>
             )}
+
+            {/* CALL HISTORY TIMELINE SECTION (As requested by Sagar) */}
+            <div className="surface-elevated rounded-xl p-3.5 border border-white/[0.08]">
+              <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-amber-400" />
+                  <span className="font-semibold text-xs text-white">
+                    Operations Call Timeline ({callCount} Calls)
+                  </span>
+                </div>
+                {latestStatusDef && (
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${latestStatusDef.badge}`}>
+                    {latestStatusDef.label}
+                  </span>
+                )}
+              </div>
+
+              {history.length > 0 ? (
+                <div className="space-y-3 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-white/[0.08]">
+                  {history.map((call, idx) => {
+                    const st = CALL_STATUSES[call.status] || {};
+                    const dateFormatted = call.timestamp ? new Date(call.timestamp).toLocaleString('en-IN', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : '--';
+
+                    return (
+                      <div key={call.id || idx} className="relative flex items-start gap-3 pl-8">
+                        {/* Timeline Node */}
+                        <div className={`absolute left-2 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-[#11141A] ${st.indicator || 'bg-slate-400'}`} />
+
+                        <div className="flex-1 p-2.5 rounded-lg bg-black/40 border border-white/[0.04] text-xs">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 font-medium text-white">
+                              <span>{call.callerName}</span>
+                              <span className="text-[10px] font-mono text-slate-400">
+                                ({call.callerTeam || 'Team'})
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              {dateFormatted}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2 my-1.5">
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${st.badge || 'border-slate-600 text-slate-300'}`}>
+                              {st.label || call.status}
+                            </span>
+                            {call.leadNumber && (
+                              <span className="text-[10px] font-mono text-slate-400">
+                                Lead: {call.leadNumber}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-slate-300 text-[11px] leading-relaxed">
+                            {call.remark}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-6 text-center text-xs text-slate-500">
+                  <p>No calls logged yet for this participant.</p>
+                  {participant.phone && participant.phone !== 'N/A' && (
+                    <button
+                      onClick={() => onTriggerCall && onTriggerCall(participant)}
+                      className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20 font-medium transition-all"
+                    >
+                      <PhoneCall className="w-3.5 h-3.5" />
+                      <span>Initiate 1st Call</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Candidate Profile Details */}
             <div className="surface-elevated rounded-xl p-3.5 border border-white/[0.08]">

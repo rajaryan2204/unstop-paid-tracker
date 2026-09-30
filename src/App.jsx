@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/App.jsx
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import KPIStrip from './components/KPIStrip';
 import AnalyticsChart from './components/AnalyticsChart';
@@ -6,8 +7,19 @@ import DataTable from './components/DataTable';
 import CandidateDrawer from './components/CandidateDrawer';
 import TokenModal from './components/TokenModal';
 import BookmarkletModal from './components/BookmarkletModal';
+import CallRemarkModal from './components/CallRemarkModal';
+import AuthModal from './components/AuthModal';
+import AuditLogsModal from './components/AuditLogsModal';
+import VerificationQueueModal from './components/VerificationQueueModal';
 import Toast from './components/Toast';
+
 import { exportParticipantsToCSV } from './utils/csv';
+import { getActiveUser, setActiveUser } from './utils/auth';
+import { 
+  logCallForParticipant, 
+  getPaymentVerificationQueue, 
+  CALL_STATUSES 
+} from './utils/callStore';
 
 import initialData from '../data.json';
 
@@ -26,11 +38,24 @@ export default function App() {
     return {};
   });
 
+  const [currentUser, setCurrentUser] = useState(() => getActiveUser());
+  const [callDbVersion, setCallDbVersion] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  
+  // Modals state
   const [isBookmarkletOpen, setIsBookmarkletOpen] = useState(false);
   const [isTokenHealthOpen, setIsTokenHealthOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
+  const [isVerificationQueueOpen, setIsVerificationQueueOpen] = useState(false);
+  
+  // Active call logging modal state
+  const [callingCandidate, setCallingCandidate] = useState(null);
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+
   const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('tf_theme') || 'dark');
 
@@ -39,7 +64,7 @@ export default function App() {
     setToast(toastData);
     setTimeout(() => {
       setToast(current => current === toastData ? null : current);
-    }, 3000);
+    }, 3200);
   }, []);
 
   // Theme toggle
@@ -119,6 +144,69 @@ export default function App() {
     }
   };
 
+  // Switch Active User / RBAC Persona
+  const handleSelectUser = (user) => {
+    setActiveUser(user);
+    setCurrentUser(user);
+    triggerToast({
+      type: 'success',
+      message: `Active session: ${user.name} (${user.title || user.role})`
+    });
+  };
+
+  // Initiate Direct Phone Call & Open Post-Call Remark Modal
+  const handleTriggerCall = useCallback((participant) => {
+    if (!participant) return;
+    
+    // 1. Direct phone connection
+    if (participant.phone && participant.phone !== 'N/A') {
+      window.open(`tel:${participant.phone}`, '_self');
+    }
+
+    // 2. Open pop box for remark, lead number & status
+    setCallingCandidate(participant);
+    setIsCallModalOpen(true);
+  }, []);
+
+  // Save Call Record & Log
+  const handleSaveCall = useCallback(({ participant, callerUser, remark, leadNumber, status }) => {
+    try {
+      logCallForParticipant({
+        participant,
+        callerUser,
+        remark,
+        leadNumber,
+        status
+      });
+
+      setCallDbVersion(v => v + 1);
+
+      const statusDef = CALL_STATUSES[status];
+      if (status === 'PAYMENT_CLAIMED') {
+        triggerToast({
+          type: 'success',
+          message: `Payment claimed for ${participant.name}! Queued to Verification Desk.`
+        });
+      } else {
+        triggerToast({
+          type: 'success',
+          message: `Call logged for ${participant.name} (${statusDef?.label || status})`
+        });
+      }
+    } catch (err) {
+      triggerToast({
+        type: 'error',
+        message: err.message || 'Failed to save call record'
+      });
+    }
+  }, [triggerToast]);
+
+  // Compute pending verifications count for header badge
+  const pendingVerificationCount = useMemo(() => {
+    const queue = getPaymentVerificationQueue(participants);
+    return queue.filter(q => q.verificationState === 'PENDING_SYNC' || q.verificationState === 'DEFAULTER').length;
+  }, [participants, callDbVersion]);
+
   // Keyboard shortcut for search
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -135,13 +223,18 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
-      {/* 1. Glassmorphism Navigation Bar */}
+      {/* 1. Header with RBAC Profile & Verification Badges */}
       <Header
         onRefresh={() => fetchData(true)}
         isRefreshing={isRefreshing}
         onOpenBookmarklet={() => setIsBookmarkletOpen(true)}
         onOpenTokenHealth={() => setIsTokenHealthOpen(true)}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
+        onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
         onExportCSV={handleExportCSV}
+        currentUser={currentUser}
+        verificationCount={pendingVerificationCount}
         theme={theme}
         onToggleTheme={toggleTheme}
         summary={summary}
@@ -164,11 +257,14 @@ export default function App() {
             {/* 3. Event Activity Analytics Chart */}
             <AnalyticsChart participants={participants} summary={summary} />
 
-            {/* 4. Master Operations Data Table */}
+            {/* 4. Master Operations Data Table with Direct Calling & RBAC */}
             <DataTable
+              key={callDbVersion}
               participants={participants}
               summary={summary}
+              currentUser={currentUser}
               onSelectParticipant={setSelectedParticipant}
+              onTriggerCall={handleTriggerCall}
               onTriggerToast={triggerToast}
             />
           </>
@@ -178,8 +274,46 @@ export default function App() {
 
       {/* Slide-over Candidate Inspector Drawer */}
       <CandidateDrawer
+        key={`drawer_${callDbVersion}_${selectedParticipant?.id}`}
         participant={selectedParticipant}
         onClose={() => setSelectedParticipant(null)}
+        onTriggerCall={handleTriggerCall}
+      />
+
+      {/* Pop-up Box for Call Remarks, Lead Number & Status (As requested by Sagar) */}
+      <CallRemarkModal
+        isOpen={isCallModalOpen}
+        participant={callingCandidate}
+        currentUser={currentUser}
+        onClose={() => {
+          setIsCallModalOpen(false);
+          setCallingCandidate(null);
+        }}
+        onSubmit={handleSaveCall}
+      />
+
+      {/* Operations RBAC Authentication & Profile Switcher Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        currentUser={currentUser}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSelectUser={handleSelectUser}
+      />
+
+      {/* Caller Activity & Access Control Audit Logs Modal */}
+      <AuditLogsModal
+        isOpen={isAuditLogsOpen}
+        onClose={() => setIsAuditLogsOpen(false)}
+      />
+
+      {/* Payment Verification & Defaulter Desk Modal */}
+      <VerificationQueueModal
+        isOpen={isVerificationQueueOpen}
+        participants={participants}
+        currentUser={currentUser}
+        onClose={() => setIsVerificationQueueOpen(false)}
+        onTriggerCall={handleTriggerCall}
+        onTriggerToast={triggerToast}
       />
 
       {/* Autonomous Token Health Modal */}

@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import React from 'react';
 import { 
   Zap, 
@@ -6,15 +7,26 @@ import {
   Moon, 
   Sun, 
   ShieldCheck, 
-  Activity 
+  Activity,
+  User,
+  Users,
+  FileText,
+  AlertTriangle,
+  PhoneCall
 } from 'lucide-react';
+import { ROLES } from '../utils/auth';
 
 export default function Header({ 
   onRefresh, 
   isRefreshing, 
   onOpenBookmarklet, 
   onOpenTokenHealth, 
+  onOpenAuth,
+  onOpenAuditLogs,
+  onOpenVerificationQueue,
   onExportCSV,
+  currentUser,
+  verificationCount = 0,
   theme,
   onToggleTheme,
   summary
@@ -23,11 +35,13 @@ export default function Header({
     ? new Date(summary.last_synced_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'Active';
 
+  const roleDef = ROLES[currentUser?.role] || {};
+
   return (
     <header className="sticky top-0 z-40 w-full glass-nav border-b border-white/[0.08] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         
-        {/* Brand Identity */}
+        {/* Brand Identity & Team Context */}
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-400/25 to-blue-600/10 border border-sky-400/35 flex items-center justify-center text-sky-400 font-bold text-xs tracking-tight shadow-[0_0_12px_rgba(56,189,248,0.2)]">
             TF
@@ -38,15 +52,61 @@ export default function Header({
               Central Desk
             </span>
           </div>
+
+          {/* Quick Operations Nav Links */}
+          <div className="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l border-white/[0.08]">
+            <button
+              onClick={onOpenVerificationQueue}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all"
+              title="Open Payment Verification & Defaulter Desk"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Verification</span>
+              {verificationCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-emerald-400 text-black">
+                  {verificationCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={onOpenAuditLogs}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-purple-300 bg-purple-500/10 border border-purple-500/25 hover:bg-purple-500/20 transition-all"
+              title="Open Caller Activity & Access Audit Trail"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Audit Trail</span>
+            </button>
+          </div>
         </div>
 
-        {/* Right Tools & Actions */}
+        {/* Right Tools & User Profile */}
         <div className="flex items-center gap-2">
           
+          {/* Active User Switcher / Profile Badge */}
+          <button
+            onClick={onOpenAuth}
+            className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#161A22] border border-white/[0.08] hover:border-white/20 transition-all text-left"
+            title="Switch User Role or Login"
+          >
+            <span className="w-5 h-5 rounded-md bg-white/[0.08] flex items-center justify-center font-bold text-[10px] text-white">
+              {currentUser?.avatarInitials || 'SA'}
+            </span>
+            <div className="hidden sm:block">
+              <div className="text-xs font-medium text-white leading-none truncate max-w-[120px]">
+                {currentUser?.name || 'Staff'}
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 truncate max-w-[120px] mt-0.5">
+                {roleDef.name || 'Member'}
+              </div>
+            </div>
+            <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          </button>
+
           {/* Autonomous Token Health Indicator */}
           <button
             onClick={onOpenTokenHealth}
-            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono text-slate-300 bg-[#161A22] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer"
+            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono text-slate-300 bg-[#161A22] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer"
             title="Click to view 24/7 Autonomous OAuth Token Health"
           >
             <span className="relative flex h-2 w-2">
@@ -57,9 +117,9 @@ export default function Header({
           </button>
 
           {/* Live Sync Timestamp Pill */}
-          <div className="hidden md:flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono text-slate-400">
+          <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono text-slate-400">
             <Activity className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Synced {lastSyncTime}</span>
+            <span>{lastSyncTime}</span>
           </div>
 
           {/* 1-Click Sync Trigger */}
@@ -69,7 +129,7 @@ export default function Header({
             title="1-Click Unstop Browser Sync Tool"
           >
             <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>1-Click Sync</span>
+            <span>Sync</span>
           </button>
 
           {/* Force Refresh Button */}
@@ -98,8 +158,7 @@ export default function Header({
             title="Export verified attendees to CSV"
           >
             <Download className="w-3.5 h-3.5 text-sky-400" />
-            <span className="hidden sm:inline">Export CSV</span>
-            <span className="sm:hidden">CSV</span>
+            <span className="hidden sm:inline">CSV</span>
           </button>
 
         </div>

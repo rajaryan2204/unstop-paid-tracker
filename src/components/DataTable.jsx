@@ -1,3 +1,4 @@
+// src/components/DataTable.jsx
 import React, { useState, useMemo } from 'react';
 import { 
   Search, 
@@ -5,6 +6,7 @@ import {
   Copy, 
   Check, 
   Phone, 
+  PhoneCall, 
   ArrowRight, 
   Users, 
   Sparkles, 
@@ -15,19 +17,26 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import { getAvatarStyle, getInitials } from '../utils/avatar';
+import { getCallRecords, CALL_STATUSES } from '../utils/callStore';
+import { filterParticipantsByUser } from '../utils/auth';
 
 export default function DataTable({ 
-  participants, 
-  summary, 
+  participants = [], 
+  summary = {}, 
+  currentUser,
   onSelectParticipant, 
+  onTriggerCall,
   onTriggerToast 
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPayment, setSelectedPayment] = useState('all');
+  const [selectedCallStatus, setSelectedCallStatus] = useState('all');
   const [selectedEvent, setSelectedEvent] = useState('');
   const [selectedCollege, setSelectedCollege] = useState('');
   const [sortBy, setSortBy] = useState('date-desc');
@@ -37,10 +46,20 @@ export default function DataTable({
   const [pageSize, setPageSize] = useState(50);
   const [copiedEmail, setCopiedEmail] = useState(null);
 
-  // Category counts
+  // Fetch call records database
+  const callRecords = useMemo(() => getCallRecords(), [participants]);
+
+  // Apply RBAC filtering based on currentUser
+  const userScopedParticipants = useMemo(() => {
+    return filterParticipantsByUser(currentUser, participants);
+  }, [currentUser, participants]);
+
+  const isUserScoped = currentUser && currentUser.role !== 'super_admin' && currentUser.role !== 'team_head';
+
+  // Category counts based on accessible participants
   const categoryCounts = useMemo(() => {
-    const counts = { all: participants.length, competitions: 0, quizzes: 0, hackathons: 0, cultural: 0 };
-    participants.forEach(p => {
+    const counts = { all: userScopedParticipants.length, competitions: 0, quizzes: 0, hackathons: 0, cultural: 0 };
+    userScopedParticipants.forEach(p => {
       const t = (p.event_type || 'competitions').toLowerCase();
       if (t.includes('quiz')) counts.quizzes++;
       else if (t.includes('hack')) counts.hackathons++;
@@ -48,18 +67,18 @@ export default function DataTable({
       else counts.competitions++;
     });
     return counts;
-  }, [participants]);
+  }, [userScopedParticipants]);
 
   // Payment counts
   const paymentCounts = useMemo(() => {
-    const paid = participants.filter(p => Number(p.amount) > 0).length;
-    return { all: participants.length, paid, free: participants.length - paid };
-  }, [participants]);
+    const paid = userScopedParticipants.filter(p => Number(p.amount) > 0).length;
+    return { all: userScopedParticipants.length, paid, free: userScopedParticipants.length - paid };
+  }, [userScopedParticipants]);
 
   // Master events list for dropdown
   const masterEvents = useMemo(() => {
     const eventCounts = {};
-    participants.forEach(p => {
+    userScopedParticipants.forEach(p => {
       const name = (p.event_name || 'Event').trim();
       eventCounts[name] = (eventCounts[name] || 0) + 1;
     });
@@ -80,16 +99,16 @@ export default function DataTable({
 
     const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
     return { fallback: sortedEvents, eventCounts };
-  }, [participants, summary]);
+  }, [userScopedParticipants, summary]);
 
   // Colleges list
   const collegesList = useMemo(() => {
-    return Array.from(new Set(participants.map(p => p.college).filter(Boolean))).sort();
-  }, [participants]);
+    return Array.from(new Set(userScopedParticipants.map(p => p.college).filter(Boolean))).sort();
+  }, [userScopedParticipants]);
 
   // Filter & Search logic
   const filteredParticipants = useMemo(() => {
-    return participants.filter(p => {
+    return userScopedParticipants.filter(p => {
       // 1. Category
       if (selectedCategory !== 'all') {
         const t = (p.event_type || 'competitions').toLowerCase();
@@ -103,13 +122,27 @@ export default function DataTable({
       if (selectedPayment === 'paid' && Number(p.amount) <= 0) return false;
       if (selectedPayment === 'free' && Number(p.amount) > 0) return false;
 
-      // 3. Event
+      // 3. Calling Status Filter
+      if (selectedCallStatus !== 'all') {
+        const record = callRecords[String(p.id)];
+        const callCount = record?.callCount || 0;
+        const lastStatus = record?.lastStatus;
+
+        if (selectedCallStatus === 'never_called' && callCount > 0) return false;
+        if (selectedCallStatus === 'called' && callCount === 0) return false;
+        if (selectedCallStatus === 'PAYMENT_CLAIMED' && lastStatus !== 'PAYMENT_CLAIMED') return false;
+        if (selectedCallStatus === 'INTERESTED' && lastStatus !== 'INTERESTED') return false;
+        if (selectedCallStatus === 'CALL_LATER' && lastStatus !== 'CALL_LATER') return false;
+        if (selectedCallStatus === 'NOT_PICKED' && lastStatus !== 'NOT_PICKED') return false;
+      }
+
+      // 4. Event
       if (selectedEvent && (p.event_name || '').trim() !== selectedEvent) return false;
 
-      // 4. College
+      // 5. College
       if (selectedCollege && (p.college || '').trim() !== selectedCollege) return false;
 
-      // 5. Query
+      // 6. Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchName = (p.name || '').toLowerCase().includes(q);
@@ -138,9 +171,14 @@ export default function DataTable({
       if (sortBy === 'name-asc') return (a.name || '').localeCompare(b.name || '');
       if (sortBy === 'event-asc') return (a.event_name || '').localeCompare(b.event_name || '');
       if (sortBy === 'amount-desc') return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+      if (sortBy === 'calls-desc') {
+        const cA = callRecords[String(a.id)]?.callCount || 0;
+        const cB = callRecords[String(b.id)]?.callCount || 0;
+        return cB - cA;
+      }
       return 0;
     });
-  }, [participants, selectedCategory, selectedPayment, selectedEvent, selectedCollege, searchQuery, sortBy]);
+  }, [userScopedParticipants, callRecords, selectedCategory, selectedPayment, selectedCallStatus, selectedEvent, selectedCollege, searchQuery, sortBy]);
 
   // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredParticipants.length / (pageSize === 'all' ? 999999 : pageSize)));
@@ -149,7 +187,7 @@ export default function DataTable({
   const endIndex = Math.min(startIndex + (pageSize === 'all' ? 999999 : pageSize), filteredParticipants.length);
   const pageItems = filteredParticipants.slice(startIndex, endIndex);
 
-  const isFiltering = searchQuery || selectedEvent || selectedCollege || selectedCategory !== 'all' || selectedPayment !== 'all';
+  const isFiltering = searchQuery || selectedEvent || selectedCollege || selectedCategory !== 'all' || selectedPayment !== 'all' || selectedCallStatus !== 'all';
 
   const handleCopyEmail = (e, email) => {
     e.stopPropagation();
@@ -163,6 +201,7 @@ export default function DataTable({
     setSearchQuery('');
     setSelectedCategory('all');
     setSelectedPayment('all');
+    setSelectedCallStatus('all');
     setSelectedEvent('');
     setSelectedCollege('');
     setCurrentPage(1);
@@ -203,6 +242,19 @@ export default function DataTable({
   return (
     <div className="surface-card rounded-xl overflow-hidden border border-white/[0.08] transition-all mb-10">
       
+      {/* Scoped RBAC Notice if restricted */}
+      {isUserScoped && (
+        <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+            <span>
+              <strong>Scoped Operations View:</strong> Showing {userScopedParticipants.length} attendees restricted to <strong>{currentUser.teamName}</strong> ({currentUser.name} • {currentUser.title})
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-amber-400/80">RBAC Enforced</span>
+        </div>
+      )}
+
       {/* 1. Header Bar: Category Tabs + Payment Segments */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-white/[0.06] bg-[#11141A]">
         
@@ -249,14 +301,14 @@ export default function DataTable({
               <button
                 key={p.id}
                 onClick={() => { setSelectedPayment(p.id); setCurrentPage(1); }}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
                   isActive 
-                    ? 'bg-[#11141A] text-white shadow-sm' 
+                    ? 'bg-[#1F2430] text-white shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <span>{p.label}</span>
-                <span className={`text-[10px] font-mono ${p.countClass}`}>{p.count}</span>
+                <span className={`text-[10px] font-mono ${p.countClass}`}>({p.count})</span>
               </button>
             );
           })}
@@ -264,139 +316,138 @@ export default function DataTable({
 
       </div>
 
-      {/* 2. Operations Toolbar: Search + Filter Dropdowns */}
-      <div className="p-3 bg-[#11141A] border-b border-white/[0.06] flex flex-wrap gap-2.5 items-center justify-between">
+      {/* 2. Operations Filter Toolbar */}
+      <div className="p-4 bg-[#11141A] border-b border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
         
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[240px] max-w-md">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+        {/* Instant Search Bar */}
+        <div className="lg:col-span-4 relative">
+          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            placeholder="Search attendee, email, phone, college, team..."
-            className="w-full pl-9 pr-14 py-1.5 rounded-lg text-xs bg-[#161A22] border border-white/[0.08] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400/50 focus:ring-1 focus:ring-sky-400/30 transition-all font-sans"
+            placeholder="Search candidate, team, college, email... (Press / to focus)"
+            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all"
           />
-          {searchQuery ? (
-            <button 
+          {searchQuery && (
+            <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+              className="absolute right-2.5 top-2.5 text-slate-500 hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
             </button>
-          ) : (
-            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 px-1 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">
-              /
-            </span>
           )}
         </div>
 
-        {/* Filters Group */}
-        <div className="flex flex-wrap items-center gap-2">
-          
-          {/* Specific Event Filter */}
+        {/* Event Dropdown Filter */}
+        <div className="lg:col-span-3">
           <select
             value={selectedEvent}
             onChange={(e) => { setSelectedEvent(e.target.value); setCurrentPage(1); }}
-            className="px-2.5 py-1.5 rounded-lg text-xs bg-[#161A22] border border-white/[0.08] text-slate-300 focus:outline-none focus:border-sky-400/50 cursor-pointer max-w-[220px] truncate"
+            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
           >
-            <option value="">All Competitions ({masterEvents.total || masterEvents.fallback?.length || 62})</option>
-            {masterEvents.withEntries ? (
-              <>
-                <optgroup label="── With Verified Entries ──">
-                  {masterEvents.withEntries.map(ev => {
-                    const cnt = masterEvents.eventCounts[ev.title?.trim()] || ev.paid_registrations || 0;
-                    return (
-                      <option key={ev.id} value={ev.title}>
-                        {ev.title} ({cnt} verified)
-                      </option>
-                    );
-                  })}
-                </optgroup>
-                {masterEvents.awaiting.length > 0 && (
-                  <optgroup label="── Awaiting Entries ──">
-                    {masterEvents.awaiting.map(ev => (
-                      <option key={ev.id} value={ev.title}>
-                        {ev.title} (0 verified • {ev.total_registrations || 0} applicants)
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </>
-            ) : (
-              masterEvents.fallback?.map(ev => (
-                <option key={ev} value={ev}>
-                  {ev} ({masterEvents.eventCounts[ev]})
-                </option>
-              ))
-            )}
-          </select>
-
-          {/* College Filter */}
-          <select
-            value={selectedCollege}
-            onChange={(e) => { setSelectedCollege(e.target.value); setCurrentPage(1); }}
-            className="px-2.5 py-1.5 rounded-lg text-xs bg-[#161A22] border border-white/[0.08] text-slate-300 focus:outline-none focus:border-sky-400/50 cursor-pointer max-w-[160px] truncate"
-          >
-            <option value="">All Colleges ({collegesList.length})</option>
-            {collegesList.map(col => (
-              <option key={col} value={col}>
-                {col.length > 28 ? col.substring(0, 26) + '...' : col}
+            <option value="">All Competitions & Tracks ({userScopedParticipants.length})</option>
+            {masterEvents.withEntries && masterEvents.withEntries.map((ev, i) => (
+              <option key={i} value={ev.title}>
+                {ev.title} ({(masterEvents.eventCounts[(ev.title || '').trim()] || ev.paid_registrations || 0)})
+              </option>
+            ))}
+            {masterEvents.fallback && masterEvents.fallback.map((ev, i) => (
+              <option key={i} value={ev}>
+                {ev} ({masterEvents.eventCounts[ev] || 0})
               </option>
             ))}
           </select>
+        </div>
 
-          {/* Sort By */}
+        {/* Calling Status Filter (As requested by Sagar) */}
+        <div className="lg:col-span-2">
+          <select
+            value={selectedCallStatus}
+            onChange={(e) => { setSelectedCallStatus(e.target.value); setCurrentPage(1); }}
+            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
+          >
+            <option value="all">All Calling Status</option>
+            <option value="never_called">Never Called (0 calls)</option>
+            <option value="called">Called (1+ calls)</option>
+            <option value="PAYMENT_CLAIMED">Payment Completed</option>
+            <option value="INTERESTED">Interested / Follow Up</option>
+            <option value="CALL_LATER">Callback Scheduled</option>
+            <option value="NOT_PICKED">Not Picked / Busy</option>
+          </select>
+        </div>
+
+        {/* College Filter Dropdown */}
+        <div className="lg:col-span-2">
+          <select
+            value={selectedCollege}
+            onChange={(e) => { setSelectedCollege(e.target.value); setCurrentPage(1); }}
+            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
+          >
+            <option value="">All Colleges & Institutions ({collegesList.length})</option>
+            {collegesList.map((c, i) => (
+              <option key={i} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sorting Dropdown */}
+        <div className="lg:col-span-1 flex items-center justify-end">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg text-xs bg-[#161A22] border border-white/[0.08] text-slate-300 focus:outline-none focus:border-sky-400/50 cursor-pointer"
+            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-2 py-2 text-xs text-slate-300 outline-none transition-all"
+            title="Sort Attendees"
           >
-            <option value="date-desc">Latest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="event-asc">Event (A-Z)</option>
-            <option value="amount-desc">Highest Fee</option>
+            <option value="date-desc">Latest</option>
+            <option value="date-asc">Oldest</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="calls-desc">Most Calls</option>
+            <option value="amount-desc">Paid First</option>
           </select>
-
-          {/* Clear Filters Button */}
-          {isFiltering && (
-            <button
-              onClick={handleResetFilters}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/15 transition-all"
-              title="Reset all search filters"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Clear</span>
-            </button>
-          )}
-
         </div>
 
       </div>
 
-      {/* 3. Desktop High-Density Data Table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      {/* Active Filter Bar Summary */}
+      {isFiltering && (
+        <div className="px-4 py-2 bg-[#151922] border-b border-white/[0.06] flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-slate-300">
+            <span className="font-mono text-sky-400 font-semibold">{filteredParticipants.length}</span>
+            <span>attendees matched active filters</span>
+          </div>
+          <button
+            onClick={handleResetFilters}
+            className="flex items-center gap-1 text-[11px] font-mono text-sky-400 hover:text-sky-300 transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>Reset filters</span>
+          </button>
+        </div>
+      )}
+
+      {/* 3. High Density Desktop Table */}
+      <div className="overflow-x-auto hidden md:block">
+        <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-[#11141A] text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              <th className="py-2.5 px-3 text-center w-12">#</th>
-              <th className="py-2.5 px-3 min-w-[220px]">Participant</th>
-              <th className="py-2.5 px-3 min-w-[140px]">Contact</th>
-              <th className="py-2.5 px-3 min-w-[200px]">College & Branch</th>
-              <th className="py-2.5 px-3 min-w-[170px]">Event & Track</th>
-              <th className="py-2.5 px-3 min-w-[120px]">Team Roster</th>
-              <th className="py-2.5 px-3 min-w-[110px]">Payment</th>
-              <th className="py-2.5 px-3 text-end w-20">Action</th>
+            <tr className="border-b border-white/[0.06] bg-[#161A22] text-slate-400 font-medium">
+              <th className="py-2.5 px-3 w-10 text-center font-mono text-[11px]">#</th>
+              <th className="py-2.5 px-3 min-w-[200px]">Candidate Details</th>
+              <th className="py-2.5 px-3 min-w-[190px]">Phone & Direct Calling</th>
+              <th className="py-2.5 px-3 min-w-[180px]">Institution & Course</th>
+              <th className="py-2.5 px-3 min-w-[170px]">Competition / Event</th>
+              <th className="py-2.5 px-3 min-w-[130px]">Team Roster</th>
+              <th className="py-2.5 px-3 min-w-[120px] text-right">Payment Status</th>
+              <th className="py-2.5 px-3 w-12 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04] text-xs">
+          <tbody className="divide-y divide-white/[0.04]">
             {pageItems.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-slate-400">
-                  <div className="max-w-sm mx-auto flex flex-col items-center">
-                    <Filter className="w-8 h-8 text-slate-600 mb-2" />
-                    <p className="font-medium text-slate-200 text-sm">No attendees match your filter</p>
+                <td colSpan={8} className="py-16 text-center text-slate-400">
+                  <div className="max-w-xs mx-auto">
+                    <Filter className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                    <p className="font-semibold text-sm text-slate-300">No participants found</p>
                     <p className="text-xs text-slate-500 mt-1">Try resetting search terms or switching categories.</p>
                     <button
                       onClick={handleResetFilters}
@@ -414,9 +465,13 @@ export default function DataTable({
                 const initials = getInitials(p.name);
                 const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
                 const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
-                const telLink = p.phone && p.phone !== 'N/A' ? `tel:${p.phone}` : null;
                 const amt = Number(p.amount) || 0;
                 const hasMembers = p.team_members && p.team_members.length > 0;
+
+                // Call CRM record
+                const rec = callRecords[String(p.id)];
+                const callCount = rec?.callCount || 0;
+                const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
 
                 return (
                   <tr 
@@ -465,30 +520,54 @@ export default function DataTable({
                       </div>
                     </td>
 
-                    {/* Contact Phone & Actions */}
+                    {/* Phone & Direct Calling (As requested by Sagar) */}
                     <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
                       {p.phone && p.phone !== 'N/A' ? (
-                        <div className="flex items-center gap-1.5 font-mono text-[11.5px] text-slate-300">
-                          <span>{p.phone}</span>
-                          {waLink && (
-                            <a
-                              href={waLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              title="Chat on WhatsApp"
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-[0_0_8px_rgba(37,211,102,0.15)]"
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 font-mono text-[11.5px] text-slate-300">
+                            <span>{p.phone}</span>
+
+                            {/* Prominent Direct Phone Call Button */}
+                            <button
+                              onClick={() => onTriggerCall && onTriggerCall(p)}
+                              title="Direct Phone Call & Log Remarks"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all shadow-[0_0_8px_rgba(56,189,248,0.2)]"
                             >
-                              <span>WA</span>
-                            </a>
-                          )}
-                          {telLink && (
-                            <a
-                              href={telLink}
-                              title="Direct Phone Call"
-                              className="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-white bg-[#161A22] border border-white/[0.08] hover:border-white/20 transition-all"
-                            >
-                              <Phone className="w-2.5 h-2.5" />
-                            </a>
+                              <PhoneCall className="w-3 h-3 text-sky-400" />
+                              <span className="font-mono text-[10px]">{callCount > 0 ? callCount : 'Call'}</span>
+                            </button>
+
+                            {/* WhatsApp Button */}
+                            {waLink && (
+                              <a
+                                href={waLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Chat on WhatsApp"
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all"
+                              >
+                                WA
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Dynamic Calling Status Badge */}
+                          {statusDef ? (
+                            <div className="flex items-center gap-1">
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-mono border ${statusDef.badge}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
+                                <span>{statusDef.shortLabel}</span>
+                              </span>
+                              {rec.leadNumber && (
+                                <span className="text-[10px] font-mono text-slate-500">
+                                  L: {rec.leadNumber}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-[10px] font-mono text-slate-500">
+                              Never Called
+                            </div>
                           )}
                         </div>
                       ) : (
@@ -528,42 +607,43 @@ export default function DataTable({
                         {hasMembers ? (
                           <button
                             onClick={() => onSelectParticipant(p)}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10.5px] font-medium text-purple-300 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-400 hover:text-purple-300"
                           >
-                            <Users className="w-3 h-3 text-purple-400" />
+                            <Users className="w-3 h-3" />
                             <span>{p.team_members.length} members</span>
                           </button>
                         ) : (
-                          <span className="text-[10.5px] text-slate-500 font-mono">Solo</span>
+                          <span className="text-[10px] text-slate-400">Solo</span>
                         )}
                       </div>
                     </td>
 
-                    {/* Payment Fee */}
-                    <td className="py-3 px-3">
+                    {/* Payment Status Pill */}
+                    <td className="py-3 px-3 text-right">
                       {amt > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.9)]"></span>
-                          Paid ₹{amt.toLocaleString('en-IN')}
-                        </span>
+                        <div>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                            <span>₹{amt.toLocaleString('en-IN')}</span>
+                          </span>
+                        </div>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium text-slate-400 bg-white/[0.04] border border-white/[0.08]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-white/[0.04] border border-white/[0.06]">
                           Free Entry
                         </span>
                       )}
                     </td>
 
-                    {/* Action Button */}
-                    <td className="py-3 px-3 text-end" onClick={(e) => e.stopPropagation()}>
+                    {/* View Action */}
+                    <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => onSelectParticipant(p)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-sky-400 bg-sky-500/10 border border-sky-500/20 hover:bg-sky-500/20 hover:border-sky-500/40 transition-all"
+                        className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        title="View Full Candidate Profile"
                       >
-                        <span>View</span>
-                        <ArrowRight className="w-3 h-3" />
+                        <ArrowRight className="w-4 h-4" />
                       </button>
                     </td>
+
                   </tr>
                 );
               })
@@ -572,11 +652,11 @@ export default function DataTable({
         </table>
       </div>
 
-      {/* 4. Mobile Cards Feed (For Small Screens) */}
-      <div className="md:hidden divide-y divide-white/[0.06] p-3 space-y-3">
+      {/* 4. Responsive Mobile Cards Feed */}
+      <div className="md:hidden divide-y divide-white/[0.06]">
         {pageItems.length === 0 ? (
-          <div className="py-8 text-center text-slate-400">
-            <p className="text-sm font-medium">No attendees found</p>
+          <div className="py-12 text-center text-slate-500 text-xs">
+            No participants found matching active filters.
           </div>
         ) : (
           pageItems.map((p, idx) => {
@@ -585,66 +665,82 @@ export default function DataTable({
             const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
             const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
             const amt = Number(p.amount) || 0;
+            const rec = callRecords[String(p.id)];
+            const callCount = rec?.callCount || 0;
+            const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
 
             return (
-              <div
+              <div 
                 key={p.id || idx}
                 onClick={() => onSelectParticipant(p)}
-                className="surface-elevated rounded-lg p-3 cursor-pointer"
+                className="p-4 space-y-2.5 active:bg-white/[0.02] cursor-pointer"
               >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
                     <span 
                       style={avatarStyle}
-                      className="w-7 h-7 rounded-md flex items-center justify-center text-[10.5px] font-bold shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                     >
                       {initials}
                     </span>
-                    <div className="min-w-0">
-                      <div className="font-medium text-white text-xs truncate">{p.name}</div>
-                      <div className="text-[11px] font-mono text-slate-400 truncate">{p.phone || p.email}</div>
+                    <div>
+                      <div className="font-semibold text-white text-xs">{p.name}</div>
+                      <div className="text-[11px] font-mono text-slate-400">{p.email || 'N/A'}</div>
                     </div>
                   </div>
-                  <div>
-                    {amt > 0 ? (
-                      <span className="text-[10.5px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                        Paid ₹{amt}
+
+                  {amt > 0 ? (
+                    <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                      ₹{amt}
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-white/[0.04]">
+                      Free
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-xs text-slate-300">
+                  <div className="font-medium text-white">{p.event_name}</div>
+                  <div className="text-[11px] text-slate-400 truncate mt-0.5">{p.college}</div>
+                </div>
+
+                {/* Call Status & Direct Action Buttons */}
+                <div className="flex items-center justify-between pt-1" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1.5">
+                    {statusDef ? (
+                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${statusDef.badge}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
+                        <span>{statusDef.shortLabel}</span>
                       </span>
                     ) : (
-                      <span className="text-[10.5px] text-slate-400 bg-white/[0.04] border border-white/[0.08] px-2 py-0.5 rounded-full">
-                        Free
+                      <span className="text-[10px] font-mono text-slate-500">
+                        Never Called
                       </span>
                     )}
                   </div>
-                </div>
 
-                <div className="p-2 rounded bg-black/30 border border-white/[0.04] mb-2 text-xs">
-                  <div className="flex justify-between items-center gap-2 mb-1">
-                    <span className="font-medium text-slate-200 truncate">{p.event_name}</span>
-                    {renderTrackBadge(p.event_type)}
+                  <div className="flex items-center gap-1.5">
+                    {p.phone && p.phone !== 'N/A' && (
+                      <button
+                        onClick={() => onTriggerCall && onTriggerCall(p)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30"
+                      >
+                        <PhoneCall className="w-3 h-3 text-sky-400" />
+                        <span>Call ({callCount})</span>
+                      </button>
+                    )}
+                    {waLink && (
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-1 rounded text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25"
+                      >
+                        WA
+                      </a>
+                    )}
                   </div>
-                  <div className="text-[11px] text-slate-400 truncate">{p.college}</div>
-                </div>
-
-                <div className="flex items-center justify-between pt-1.5 border-t border-white/[0.06]" onClick={(e) => e.stopPropagation()}>
-                  {waLink ? (
-                    <a
-                      href={waLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20"
-                    >
-                      <span>WhatsApp</span>
-                    </a>
-                  ) : <span></span>}
-
-                  <button
-                    onClick={() => onSelectParticipant(p)}
-                    className="inline-flex items-center gap-1 text-xs text-sky-400 hover:text-sky-300 font-medium"
-                  >
-                    <span>Inspect</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
                 </div>
               </div>
             );
@@ -652,49 +748,59 @@ export default function DataTable({
         )}
       </div>
 
-      {/* 5. Master Card Footer: Pagination */}
-      <div className="p-3 bg-[#11141A] border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 font-mono">
+      {/* 5. Pagination Bar */}
+      <div className="p-3 bg-[#11141A] border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        
         <div className="flex items-center gap-2">
-          <span>Rows per page:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="px-2 py-1 rounded bg-[#161A22] border border-white/[0.08] text-white focus:outline-none"
-          >
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-            <option value="all">All</option>
-          </select>
+          <span>Showing</span>
+          <span className="font-mono text-slate-200">{filteredParticipants.length > 0 ? startIndex + 1 : 0}</span>
+          <span>to</span>
+          <span className="font-mono text-slate-200">{endIndex}</span>
+          <span>of</span>
+          <span className="font-mono text-slate-200">{filteredParticipants.length}</span>
+          <span>verified records</span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span>
-            Showing {filteredParticipants.length === 0 ? 0 : startIndex + 1}–{endIndex} of {filteredParticipants.length}
-          </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-slate-500">Rows per page:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                const val = e.target.value === 'all' ? 'all' : Number(e.target.value);
+                setPageSize(val);
+                setCurrentPage(1);
+              }}
+              className="bg-[#0B0D11] border border-white/[0.08] rounded-md px-2 py-1 text-xs text-slate-300 outline-none"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1 font-mono text-xs">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={effectivePage <= 1}
-              className="p-1 rounded bg-[#161A22] border border-white/[0.08] disabled:opacity-40 hover:text-white transition-all"
-              title="Previous Page"
+              disabled={currentPage <= 1 || pageSize === 'all'}
+              className="p-1 rounded bg-[#161A22] border border-white/[0.08] hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="px-2 text-slate-300 font-semibold">{effectivePage} / {totalPages}</span>
+            <span className="px-2 text-slate-300">
+              Page {effectivePage} of {totalPages}
+            </span>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={effectivePage >= totalPages}
-              className="p-1 rounded bg-[#161A22] border border-white/[0.08] disabled:opacity-40 hover:text-white transition-all"
-              title="Next Page"
+              disabled={currentPage >= totalPages || pageSize === 'all'}
+              className="p-1 rounded bg-[#161A22] border border-white/[0.08] hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
+
       </div>
 
     </div>
