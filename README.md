@@ -61,7 +61,7 @@ Repo me token secure rakhne ke liye:
    - **Source**: `Deploy from a branch`
    - **Branch**: `main` / `/(root)`
 3. **Save** par click karo.
-4. 1-2 minute baad aapka dashboard live ho jayega:  
+4. Dashboard live link:  
    `https://sagar-anmol.github.io/unstop-paid-tracker/`
 
 ---
