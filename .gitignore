@@ -28,6 +28,11 @@ wheels/
 .env.local
 token.txt
 
+# Node
+node_modules/
+.vite/
+dist/
+
 # OS
 .DS_Store
 Thumbs.db
