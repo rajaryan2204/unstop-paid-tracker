@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>techFEST '26 • Central Operations Desk</title>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Google Fonts: Geist, Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Tabler Core CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
@@ -21,70 +21,56 @@
 
   <style>
     /* ==========================================================================
-       Linear / Vercel 2026 Dark Operations Theme System
+       Vercel × Linear × Raycast Premium Neutral Design System
        ========================================================================== */
     :root {
-      --tblr-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --tblr-font-sans-serif: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --tblr-font-monospace: 'JetBrains Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
       
-      --tf-bg-base: #08090d;
-      --tf-bg-canvas: #0c0e15;
-      --tf-bg-surface: #10131d;
-      --tf-bg-surface-elevated: #151824;
-      --tf-bg-surface-hover: #171c2b;
-      --tf-bg-well: #090b12;
+      --tf-bg-base: #0B0D10;
+      --tf-bg-surface: #11141A;
+      --tf-bg-elevated: #151922;
+      --tf-bg-hover: #171B23;
+      --tf-border: #242832;
+      --tf-border-subtle: rgba(255, 255, 255, 0.07);
 
-      --tf-border-subtle: rgba(255, 255, 255, 0.08);
-      --tf-border-strong: rgba(255, 255, 255, 0.14);
-      --tf-border-focus: rgba(56, 189, 248, 0.4);
+      --tf-text-primary: #F5F7FA;
+      --tf-text-secondary: #8B93A1;
+      --tf-text-muted: #626A78;
 
-      --tf-text-primary: #f8fafc;
-      --tf-text-secondary: #94a3b8;
-      --tf-text-muted: #64748b;
+      --tf-accent-blue: #4EA8FF;
+      --tf-accent-blue-dim: rgba(78, 168, 255, 0.1);
+      --tf-accent-green: #34d399;
+      --tf-accent-green-dim: rgba(52, 211, 153, 0.08);
 
-      --tf-accent-blue: #38bdf8;
-      --tf-accent-blue-dim: rgba(56, 189, 248, 0.1);
-      --tf-accent-green: #10b981;
-      --tf-accent-green-dim: rgba(16, 185, 129, 0.12);
-      --tf-accent-amber: #f59e0b;
-      --tf-accent-amber-dim: rgba(245, 158, 11, 0.1);
-      --tf-accent-purple: #a855f7;
-      --tf-accent-purple-dim: rgba(168, 85, 247, 0.1);
-
-      --tf-radius-sm: 5px;
-      --tf-radius-md: 7px;
-      --tf-radius-lg: 10px;
+      --tf-radius-sm: 4px;
+      --tf-radius-md: 6px;
+      --tf-radius-lg: 8px;
     }
 
     [data-bs-theme="light"] {
-      --tf-bg-base: #f8fafc;
-      --tf-bg-canvas: #f1f5f9;
-      --tf-bg-surface: #ffffff;
-      --tf-bg-surface-elevated: #ffffff;
-      --tf-bg-surface-hover: #f8fafc;
-      --tf-bg-well: #f1f5f9;
+      --tf-bg-base: #F8FAFC;
+      --tf-bg-surface: #FFFFFF;
+      --tf-bg-elevated: #F1F5F9;
+      --tf-bg-hover: #F8FAFC;
+      --tf-border: #E2E8F0;
+      --tf-border-subtle: rgba(0, 0, 0, 0.07);
 
-      --tf-border-subtle: rgba(0, 0, 0, 0.08);
-      --tf-border-strong: rgba(0, 0, 0, 0.15);
-      --tf-border-focus: rgba(2, 132, 199, 0.4);
-
-      --tf-text-primary: #0f172a;
+      --tf-text-primary: #0F172A;
       --tf-text-secondary: #475569;
-      --tf-text-muted: #64748b;
+      --tf-text-muted: #94A3B8;
 
-      --tf-accent-blue: #0284c7;
+      --tf-accent-blue: #0284C7;
       --tf-accent-blue-dim: rgba(2, 132, 199, 0.08);
       --tf-accent-green: #059669;
       --tf-accent-green-dim: rgba(5, 150, 105, 0.08);
-      --tf-accent-amber: #d97706;
-      --tf-accent-amber-dim: rgba(217, 119, 6, 0.08);
-      --tf-accent-purple: #7e22ce;
-      --tf-accent-purple-dim: rgba(126, 34, 206, 0.08);
     }
 
     body {
       background-color: var(--tf-bg-base) !important;
       color: var(--tf-text-primary) !important;
+      font-family: var(--tblr-font-sans-serif) !important;
+      font-weight: 400;
       font-feature-settings: "cv02", "cv03", "cv04", "cv11";
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -99,8 +85,8 @@
     /* Subtle custom scrollbar */
     .custom-scrollbar::-webkit-scrollbar,
     ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track,
     ::-webkit-scrollbar-track {
@@ -108,7 +94,7 @@
     }
     .custom-scrollbar::-webkit-scrollbar-thumb,
     ::-webkit-scrollbar-thumb {
-      background: var(--tf-border-strong);
+      background: var(--tf-border);
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover,
@@ -117,78 +103,110 @@
     }
 
     /* ==========================================================================
-       Header Styling
+       Header Styling (Vercel / Linear Inspired)
        ========================================================================== */
     .ops-header {
-      background: rgba(11, 14, 22, 0.85) !important;
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      border-bottom: 1px solid var(--tf-border-subtle) !important;
-      height: 56px;
-      min-height: 56px;
+      background: var(--tf-bg-base) !important;
+      border-bottom: 1px solid var(--tf-border) !important;
+      height: 52px;
+      min-height: 52px;
     }
     [data-bs-theme="light"] .ops-header {
-      background: rgba(255, 255, 255, 0.88) !important;
+      background: #FFFFFF !important;
+      border-bottom: 1px solid var(--tf-border) !important;
     }
 
     .brand-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--tf-radius-md);
-      background: var(--tf-accent-blue-dim);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      width: 24px;
+      height: 24px;
+      border-radius: var(--tf-radius-sm);
+      background: var(--tf-bg-elevated);
+      border: 1px solid var(--tf-border);
       color: var(--tf-accent-blue);
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10.5px;
+      font-weight: 600;
       letter-spacing: -0.02em;
     }
 
     .ops-brand-title {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: var(--tf-text-primary);
     }
 
-    .badge-subtle {
+    .ops-brand-subtitle {
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-weight: 500;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--tf-text-secondary);
-      border: 1px solid var(--tf-border-subtle);
+      color: var(--tf-text-muted);
     }
 
-    .badge-status-active {
-      background: var(--tf-accent-green-dim);
-      color: var(--tf-accent-green);
-      border: 1px solid rgba(16, 185, 129, 0.25);
+    .header-token-btn {
+      background: var(--tf-bg-surface);
+      border: 1px solid var(--tf-border);
+      color: var(--tf-text-secondary);
+      font-size: 11.5px;
+      padding: 4px 9px;
+      border-radius: var(--tf-radius-sm);
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .header-token-btn:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--tf-text-primary);
+    }
+
+    .btn-header-action {
+      background: var(--tf-bg-elevated);
+      border: 1px solid var(--tf-border);
+      color: var(--tf-text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: var(--tf-radius-sm);
+      transition: all 0.15s ease;
+    }
+    .btn-header-action:hover {
+      background: var(--tf-bg-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--tf-text-primary);
+    }
+
+    .badge-subtle {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 2px 6px;
+      border-radius: var(--tf-radius-sm);
+      background: var(--tf-bg-elevated);
+      color: var(--tf-text-muted);
+      border: 1px solid var(--tf-border);
     }
 
     /* ==========================================================================
-       Unified KPI Ribbon
+       Unified KPI Metrics Section
        ========================================================================== */
     .kpi-container {
       background: var(--tf-bg-surface);
-      border: 1px solid var(--tf-border-subtle);
+      border: 1px solid var(--tf-border);
       border-radius: var(--tf-radius-lg);
       padding: 0;
       overflow: hidden;
+      margin-bottom: 24px;
     }
 
     .kpi-col {
-      padding: 16px 20px;
-      border-right: 1px solid var(--tf-border-subtle);
+      padding: 16px 22px;
+      border-right: 1px solid var(--tf-border);
       transition: background 0.15s ease;
     }
     .kpi-col:last-child {
       border-right: none;
     }
     .kpi-col:hover {
-      background: rgba(255, 255, 255, 0.015);
+      background: var(--tf-bg-hover);
     }
 
     @media (max-width: 991px) {
@@ -196,13 +214,13 @@
         border-right: none;
       }
       .kpi-col:nth-child(1), .kpi-col:nth-child(2) {
-        border-bottom: 1px solid var(--tf-border-subtle);
+        border-bottom: 1px solid var(--tf-border);
       }
     }
     @media (max-width: 575px) {
       .kpi-col {
         border-right: none !important;
-        border-bottom: 1px solid var(--tf-border-subtle);
+        border-bottom: 1px solid var(--tf-border);
       }
       .kpi-col:last-child {
         border-bottom: none;
@@ -211,17 +229,17 @@
 
     .kpi-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       color: var(--tf-text-muted);
       margin-bottom: 4px;
     }
 
     .kpi-value {
       font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       line-height: 1.15;
       font-variant-numeric: tabular-nums;
       color: var(--tf-text-primary);
@@ -229,92 +247,74 @@
 
     .kpi-subtext {
       font-size: 11.5px;
+      font-weight: 400;
       color: var(--tf-text-secondary);
-      margin-top: 5px;
+      margin-top: 4px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     /* ==========================================================================
-       Event Overview Analytics Panel
+       Event Overview Analytics Panel (Graph)
        ========================================================================== */
     .overview-panel {
       background: var(--tf-bg-surface);
-      border: 1px solid var(--tf-border-subtle);
+      border: 1px solid var(--tf-border);
       border-radius: var(--tf-radius-lg);
       overflow: hidden;
+      margin-bottom: 24px;
     }
 
     .overview-header {
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--tf-border-subtle);
-      background: rgba(255, 255, 255, 0.01);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--tf-border);
+      background: var(--tf-bg-surface);
     }
 
     .chart-container-box {
       position: relative;
-      height: 220px;
+      height: 200px;
       width: 100%;
-      padding: 12px 16px 16px 16px;
+      padding: 10px 14px 14px 14px;
+    }
+
+    .chart-switch-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--tf-text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--tf-radius-sm);
+      transition: all 0.15s ease;
+    }
+    .chart-switch-btn:hover {
+      color: var(--tf-text-primary);
+    }
+    .chart-switch-btn.active {
+      background: var(--tf-bg-elevated);
+      border-color: var(--tf-border);
+      color: var(--tf-text-primary);
     }
 
     /* ==========================================================================
        MASTER UNIFIED OPERATIONS DATA TABLE CARD
        ========================================================================== */
     .ops-master-card {
-      background: #0d1017 !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-radius: 10px !important;
+      background: var(--tf-bg-surface) !important;
+      border: 1px solid var(--tf-border) !important;
+      border-radius: var(--tf-radius-lg) !important;
       overflow: hidden !important;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
-    }
-    [data-bs-theme="light"] .ops-master-card {
-      background: #ffffff !important;
-      border: 1px solid rgba(0, 0, 0, 0.12) !important;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+      box-shadow: none !important;
+      margin-bottom: 28px;
     }
 
+    /* Tabs Header Bar */
     .ops-master-header {
-      background: #090b12 !important;
-      padding: 12px 16px !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-    [data-bs-theme="light"] .ops-master-header {
-      background: #f8fafc !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .ops-master-toolbar {
-      background: #0d1017 !important;
-      padding: 14px 16px !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-    [data-bs-theme="light"] .ops-master-toolbar {
-      background: #ffffff !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .ops-master-footer {
-      background: #090b12 !important;
-      padding: 11px 16px !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-    [data-bs-theme="light"] .ops-master-footer {
-      background: #f8fafc !important;
-      border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
-    }
-
-    /* Segmented Navigation */
-    .ops-tray {
-      background: #05070c;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--tf-radius-md);
-      padding: 3px;
-    }
-    [data-bs-theme="light"] .ops-tray {
-      background: #f1f5f9;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: var(--tf-bg-surface) !important;
+      padding: 0 16px !important;
+      border-bottom: 1px solid var(--tf-border) !important;
     }
 
     .nav-segmented {
@@ -328,171 +328,164 @@
     .cat-tab {
       background: transparent;
       border: none;
+      border-bottom: 2px solid transparent;
       color: var(--tf-text-secondary);
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 500;
-      padding: 5px 12px;
-      border-radius: var(--tf-radius-sm);
+      padding: 11px 14px;
+      margin-bottom: -1px;
       transition: all 0.15s ease;
       white-space: nowrap;
     }
     .cat-tab:hover {
       color: var(--tf-text-primary);
-      background: rgba(255, 255, 255, 0.04);
     }
     .cat-tab.active {
-      color: #ffffff !important;
-      background: #1e2638 !important;
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      color: var(--tf-accent-blue) !important;
+      border-bottom: 2px solid var(--tf-accent-blue) !important;
+      background: transparent !important;
+      font-weight: 500;
+      box-shadow: none !important;
     }
-    [data-bs-theme="light"] .cat-tab.active {
-      color: #0f172a !important;
-      background: #ffffff !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .tab-count {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--tf-text-muted);
+      margin-left: 4px;
+    }
+    .cat-tab.active .tab-count {
+      color: rgba(78, 168, 255, 0.7);
+    }
+
+    /* Payment Segments */
+    .ops-pay-tray {
+      display: inline-flex;
+      gap: 2px;
+      padding: 2px;
+      background: var(--tf-bg-elevated);
+      border: 1px solid var(--tf-border);
+      border-radius: var(--tf-radius-sm);
     }
 
     .pay-btn {
       background: transparent;
       border: none;
-      color: var(--tf-text-secondary);
+      color: var(--tf-text-muted);
       font-size: 11.5px;
       font-weight: 500;
-      padding: 4px 10px;
-      border-radius: var(--tf-radius-sm);
+      padding: 3px 8px;
+      border-radius: 3px;
       transition: all 0.15s ease;
     }
     .pay-btn:hover {
       color: var(--tf-text-primary);
-      background: rgba(255, 255, 255, 0.04);
     }
     .pay-btn.active {
-      color: #ffffff !important;
-      background: #1e2638 !important;
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    }
-    [data-bs-theme="light"] .pay-btn.active {
-      color: #0f172a !important;
-      background: #ffffff !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      background: var(--tf-bg-surface);
+      color: var(--tf-text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
-    /* Form Controls */
+    /* Toolbar */
+    .ops-master-toolbar {
+      background: var(--tf-bg-surface) !important;
+      padding: 12px 16px !important;
+      border-bottom: 1px solid var(--tf-border) !important;
+    }
+
     .ops-input, .ops-select {
-      background-color: #080a10 !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background-color: var(--tf-bg-elevated) !important;
+      border: 1px solid var(--tf-border) !important;
       color: var(--tf-text-primary) !important;
-      border-radius: var(--tf-radius-md) !important;
-      font-size: 13px !important;
-      height: 36px;
+      border-radius: var(--tf-radius-sm) !important;
+      font-size: 12.5px !important;
+      font-weight: 400;
+      height: 34px;
       transition: all 0.15s ease;
     }
-    [data-bs-theme="light"] .ops-input, [data-bs-theme="light"] .ops-select {
-      background-color: #ffffff !important;
-      border: 1px solid rgba(0, 0, 0, 0.12) !important;
-    }
     .ops-input:focus, .ops-select:focus {
-      border-color: var(--tf-border-focus) !important;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+      border-color: rgba(78, 168, 255, 0.5) !important;
+      box-shadow: 0 0 0 1px rgba(78, 168, 255, 0.2) !important;
       outline: none !important;
     }
     .ops-input::placeholder {
       color: var(--tf-text-muted);
-      font-size: 12.5px;
+      font-size: 12px;
+    }
+
+    /* Kbd shortcut */
+    .ops-kbd {
+      background: var(--tf-bg-surface);
+      border: 1px solid var(--tf-border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 10px;
+      font-family: var(--tblr-font-monospace);
+      color: var(--tf-text-muted);
     }
 
     /* ==========================================================================
-       PROPER ENTERPRISE DATA TABLE
+       ENTERPRISE DATA TABLE
        ========================================================================== */
     .ops-data-table {
       width: 100% !important;
       border-collapse: collapse !important;
-      background: #0d1017 !important;
+      background: var(--tf-bg-surface) !important;
       margin: 0 !important;
-    }
-    [data-bs-theme="light"] .ops-data-table {
-      background: #ffffff !important;
     }
 
     .ops-data-table thead th {
-      background-color: #141825 !important;
-      color: #94a3b8 !important;
+      background-color: var(--tf-bg-surface) !important;
+      color: var(--tf-text-muted) !important;
       font-size: 11px !important;
-      font-weight: 600 !important;
+      font-weight: 500 !important;
       text-transform: uppercase !important;
-      letter-spacing: 0.06em !important;
-      padding: 12px 14px !important;
+      letter-spacing: 0.05em !important;
+      padding: 10px 14px !important;
       border-top: none !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+      border-bottom: 1px solid var(--tf-border) !important;
+      border-right: none !important;
       white-space: nowrap !important;
       vertical-align: middle !important;
     }
-    .ops-data-table thead th:last-child {
-      border-right: none !important;
-    }
-    [data-bs-theme="light"] .ops-data-table thead th {
-      background-color: #f1f5f9 !important;
-      color: #475569 !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
-      border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-    }
 
     .ops-data-table tbody tr {
-      background-color: #0d1017 !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-      transition: background-color 0.12s ease !important;
+      background-color: var(--tf-bg-surface) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      transition: background-color 0.1s ease !important;
       cursor: pointer !important;
     }
     .ops-data-table tbody tr:nth-child(even) {
-      background-color: #0a0d14 !important;
+      background-color: var(--tf-bg-surface) !important;
     }
     .ops-data-table tbody tr:hover {
-      background-color: #182032 !important;
-    }
-    [data-bs-theme="light"] .ops-data-table tbody tr {
-      background-color: #ffffff !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-    }
-    [data-bs-theme="light"] .ops-data-table tbody tr:nth-child(even) {
-      background-color: #f8fafc !important;
-    }
-    [data-bs-theme="light"] .ops-data-table tbody tr:hover {
-      background-color: #f1f5f9 !important;
+      background-color: var(--tf-bg-hover) !important;
     }
 
     .ops-data-table tbody td {
       padding: 12px 14px !important;
       vertical-align: middle !important;
-      color: #f1f5f9 !important;
+      color: var(--tf-text-primary) !important;
       font-size: 13px !important;
       border-top: none !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-      border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
-    }
-    .ops-data-table tbody td:last-child {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
       border-right: none !important;
     }
-    [data-bs-theme="light"] .ops-data-table tbody td {
-      color: #0f172a !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-      border-right: 1px solid rgba(0, 0, 0, 0.04) !important;
-    }
-
     .ops-data-table tbody tr:last-child td {
       border-bottom: none !important;
     }
 
+    /* Table Components */
     .user-avatar-sm {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: var(--tf-radius-sm);
-      background: var(--tf-accent-blue-dim);
-      color: var(--tf-accent-blue);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      font-size: 11px;
-      font-weight: 600;
+      background: var(--tf-bg-elevated);
+      color: var(--tf-text-secondary);
+      border: 1px solid var(--tf-border);
+      font-size: 10.5px;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -501,93 +494,140 @@
 
     .tag-track {
       font-size: 10.5px;
-      font-weight: 500;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      padding: 2.5px 7px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      padding: 2px 6px;
+      border-radius: var(--tf-radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--tf-border);
       color: var(--tf-text-secondary);
       display: inline-flex;
       align-items: center;
     }
 
     .tag-paid {
-      background: rgba(16, 185, 129, 0.12) !important;
-      border: 1px solid rgba(16, 185, 129, 0.35) !important;
-      color: #10b981 !important;
-      font-weight: 600 !important;
-    }
-    .tag-free {
-      background: rgba(255, 255, 255, 0.04) !important;
-      border: 1px solid rgba(255, 255, 255, 0.09) !important;
-      color: #94a3b8 !important;
+      background: var(--tf-accent-green-dim) !important;
+      border: 1px solid rgba(52, 211, 153, 0.2) !important;
+      color: var(--tf-accent-green) !important;
+      font-size: 11px !important;
       font-weight: 500 !important;
+      padding: 2px 7px !important;
+      border-radius: 9999px !important;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .tag-free {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border: 1px solid var(--tf-border) !important;
+      color: var(--tf-text-secondary) !important;
+      font-size: 11px !important;
+      font-weight: 400 !important;
+      padding: 2px 7px !important;
+      border-radius: 9999px !important;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-member-tag {
+      background: var(--tf-bg-elevated);
+      border: 1px solid var(--tf-border);
+      color: var(--tf-text-secondary);
+      font-size: 11px;
+      font-weight: 400;
+      padding: 1px 6px;
+      border-radius: var(--tf-radius-sm);
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .btn-member-tag:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--tf-text-primary);
     }
 
     .btn-view-action {
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: none;
       color: var(--tf-text-secondary);
       font-size: 11.5px;
       font-weight: 500;
-      padding: 4px 10px;
+      padding: 3px 6px;
+      border-radius: var(--tf-radius-sm);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .btn-view-action:hover {
+      color: var(--tf-accent-blue);
+      background: var(--tf-accent-blue-dim);
+    }
+
+    /* Footer */
+    .ops-master-footer {
+      background: var(--tf-bg-surface) !important;
+      padding: 10px 16px !important;
+      border-top: 1px solid var(--tf-border) !important;
+    }
+
+    .btn-page {
+      background: var(--tf-bg-elevated);
+      border: 1px solid var(--tf-border);
+      color: var(--tf-text-secondary);
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 3px 9px;
       border-radius: var(--tf-radius-sm);
       transition: all 0.15s ease;
     }
-    .btn-view-action:hover {
-      background: var(--tf-accent-blue-dim);
-      border-color: rgba(56, 189, 248, 0.4);
-      color: var(--tf-accent-blue);
+    .btn-page:hover:not(:disabled) {
+      color: var(--tf-text-primary);
+      background: var(--tf-bg-hover);
+      border-color: rgba(255, 255, 255, 0.15);
     }
-    [data-bs-theme="light"] .btn-view-action {
-      border: 1px solid rgba(0, 0, 0, 0.15);
+    .btn-page:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
-    /* ==========================================================================
-       Mobile Card Feed
-       ========================================================================== */
+    /* Mobile attendee card */
     .mobile-attendee-card {
-      background: #090c13;
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: var(--tf-bg-surface);
+      border: 1px solid var(--tf-border);
       border-radius: var(--tf-radius-md);
       padding: 12px 14px;
       margin-bottom: 8px;
       transition: background 0.15s ease;
     }
     .mobile-attendee-card:active {
-      background: #141a27;
+      background: var(--tf-bg-hover);
     }
 
-    /* ==========================================================================
-       Offcanvas Drawer & Modals
-       ========================================================================== */
+    /* Drawer & Modals */
     .offcanvas-candidate {
-      width: 540px !important;
+      width: 520px !important;
       max-width: 100vw !important;
-      background: var(--tf-bg-surface-elevated) !important;
-      border-left: 1px solid var(--tf-border-strong) !important;
-      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
+      background: var(--tf-bg-surface) !important;
+      border-left: 1px solid var(--tf-border) !important;
     }
 
     .drawer-header {
       background: var(--tf-bg-surface);
-      border-bottom: 1px solid var(--tf-border-subtle);
+      border-bottom: 1px solid var(--tf-border);
       padding: 14px 20px;
     }
 
     .drawer-body {
       padding: 20px;
-      background: var(--tf-bg-canvas);
+      background: var(--tf-bg-base);
     }
 
     .drawer-card {
       background: var(--tf-bg-surface);
-      border: 1px solid var(--tf-border-subtle);
+      border: 1px solid var(--tf-border);
       border-radius: var(--tf-radius-md);
       padding: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .drawer-table {
@@ -595,7 +635,7 @@
       font-size: 12.5px;
     }
     .drawer-table td {
-      padding: 6px 4px;
+      padding: 5px 4px;
       vertical-align: top;
     }
     .drawer-table td:first-child {
@@ -614,17 +654,6 @@
       font-weight: 500;
       transition: all 0.15s ease;
     }
-
-    /* Keyboard kbd */
-    .ops-kbd {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--tf-border-subtle);
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 10.5px;
-      font-family: var(--tblr-font-monospace);
-      color: var(--tf-text-secondary);
-    }
   </style>
 </head>
 <body data-bs-theme="dark">
@@ -632,17 +661,16 @@
   <!-- Application Shell -->
   <div id="authenticatedApp" class="page">
     
-    <!-- Top Modern Navigation Bar (Height: 56px) -->
+    <!-- Top Modern Navigation Bar (Height: 52px) -->
     <header class="navbar navbar-expand-md d-print-none sticky-top ops-header py-0">
       <div class="container-xl d-flex align-items-center justify-content-between h-100">
         
         <!-- Brand & Identity -->
         <a href="." class="d-flex align-items-center text-decoration-none py-1 pe-2">
-          <div class="brand-mark d-flex align-items-center justify-content-center me-2">TF</div>
-          <div class="d-flex align-items-center gap-2">
+          <div class="brand-mark d-flex align-items-center justify-content-center me-2.5">TF</div>
+          <div class="d-flex align-items-baseline gap-2">
             <span class="ops-brand-title">techFEST '26</span>
-            <span class="d-none d-sm-inline-block text-secondary opacity-25">|</span>
-            <span class="badge-subtle d-none d-sm-inline-flex align-items-center">SLIET Central Desk</span>
+            <span class="ops-brand-subtitle d-none d-sm-inline-block">Central Desk</span>
           </div>
         </a>
 
@@ -654,38 +682,38 @@
             type="button" 
             onclick="openTokenHealthModal()" 
             id="tokenBadge" 
-            class="badge-subtle badge-status-active d-none d-lg-inline-flex align-items-center gap-1.5 py-1 px-2.5 text-decoration-none border-0 cursor-pointer" 
+            class="header-token-btn d-none d-lg-inline-flex align-items-center gap-1.5 text-decoration-none" 
             title="Click to view 24/7 Autonomous OAuth Status"
           >
-            <span id="tokenDot" class="status-dot status-dot-animated bg-green"></span>
+            <span id="tokenDot" class="status-dot status-dot-animated bg-green" style="width: 6px; height: 6px;"></span>
             <span id="tokenText" class="font-monospace">Token: Active</span>
           </button>
 
           <!-- Live Sync Status Indicator -->
-          <div class="d-none d-md-flex align-items-center gap-1.5 text-secondary small px-1.5 font-monospace" style="font-size: 11.5px;">
-            <span class="status-dot status-dot-animated bg-green"></span>
+          <div class="d-none d-md-flex align-items-center gap-1.5 small px-1 font-monospace" style="font-size: 11px; color: var(--tf-text-muted);">
+            <span class="status-dot status-dot-animated bg-green" style="width: 6px; height: 6px;"></span>
             <span id="syncTimestamp">Live sync</span>
           </div>
 
-          <!-- 1-Click Sync Trigger (Preserved & Styled in Linear Theme) -->
-          <button type="button" onclick="openBookmarkletModal()" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex align-items-center py-1 px-2.5 gap-1" title="1-Click Browser Sync Tool">
-            <i class="ti ti-bolt text-warning" style="font-size: 14px;"></i>
-            <span style="font-size: 12px;">1-Click Sync</span>
+          <!-- 1-Click Sync Trigger -->
+          <button type="button" onclick="openBookmarkletModal()" class="header-token-btn d-none d-md-inline-flex align-items-center gap-1" title="1-Click Browser Sync Tool">
+            <i class="ti ti-bolt text-warning" style="font-size: 13px;"></i>
+            <span>1-Click Sync</span>
           </button>
 
           <!-- Force Refresh Data -->
-          <button type="button" onclick="loadData()" class="btn btn-icon btn-ghost-secondary" title="Force Refresh Live Data" style="width: 32px; height: 32px;">
-            <i class="ti ti-refresh" id="refreshIcon" style="font-size: 15px;"></i>
+          <button type="button" onclick="loadData()" class="btn btn-icon btn-ghost-secondary" title="Force Refresh Live Data" style="width: 30px; height: 30px; color: var(--tf-text-secondary);">
+            <i class="ti ti-refresh" id="refreshIcon" style="font-size: 14px;"></i>
           </button>
 
           <!-- Dark / Light Theme Toggle -->
-          <button type="button" onclick="toggleTheme()" class="btn btn-icon btn-ghost-secondary" title="Toggle Theme" style="width: 32px; height: 32px;">
-            <i class="ti ti-sun" id="themeIcon" style="font-size: 15px;"></i>
+          <button type="button" onclick="toggleTheme()" class="btn btn-icon btn-ghost-secondary" title="Toggle Theme" style="width: 30px; height: 30px; color: var(--tf-text-secondary);">
+            <i class="ti ti-sun" id="themeIcon" style="font-size: 14px;"></i>
           </button>
 
-          <!-- CSV Export Button -->
-          <button type="button" onclick="exportToCSV()" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 shadow-none" style="font-size: 12px; font-weight: 600;">
-            <i class="ti ti-download" style="font-size: 14px;"></i>
+          <!-- CSV Export Button (Refined subtle professional button, not loud CTA) -->
+          <button type="button" onclick="exportToCSV()" class="btn-header-action d-inline-flex align-items-center gap-1.5" title="Export verified attendees to CSV">
+            <i class="ti ti-download" style="font-size: 13px;"></i>
             <span class="d-none d-sm-inline">Export CSV</span>
             <span class="d-sm-none">CSV</span>
           </button>
@@ -705,7 +733,7 @@
           <!-- ======================================================= -->
           <!-- 1. Unified KPI Metrics Ribbon (Linear / Vercel style)   -->
           <!-- ======================================================= -->
-          <div class="kpi-container mb-3 shadow-none">
+          <div class="kpi-container shadow-none">
             <div class="row g-0">
               
               <!-- Metric 1: Verified Attendees -->
@@ -713,7 +741,7 @@
                 <div class="kpi-label">Verified Attendees</div>
                 <div class="kpi-value d-flex align-items-baseline">
                   <span id="statTotalPaid" class="me-1.5">625</span>
-                  <span class="text-secondary fw-normal fs-4">/ <span id="statTotalApplicants">3,549</span></span>
+                  <span class="fw-normal fs-4" style="color: var(--tf-text-muted);">/ <span id="statTotalApplicants">3,549</span></span>
                 </div>
                 <div class="kpi-subtext" id="subTotalPaid">
                   587 Free • 38 Paid
@@ -722,8 +750,8 @@
 
               <!-- Metric 2: Gateway Fee Revenue -->
               <div class="col-12 col-sm-6 col-lg-3 kpi-col">
-                <div class="kpi-label">Paid Fee Revenue</div>
-                <div class="kpi-value text-warning" id="statTotalRevenue">
+                <div class="kpi-label">Paid Revenue</div>
+                <div class="kpi-value" id="statTotalRevenue">
                   ₹3,793
                 </div>
                 <div class="kpi-subtext" id="subTotalRevenue">
@@ -757,21 +785,21 @@
           </div>
 
           <!-- ======================================================= -->
-          <!-- 2. Event Overview Analytics Graph (Compact 220–240px)   -->
+          <!-- 2. Event Overview Analytics Graph (Compact 200px)       -->
           <!-- ======================================================= -->
-          <div class="overview-panel mb-3" id="eventOverviewCard">
+          <div class="overview-panel" id="eventOverviewCard">
             <div class="overview-header d-flex flex-wrap align-items-center justify-content-between gap-2">
               <div class="d-flex align-items-center gap-2">
-                <span class="fw-semibold text-reset" style="font-size: 13px;">Event Activity & Distribution</span>
-                <span class="badge-subtle badge-status-active">Live Metrics</span>
+                <span class="fw-medium text-reset" style="font-size: 13px;">Event Activity & Distribution</span>
+                <span class="badge-subtle">Live Metrics</span>
               </div>
 
               <!-- View Switcher -->
-              <div class="ops-tray d-inline-flex p-0.5">
-                <button type="button" onclick="switchOverviewChart('timeline')" id="chartViewTimelineBtn" class="pay-btn active py-0.5 px-2" style="font-size: 11px;">
+              <div class="d-inline-flex gap-1">
+                <button type="button" onclick="switchOverviewChart('timeline')" id="chartViewTimelineBtn" class="chart-switch-btn active">
                   Timeline Activity
                 </button>
-                <button type="button" onclick="switchOverviewChart('events')" id="chartViewEventsBtn" class="pay-btn py-0.5 px-2" style="font-size: 11px;">
+                <button type="button" onclick="switchOverviewChart('events')" id="chartViewEventsBtn" class="chart-switch-btn">
                   Top Competitions
                 </button>
               </div>
@@ -786,52 +814,52 @@
           <!-- ======================================================= -->
           <!-- 3. UNIFIED MASTER OPERATIONS DATA TABLE CONTAINER       -->
           <!-- ======================================================= -->
-          <div class="ops-master-card mb-4">
+          <div class="ops-master-card">
             
             <!-- 1. Master Card Header: Category Tabs + Payment Segments -->
             <div class="ops-master-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
               
-              <!-- Category Segmented Control (Tabs) -->
-              <div class="ops-tray overflow-x-auto custom-scrollbar w-100 w-md-auto">
+              <!-- Category Navigation (Tabs) -->
+              <div class="overflow-x-auto custom-scrollbar w-100 w-md-auto">
                 <ul class="nav-segmented" id="categoryTabs">
                   <li>
                     <button type="button" onclick="setCategoryFilter('all')" class="cat-tab active" data-cat="all">
-                      All Events (625)
+                      All Events <span class="tab-count">625</span>
                     </button>
                   </li>
                   <li>
                     <button type="button" onclick="setCategoryFilter('competitions')" class="cat-tab" data-cat="competitions">
-                      Competitions (526)
+                      Competitions <span class="tab-count">526</span>
                     </button>
                   </li>
                   <li>
                     <button type="button" onclick="setCategoryFilter('quizzes')" class="cat-tab" data-cat="quizzes">
-                      Quizzes (91)
+                      Quizzes <span class="tab-count">91</span>
                     </button>
                   </li>
                   <li>
                     <button type="button" onclick="setCategoryFilter('hackathons')" class="cat-tab" data-cat="hackathons">
-                      Hackathons (7)
+                      Hackathons <span class="tab-count">7</span>
                     </button>
                   </li>
                   <li>
                     <button type="button" onclick="setCategoryFilter('cultural')" class="cat-tab" data-cat="cultural">
-                      Cultural & Jam (1)
+                      Cultural & Jam <span class="tab-count">1</span>
                     </button>
                   </li>
                 </ul>
               </div>
 
               <!-- Payment Status Segmented Control -->
-              <div class="ops-tray flex-shrink-0 d-inline-flex">
+              <div class="ops-pay-tray flex-shrink-0 my-1 my-md-0">
                 <button type="button" onclick="setPaymentFilter('all')" id="payFilterAll" class="pay-btn active">
-                  All (625)
+                  All <span class="tab-count">625</span>
                 </button>
                 <button type="button" onclick="setPaymentFilter('paid')" id="payFilterPaid" class="pay-btn">
-                  💰 Paid (38)
+                  Paid <span class="tab-count">38</span>
                 </button>
                 <button type="button" onclick="setPaymentFilter('free')" id="payFilterFree" class="pay-btn">
-                  Free (587)
+                  Free <span class="tab-count">587</span>
                 </button>
               </div>
 
@@ -844,15 +872,15 @@
                 <!-- Instant Search Input with Keyboard Shortcut -->
                 <div class="col-12 col-md-5">
                   <div class="input-icon">
-                    <span class="input-icon-addon text-secondary">
-                      <i class="ti ti-search" style="font-size: 15px;"></i>
+                    <span class="input-icon-addon" style="color: var(--tf-text-muted);">
+                      <i class="ti ti-search" style="font-size: 14px;"></i>
                     </span>
                     <input 
                       type="text" 
                       id="searchInput" 
                       oninput="applyFilters()" 
                       class="form-control ops-input ps-5 pe-5" 
-                      placeholder="Search participant, email, phone, team, college, or event..."
+                      placeholder="Search participant, email, phone, team, college or event…"
                     >
                     <span class="input-icon-addon d-none d-sm-block pe-2 pointer-events-none">
                       <kbd class="ops-kbd">/</kbd>
@@ -888,13 +916,13 @@
               </div>
 
               <!-- Filter Status & Active Reset Action -->
-              <div class="d-flex justify-content-between align-items-center mt-2.5 pt-2 border-top text-secondary small" style="border-color: var(--tf-border-subtle) !important; font-size: 12px;">
+              <div class="d-flex justify-content-between align-items-center mt-2.5 pt-2 border-top small" style="border-color: rgba(255, 255, 255, 0.05) !important; font-size: 11.5px; color: var(--tf-text-muted);">
                 <div>
-                  Showing <strong id="visibleCount" class="text-body font-monospace">0</strong> of <strong id="totalCount" class="text-body font-monospace">625</strong> verified attendees
+                  Showing <strong id="visibleCount" class="font-monospace" style="color: var(--tf-text-primary);">0</strong> of <strong id="totalCount" class="font-monospace" style="color: var(--tf-text-primary);">625</strong> verified attendees
                 </div>
                 <div id="filterTag" class="d-none">
-                  <button type="button" onclick="clearSearch()" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" style="font-size: 11.5px;">
-                    <i class="ti ti-x me-1"></i> Clear all filters
+                  <button type="button" onclick="clearSearch()" class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size: 11.5px; color: var(--tf-text-muted);">
+                    <i class="ti ti-x me-1"></i> Reset filters
                   </button>
                 </div>
               </div>
@@ -919,8 +947,8 @@
                 <tbody id="tableBody">
                   <tr>
                     <td colspan="8" class="text-center py-5">
-                      <div class="spinner-border text-primary mx-auto mb-2" role="status" style="width: 1.8rem; height: 1.8rem;"></div>
-                      <p class="text-secondary small mb-0 fw-medium" style="font-size: 12px;">Loading verified attendees...</p>
+                      <div class="spinner-border text-primary mx-auto mb-2" role="status" style="width: 1.6rem; height: 1.6rem;"></div>
+                      <p class="small mb-0" style="font-size: 12px; color: var(--tf-text-secondary);">Loading verified attendees...</p>
                     </td>
                   </tr>
                 </tbody>
@@ -934,13 +962,13 @@
 
             <!-- 5. Empty State (rendered inside card when 0 results) -->
             <div id="emptyState" class="text-center py-5 d-none p-4">
-              <div class="avatar avatar-md rounded-circle bg-secondary-lt text-secondary mx-auto mb-2">
+              <div class="avatar avatar-md rounded-circle mx-auto mb-2" style="background: var(--tf-bg-elevated); color: var(--tf-text-muted);">
                 <i class="ti ti-search fs-2"></i>
               </div>
-              <h4 class="text-reset fs-3 mb-1 fw-bold">No attendees found</h4>
-              <p class="text-secondary small max-w-sm mx-auto mb-3" style="font-size: 12px;">Try adjusting search terms or resetting filters.</p>
+              <h4 class="text-reset fs-3 mb-1 fw-medium">No attendees found</h4>
+              <p class="small max-w-sm mx-auto mb-3" style="font-size: 12px; color: var(--tf-text-secondary);">Try adjusting search terms or resetting filters.</p>
               <div>
-                <button type="button" onclick="clearSearch()" class="btn btn-primary btn-sm py-1 px-3">
+                <button type="button" onclick="clearSearch()" class="btn-page py-1 px-3">
                   <i class="ti ti-refresh me-1"></i> Reset all filters
                 </button>
               </div>
@@ -948,15 +976,15 @@
 
             <!-- Loading State Placeholder (Inside Card) -->
             <div id="loadingState" class="text-center py-5 d-none p-4">
-              <div class="spinner-border text-primary mx-auto mb-2" role="status" style="width: 1.8rem; height: 1.8rem;"></div>
-              <p class="text-secondary small mb-0 fw-medium" style="font-size: 12px;">Loading techFEST '26 Unstop records...</p>
+              <div class="spinner-border text-primary mx-auto mb-2" role="status" style="width: 1.6rem; height: 1.6rem;"></div>
+              <p class="small mb-0" style="font-size: 12px; color: var(--tf-text-secondary);">Loading techFEST '26 Unstop records...</p>
             </div>
 
             <!-- 6. Master Card Footer: Integrated Pagination Bar -->
             <div id="paginationBar" class="ops-master-footer d-flex flex-wrap align-items-center justify-content-between gap-2">
               <div class="d-flex align-items-center gap-2">
-                <span class="text-secondary small" style="font-size: 12px;">Rows per page:</span>
-                <select id="pageSizeSelect" onchange="changePageSize()" class="form-select ops-select py-1 px-2 cursor-pointer" style="height: 30px; font-size: 12px; width: auto;">
+                <span style="font-size: 11.5px; color: var(--tf-text-muted);">Rows per page:</span>
+                <select id="pageSizeSelect" onchange="changePageSize()" class="form-select ops-select py-0 px-2 cursor-pointer" style="height: 28px; font-size: 11.5px; width: auto;">
                   <option value="25">25</option>
                   <option value="50" selected>50</option>
                   <option value="100">100</option>
@@ -965,13 +993,13 @@
               </div>
 
               <div class="d-flex align-items-center gap-3">
-                <span id="pageInfoText" class="text-secondary small font-monospace" style="font-size: 12px;">Showing 1–50 of 625</span>
-                <div class="btn-group btn-group-sm">
-                  <button type="button" onclick="prevPage()" id="prevPageBtn" class="btn btn-outline-secondary py-1 px-2.5">
-                    <i class="ti ti-chevron-left me-1"></i> Prev
+                <span id="pageInfoText" class="font-monospace" style="font-size: 11.5px; color: var(--tf-text-secondary);">Showing 1–50 of 625</span>
+                <div class="d-flex gap-1">
+                  <button type="button" onclick="prevPage()" id="prevPageBtn" class="btn-page">
+                    <i class="ti ti-chevron-left me-0.5"></i> Prev
                   </button>
-                  <button type="button" onclick="nextPage()" id="nextPageBtn" class="btn btn-outline-secondary py-1 px-2.5">
-                    Next <i class="ti ti-chevron-right ms-1"></i>
+                  <button type="button" onclick="nextPage()" id="nextPageBtn" class="btn-page">
+                    Next <i class="ti ti-chevron-right ms-0.5"></i>
                   </button>
                 </div>
               </div>

@@ -313,8 +313,9 @@ function renderEventOverviewChart(participants, summary) {
   if (!canvas || !window.Chart) return;
 
   const isDark = (document.body.getAttribute('data-bs-theme') || 'dark') === 'dark';
-  const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-  const textColor = isDark ? '#94a3b8' : '#64748b';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.04)';
+  const textColor = isDark ? '#626A78' : '#8B93A1';
+  const accentColor = '#4EA8FF';
 
   if (overviewChartInstance) {
     overviewChartInstance.destroy();
@@ -346,9 +347,9 @@ function renderEventOverviewChart(participants, summary) {
 
     const counts = sortedDates.map(d => dateCounts[d]);
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, isDark ? 'rgba(56, 189, 248, 0.35)' : 'rgba(2, 132, 199, 0.25)');
-    gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+    gradient.addColorStop(0, isDark ? 'rgba(78, 168, 255, 0.12)' : 'rgba(78, 168, 255, 0.08)');
+    gradient.addColorStop(1, 'rgba(78, 168, 255, 0.0)');
 
     overviewChartInstance = new Chart(ctx, {
       type: 'line',
@@ -357,16 +358,16 @@ function renderEventOverviewChart(participants, summary) {
         datasets: [{
           label: 'Registrations',
           data: counts,
-          borderColor: '#38bdf8',
-          borderWidth: 2,
-          pointBackgroundColor: '#38bdf8',
-          pointBorderColor: isDark ? '#090a0f' : '#ffffff',
+          borderColor: accentColor,
+          borderWidth: 1.5,
+          pointBackgroundColor: accentColor,
+          pointBorderColor: isDark ? '#0B0D10' : '#ffffff',
           pointBorderWidth: 1.5,
-          pointRadius: 3.5,
-          pointHoverRadius: 6,
+          pointRadius: 0,
+          pointHoverRadius: 4,
           fill: true,
           backgroundColor: gradient,
-          tension: 0.35
+          tension: 0.3
         }]
       },
       options: {
@@ -375,14 +376,16 @@ function renderEventOverviewChart(participants, summary) {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: isDark ? '#141824' : '#ffffff',
-            titleColor: isDark ? '#f8fafc' : '#0f172a',
-            bodyColor: isDark ? '#94a3b8' : '#475569',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            backgroundColor: isDark ? '#151922' : '#ffffff',
+            titleColor: isDark ? '#F5F7FA' : '#0F172A',
+            bodyColor: isDark ? '#8B93A1' : '#475569',
+            borderColor: isDark ? '#242832' : 'rgba(0, 0, 0, 0.1)',
             borderWidth: 1,
-            padding: 10,
-            cornerRadius: 6,
+            padding: 8,
+            cornerRadius: 4,
             displayColors: false,
+            titleFont: { family: 'Geist, Inter, sans-serif', size: 11, weight: '500' },
+            bodyFont: { family: 'Geist, Inter, sans-serif', size: 11 },
             callbacks: {
               label: function(context) {
                 return ` ${context.parsed.y} verified entries`;
@@ -393,11 +396,11 @@ function renderEventOverviewChart(participants, summary) {
         scales: {
           x: {
             grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 } }
+            ticks: { color: textColor, font: { family: 'Geist, sans-serif', size: 10 } }
           },
           y: {
             grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 }, precision: 0 }
+            ticks: { color: textColor, font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
           }
         }
       }
@@ -425,8 +428,8 @@ function renderEventOverviewChart(participants, summary) {
         datasets: [{
           label: 'Verified Entries',
           data: counts,
-          backgroundColor: isDark ? 'rgba(56, 189, 248, 0.75)' : 'rgba(2, 132, 199, 0.75)',
-          borderRadius: 4,
+          backgroundColor: isDark ? 'rgba(78, 168, 255, 0.55)' : 'rgba(2, 132, 199, 0.55)',
+          borderRadius: 3,
           borderSkipped: false
         }]
       },
@@ -436,13 +439,13 @@ function renderEventOverviewChart(participants, summary) {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: isDark ? '#141824' : '#ffffff',
-            titleColor: isDark ? '#f8fafc' : '#0f172a',
-            bodyColor: isDark ? '#94a3b8' : '#475569',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            backgroundColor: isDark ? '#151922' : '#ffffff',
+            titleColor: isDark ? '#F5F7FA' : '#0F172A',
+            bodyColor: isDark ? '#8B93A1' : '#475569',
+            borderColor: isDark ? '#242832' : 'rgba(0, 0, 0, 0.1)',
             borderWidth: 1,
-            padding: 10,
-            cornerRadius: 6,
+            padding: 8,
+            cornerRadius: 4,
             displayColors: false,
             callbacks: {
               label: function(context) {
@@ -454,11 +457,11 @@ function renderEventOverviewChart(participants, summary) {
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: textColor, font: { family: 'Inter', size: 10.5 } }
+            ticks: { color: textColor, font: { family: 'Geist, sans-serif', size: 10 } }
           },
           y: {
             grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10.5 }, precision: 0 }
+            ticks: { color: textColor, font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
           }
         }
       }
@@ -482,11 +485,11 @@ function updateCategoryCounts(participants) {
   const buttons = document.querySelectorAll('.cat-tab');
   buttons.forEach(btn => {
     const cat = btn.getAttribute('data-cat');
-    if (cat === 'all') btn.textContent = `All Events (${counts.all})`;
-    if (cat === 'competitions') btn.textContent = `Competitions (${counts.competitions})`;
-    if (cat === 'quizzes') btn.textContent = `Quizzes (${counts.quizzes})`;
-    if (cat === 'hackathons') btn.textContent = `Hackathons (${counts.hackathons})`;
-    if (cat === 'cultural') btn.textContent = `Cultural & Jam (${counts.cultural})`;
+    if (cat === 'all') btn.innerHTML = `All Events <span class="tab-count">${counts.all}</span>`;
+    if (cat === 'competitions') btn.innerHTML = `Competitions <span class="tab-count">${counts.competitions}</span>`;
+    if (cat === 'quizzes') btn.innerHTML = `Quizzes <span class="tab-count">${counts.quizzes}</span>`;
+    if (cat === 'hackathons') btn.innerHTML = `Hackathons <span class="tab-count">${counts.hackathons}</span>`;
+    if (cat === 'cultural') btn.innerHTML = `Cultural & Jam <span class="tab-count">${counts.cultural}</span>`;
   });
 }
 
@@ -501,9 +504,9 @@ function updatePaymentFilterCounts(participants) {
   const btnPaid = document.getElementById('payFilterPaid');
   const btnFree = document.getElementById('payFilterFree');
 
-  if (btnAll) btnAll.textContent = `All (${participants.length})`;
-  if (btnPaid) btnPaid.textContent = `💰 Paid (${paidCount})`;
-  if (btnFree) btnFree.textContent = `Free (${freeCount})`;
+  if (btnAll) btnAll.innerHTML = `All <span class="tab-count">${participants.length}</span>`;
+  if (btnPaid) btnPaid.innerHTML = `Paid <span class="tab-count">${paidCount}</span>`;
+  if (btnFree) btnFree.innerHTML = `Free <span class="tab-count">${freeCount}</span>`;
 }
 
 function setPaymentFilter(type) {
@@ -860,29 +863,23 @@ function renderDataViews(participants) {
 
       const hasMembers = p.team_members && p.team_members.length > 0;
       const teamBadge = hasMembers 
-        ? `<button onclick="openDrawer('${p.id}')" class="btn btn-sm btn-outline-info py-0 px-1.5 d-inline-flex align-items-center" style="font-size: 11px; height: 22px;">
-            <i class="ti ti-users me-1"></i> ${p.team_members.length} Members
+        ? `<button onclick="openDrawer('${p.id}')" class="btn-member-tag d-inline-flex align-items-center" style="font-size: 11px;">
+            <i class="ti ti-users me-1"></i> ${p.team_members.length}
            </button>`
-        : `<span class="tag-track text-secondary" style="font-size: 10.5px;">Solo</span>`;
+        : `<span class="text-muted" style="font-size: 11px;">Solo</span>`;
 
-      let trackClass = 'tag-track';
-      const evType = (p.event_type || '').toLowerCase();
-      if (evType.includes('quiz')) trackClass = 'tag-track text-warning';
-      else if (evType.includes('hack')) trackClass = 'tag-track text-purple';
+      // Neutral, unified track badge - part of one cohesive design system
+      const trackClass = 'tag-track';
 
       const amt = Number(p.amount) || 0;
       const paymentBlock = amt > 0
-        ? `<span class="tag-track tag-paid">
-            <i class="ti ti-check me-0.5"></i> Paid ₹${amt.toLocaleString('en-IN')}
-           </span>`
-        : `<span class="tag-track tag-free">
-            Free Entry
-           </span>`;
+        ? `<span class="tag-paid">Paid ₹${amt.toLocaleString('en-IN')}</span>`
+        : `<span class="tag-free">Free</span>`;
 
       return `
         <tr onclick="openDrawer('${p.id}')">
           <!-- Index -->
-          <td class="text-center font-monospace text-secondary" style="font-size: 11.5px;">
+          <td class="text-center font-monospace" style="font-size: 11px; color: var(--tf-text-muted);">
             ${absoluteIndex}
           </td>
 
@@ -891,11 +888,11 @@ function renderDataViews(participants) {
             <div class="d-flex align-items-center gap-2">
               <span class="user-avatar-sm">${initials}</span>
               <div class="min-w-0">
-                <div class="fw-semibold text-reset text-truncate" style="max-width: 190px;">${escapeHtml(p.name || 'Participant')}</div>
-                <div class="text-secondary font-monospace d-flex align-items-center gap-1 mt-0.5" style="font-size: 11px;" onclick="event.stopPropagation()">
+                <div class="fw-medium text-reset text-truncate" style="max-width: 190px; font-size: 13px;">${escapeHtml(p.name || 'Participant')}</div>
+                <div class="font-monospace d-flex align-items-center gap-1 mt-0.5" style="font-size: 11px; color: var(--tf-text-secondary);" onclick="event.stopPropagation()">
                   <span class="text-truncate" style="max-width: 155px;">${escapeHtml(p.email || '')}</span>
                   ${p.email && p.email !== 'N/A' ? `
-                    <button type="button" onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="btn btn-icon btn-ghost-secondary p-0 border-0" style="width: 15px; height: 15px;">
+                    <button type="button" onclick="copyToClipboard('${escapeHtml(p.email)}', this)" title="Copy Email" class="btn btn-icon p-0 border-0" style="width: 15px; height: 15px; color: var(--tf-text-muted); background: transparent;">
                       <i class="ti ti-copy" style="font-size: 10px;"></i>
                     </button>
                   ` : ''}
@@ -907,20 +904,20 @@ function renderDataViews(participants) {
           <!-- Contact (Phone + WhatsApp + Call) -->
           <td onclick="event.stopPropagation()">
             ${p.phone && p.phone !== 'N/A' ? `
-              <div class="d-flex align-items-center gap-1 font-monospace text-secondary" style="font-size: 11.5px;">
+              <div class="d-flex align-items-center gap-1 font-monospace" style="font-size: 11.5px; color: var(--tf-text-secondary);">
                 <span>${escapeHtml(p.phone)}</span>
                 ${waLink ? `
-                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="btn btn-icon btn-ghost-success p-0 border-0 ms-1" style="width: 20px; height: 20px;">
-                    <i class="ti ti-brand-whatsapp text-success" style="font-size: 14px;"></i>
+                  <a href="${waLink}" target="_blank" rel="noopener noreferrer" title="WhatsApp Message" class="btn btn-icon p-0 border-0 ms-1" style="width: 18px; height: 18px; color: var(--tf-accent-green); opacity: 0.85;">
+                    <i class="ti ti-brand-whatsapp" style="font-size: 13px;"></i>
                   </a>
                 ` : ''}
                 ${telLink ? `
-                  <a href="${telLink}" title="Call" class="btn btn-icon btn-ghost-secondary p-0 border-0" style="width: 18px; height: 18px;">
-                    <i class="ti ti-phone text-secondary" style="font-size: 12px;"></i>
+                  <a href="${telLink}" title="Call" class="btn btn-icon p-0 border-0" style="width: 18px; height: 18px; color: var(--tf-text-muted);">
+                    <i class="ti ti-phone" style="font-size: 11px;"></i>
                   </a>
                 ` : ''}
               </div>
-            ` : `<span class="text-secondary font-monospace" style="font-size: 11.5px;">--</span>`}
+            ` : `<span class="font-monospace" style="font-size: 11px; color: var(--tf-text-muted);">--</span>`}
           </td>
 
           <!-- College & Branch -->
@@ -929,9 +926,9 @@ function renderDataViews(participants) {
               ${escapeHtml(p.college || 'N/A')}
             </div>
             ${p.specialization ? `
-              <div class="text-secondary text-truncate mt-0.5 font-monospace" style="max-width: 210px; font-size: 11px;">
+              <div class="text-truncate mt-0.5" style="max-width: 210px; font-size: 11px; color: var(--tf-text-secondary);">
                 <span>${escapeHtml(p.specialization)}</span>
-                ${p.passing_year ? `<span class="opacity-75">• ${p.passing_year}</span>` : ''}
+                ${p.passing_year ? `<span style="color: var(--tf-text-muted);"> • ${p.passing_year}</span>` : ''}
               </div>
             ` : ''}
           </td>
@@ -950,7 +947,7 @@ function renderDataViews(participants) {
 
           <!-- Team Status -->
           <td onclick="event.stopPropagation()">
-            <div class="text-secondary text-truncate mb-1" style="max-width: 120px; font-size: 11.5px;" title="${escapeHtml(p.team_name)}">
+            <div class="text-truncate mb-1" style="max-width: 120px; font-size: 11.5px; color: var(--tf-text-secondary);" title="${escapeHtml(p.team_name)}">
               ${escapeHtml(p.team_name || 'Individual')}
             </div>
             <div>
@@ -965,9 +962,9 @@ function renderDataViews(participants) {
 
           <!-- Action -->
           <td class="text-end" onclick="event.stopPropagation()">
-            <button onclick="openDrawer('${p.id}')" class="btn-view-action d-inline-flex align-items-center">
+            <button onclick="openDrawer('${p.id}')" class="btn-view-action">
               <span>View</span>
-              <i class="ti ti-chevron-right ms-0.5" style="font-size: 12px;"></i>
+              <i class="ti ti-arrow-right ms-0.5" style="font-size: 11px;"></i>
             </button>
           </td>
         </tr>
@@ -994,23 +991,20 @@ function renderDataViews(participants) {
 
       const amt = Number(p.amount) || 0;
       const feePill = amt > 0
-        ? `<span class="tag-track tag-paid">₹${amt} Paid</span>`
-        : `<span class="tag-track tag-free">Free Entry</span>`;
+        ? `<span class="tag-paid">Paid ₹${amt}</span>`
+        : `<span class="tag-free">Free</span>`;
 
-      let trackClass = 'tag-track';
-      const evType = (p.event_type || '').toLowerCase();
-      if (evType.includes('quiz')) trackClass = 'tag-track text-warning';
-      else if (evType.includes('hack')) trackClass = 'tag-track text-purple';
+      const trackClass = 'tag-track';
 
       return `
         <div class="mobile-attendee-card cursor-pointer" onclick="openDrawer('${p.id}')">
           <!-- Top Row -->
           <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
             <div class="d-flex align-items-center gap-2 min-w-0">
-              <span class="user-avatar-sm" style="width: 28px; height: 28px; font-size: 11.5px;">${initials}</span>
+              <span class="user-avatar-sm" style="width: 26px; height: 26px; font-size: 11px;">${initials}</span>
               <div class="min-w-0">
-                <div class="fw-semibold text-reset text-truncate" style="font-size: 13px;">${escapeHtml(p.name)}</div>
-                <div class="text-secondary font-monospace text-truncate" style="font-size: 11px;">${escapeHtml(p.phone || p.email)}</div>
+                <div class="fw-medium text-reset text-truncate" style="font-size: 13px;">${escapeHtml(p.name)}</div>
+                <div class="font-monospace text-truncate" style="font-size: 11px; color: var(--tf-text-secondary);">${escapeHtml(p.phone || p.email)}</div>
               </div>
             </div>
             <div class="flex-shrink-0">
@@ -1019,31 +1013,31 @@ function renderDataViews(participants) {
           </div>
 
           <!-- Event & College Details -->
-          <div class="p-2 rounded border mb-2" style="background: var(--tf-bg-well); border-color: var(--tf-border-subtle) !important; font-size: 12px;">
+          <div class="p-2 rounded mb-2" style="background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); font-size: 12px;">
             <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
               <span class="fw-medium text-truncate text-reset">${escapeHtml(p.event_name)}</span>
               <span class="${trackClass}">${escapeHtml(p.event_type || 'Event')}</span>
             </div>
-            <div class="text-secondary text-truncate" style="font-size: 11.5px;">${escapeHtml(p.college || 'SLIET')}</div>
+            <div class="text-truncate" style="font-size: 11.5px; color: var(--tf-text-secondary);">${escapeHtml(p.college || 'SLIET')}</div>
           </div>
 
           <!-- Contact & View Details -->
-          <div class="d-flex align-items-center justify-content-between pt-1.5 border-top" style="border-color: var(--tf-border-subtle) !important;" onclick="event.stopPropagation()">
+          <div class="d-flex align-items-center justify-content-between pt-1.5 border-top" style="border-color: var(--tf-border) !important;" onclick="event.stopPropagation()">
             <div class="d-flex gap-1.5">
               ${waLink ? `
-                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success py-0.5 px-2 d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm py-0.5 px-2 d-inline-flex align-items-center gap-1" style="font-size: 11px; background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); color: var(--tf-accent-green);">
                   <i class="ti ti-brand-whatsapp"></i> WhatsApp
                 </a>
               ` : ''}
               ${telLink ? `
-                <a href="${telLink}" class="btn btn-sm btn-icon btn-outline-secondary" style="width: 24px; height: 24px;">
+                <a href="${telLink}" class="btn btn-sm btn-icon" style="width: 24px; height: 24px; background: var(--tf-bg-elevated); border: 1px solid var(--tf-border); color: var(--tf-text-muted);">
                   <i class="ti ti-phone" style="font-size: 11px;"></i>
                 </a>
               ` : ''}
             </div>
 
             <button onclick="openDrawer('${p.id}')" class="btn-view-action d-inline-flex align-items-center">
-              <span>Details</span>
+              <span>View</span>
               <i class="ti ti-arrow-right ms-1" style="font-size: 11px;"></i>
             </button>
           </div>
