@@ -1,8 +1,8 @@
 {
-  "last_synced_at": "2026-09-29T19:44:42.861849+00:00",
+  "last_synced_at": "2026-09-30T04:26:31.593445+00:00",
   "token_expires_at": "2026-09-30T19:09:31.752260+00:00",
-  "total_unstop_registrations": 3501,
-  "total_paid_registrations": 590,
+  "total_unstop_registrations": 3506,
+  "total_paid_registrations": 596,
   "total_amount_collected": 3195.0,
   "total_colleges": 42,
   "total_events_scanned": 62,
@@ -47,8 +47,8 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 83,
-      "paid_registrations": 11
+      "total_registrations": 85,
+      "paid_registrations": 12
     },
     {
       "id": 1744778,
@@ -82,8 +82,8 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 61,
-      "paid_registrations": 5
+      "total_registrations": 62,
+      "paid_registrations": 6
     },
     {
       "id": 1744772,
@@ -125,7 +125,7 @@
       "title": "City Model Exhibition",
       "type": "competitions",
       "total_registrations": 50,
-      "paid_registrations": 49
+      "paid_registrations": 50
     },
     {
       "id": 1744757,
@@ -194,7 +194,7 @@
       "id": 1744224,
       "title": "The Neural Nexus",
       "type": "competitions",
-      "total_registrations": 75,
+      "total_registrations": 76,
       "paid_registrations": 5
     },
     {
@@ -307,7 +307,7 @@
       "title": "Truss Load",
       "type": "competitions",
       "total_registrations": 52,
-      "paid_registrations": 48
+      "paid_registrations": 49
     },
     {
       "id": 1744178,
@@ -419,14 +419,14 @@
       "title": "Free Fire",
       "type": "competitions",
       "total_registrations": 88,
-      "paid_registrations": 3
+      "paid_registrations": 4
     },
     {
       "id": 1743774,
       "title": "Kritrim - Model Exhibition",
       "type": "competitions",
-      "total_registrations": 52,
-      "paid_registrations": 2
+      "total_registrations": 53,
+      "paid_registrations": 3
     },
     {
       "id": 1742433,
