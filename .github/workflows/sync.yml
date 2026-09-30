@@ -2,16 +2,16 @@ name: Sync Unstop Paid Registrations
 
 on:
   schedule:
-    # Runs every 8 hours (00:00, 08:00, 16:00 UTC)
-    - cron: '0 */8 * * *'
+    # Runs every 2 hours
+    - cron: '0 */2 * * *'
   workflow_dispatch:
     inputs:
       unstop_token:
-        description: 'Fresh Unstop Bearer Token'
+        description: 'Fresh Unstop Bearer Token (optional override)'
         required: false
         default: ''
       unstop_cookies:
-        description: 'Fresh Unstop Cookies'
+        description: 'Fresh Unstop Cookies (optional override)'
         required: false
         default: ''
 
@@ -40,6 +40,8 @@ jobs:
       - name: Fetch and Filter Paid Registrations
         env:
           UNSTOP_API_URL: ${{ secrets.UNSTOP_API_URL }}
+          UNSTOP_EMAIL: ${{ secrets.UNSTOP_EMAIL }}
+          UNSTOP_PASSWORD: ${{ secrets.UNSTOP_PASSWORD }}
           UNSTOP_TOKEN: ${{ github.event.inputs.unstop_token != '' && github.event.inputs.unstop_token || secrets.UNSTOP_TOKEN }}
           UNSTOP_COOKIES: ${{ github.event.inputs.unstop_cookies != '' && github.event.inputs.unstop_cookies || secrets.UNSTOP_COOKIES }}
           UNSTOP_ACCOUNT_ID: ${{ secrets.UNSTOP_ACCOUNT_ID }}

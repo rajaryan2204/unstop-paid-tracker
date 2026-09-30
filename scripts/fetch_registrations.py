@@ -34,6 +34,8 @@ ROOT_DATA_FILE = os.path.join(BASE_DIR, "data.json")
 UNSTOP_TOKEN = os.environ.get("UNSTOP_TOKEN", "").strip()
 UNSTOP_COOKIES = os.environ.get("UNSTOP_COOKIES", "").strip()
 UNSTOP_ACCOUNT_ID = os.environ.get("UNSTOP_ACCOUNT_ID", "2313619").strip()
+UNSTOP_EMAIL = os.environ.get("UNSTOP_EMAIL", "").strip()
+UNSTOP_PASSWORD = os.environ.get("UNSTOP_PASSWORD", "").strip()
 MOCK_MODE = os.environ.get("MOCK_MODE", "false").lower() in ("true", "1", "yes")
 
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -46,7 +48,7 @@ def get_http_session():
         total=3,
         backoff_factor=1,
         status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET"]
+        allowed_methods=["GET", "POST"]
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("https://", adapter)
@@ -69,7 +71,89 @@ def parse_jwt_expiry(token: str):
     return None
 
 
-def get_headers():
+def is_token_valid(token: str, margin_seconds: int = 600) -> bool:
+    """Check if token is a valid JWT and has more than margin_seconds remaining."""
+    if not token:
+        return False
+    try:
+        clean_token = token.replace("Bearer ", "").strip()
+        parts = clean_token.split(".")
+        if len(parts) >= 2:
+            payload_b64 = parts[1] + "==="
+            payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode("utf-8")))
+            if "exp" in payload:
+                now_ts = datetime.now(timezone.utc).timestamp()
+                return (payload["exp"] - now_ts) > margin_seconds
+    except Exception:
+        pass
+    return False
+
+
+def login_to_unstop(email: str, password: str, session: requests.Session = None):
+    """
+    Autonomous login to Unstop using email and password via OAuth microservice.
+    Returns (access_token, cookie_str).
+    """
+    if not email or not password:
+        return None, None
+
+    if session is None:
+        session = requests.Session()
+
+    login_headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://unstop.com",
+        "Referer": "https://unstop.com/auth/login"
+    }
+
+    try:
+        logging.info("Requesting Unstop CSRF cookie...")
+        csrf_url = "https://unstop.com/api/micro/oauth/v2/generate/csrf-cookie"
+        session.get(csrf_url, headers=login_headers, timeout=15)
+        xsrf = session.cookies.get("XSRF-TOKEN")
+        if xsrf:
+            import urllib.parse
+            login_headers["X-XSRF-TOKEN"] = urllib.parse.unquote(xsrf)
+
+        logging.info(f"Authenticating autonomously as {email}...")
+        login_url = "https://unstop.com/api/micro/oauth/v2/user/login"
+        payload = {
+            "grant_type": "password",
+            "username": email,
+            "email": email,
+            "password": password,
+            "scope": "*",
+            "network": "",
+            "access_token": "",
+            "e": True
+        }
+
+        resp = session.post(login_url, json=payload, headers=login_headers, timeout=20)
+        if resp.status_code == 200:
+            token = session.cookies.get("access_token", "")
+            if not token:
+                try:
+                    data = resp.json()
+                    token = data.get("access_token", "")
+                except Exception:
+                    pass
+
+            cookie_str = "; ".join([f"{k}={v}" for k, v in session.cookies.get_dict().items()])
+            logging.info("✅ Autonomous Unstop login successful! Fresh token acquired.")
+            return token, cookie_str
+        else:
+            logging.error(f"Unstop login failed (HTTP {resp.status_code}): {resp.text[:300]}")
+            return None, None
+    except Exception as e:
+        logging.error(f"Exception during Unstop login: {e}")
+        return None, None
+
+
+def get_headers(token=None, cookies=None):
+    tok = token if token is not None else UNSTOP_TOKEN
+    cks = cookies if cookies is not None else UNSTOP_COOKIES
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -79,14 +163,14 @@ def get_headers():
         "selected-account": UNSTOP_ACCOUNT_ID
     }
 
-    if UNSTOP_TOKEN:
-        if not UNSTOP_TOKEN.lower().startswith("bearer ") and not UNSTOP_TOKEN.lower().startswith("token "):
-            headers["Authorization"] = f"Bearer {UNSTOP_TOKEN}"
+    if tok:
+        if not tok.lower().startswith("bearer ") and not tok.lower().startswith("token "):
+            headers["Authorization"] = f"Bearer {tok}"
         else:
-            headers["Authorization"] = UNSTOP_TOKEN
+            headers["Authorization"] = tok
 
-    if UNSTOP_COOKIES:
-        headers["Cookie"] = UNSTOP_COOKIES
+    if cks:
+        headers["Cookie"] = cks
 
     return headers
 
@@ -220,9 +304,19 @@ def fetch_all_opportunities(session, headers):
         try:
             resp = session.get(url, headers=headers, params=params, timeout=25)
             if resp.status_code in (401, 403):
-                logging.error(f"Failed to fetch opportunities listing (HTTP {resp.status_code})")
-                print(f"::error::Unstop Token expired or invalid! HTTP {resp.status_code}")
-                return []
+                logging.warning(f"Got HTTP {resp.status_code} fetching opportunities listing.")
+                if UNSTOP_EMAIL and UNSTOP_PASSWORD:
+                    logging.info("Attempting auto-login refresh...")
+                    fresh_tok, fresh_cks = login_to_unstop(UNSTOP_EMAIL, UNSTOP_PASSWORD, session)
+                    if fresh_tok:
+                        headers.update(get_headers(fresh_tok, fresh_cks))
+                        resp = session.get(url, headers=headers, params=params, timeout=25)
+
+                if resp.status_code in (401, 403):
+                    logging.error(f"Failed to fetch opportunities listing (HTTP {resp.status_code})")
+                    print(f"::error::Unstop Token expired or invalid! HTTP {resp.status_code}")
+                    return []
+
             resp.raise_for_status()
             data = resp.json()
 
@@ -276,6 +370,14 @@ def fetch_event_registrations(session, headers, event):
         }
         try:
             resp = session.get(url, headers=headers, params=params, timeout=25)
+            if resp.status_code in (401, 403):
+                logging.warning(f"Got HTTP {resp.status_code} fetching '{title}'. Refreshing token...")
+                if UNSTOP_EMAIL and UNSTOP_PASSWORD:
+                    fresh_tok, fresh_cks = login_to_unstop(UNSTOP_EMAIL, UNSTOP_PASSWORD, session)
+                    if fresh_tok:
+                        headers.update(get_headers(fresh_tok, fresh_cks))
+                        resp = session.get(url, headers=headers, params=params, timeout=25)
+
             if resp.status_code != 200:
                 break
             data = resp.json()
@@ -305,16 +407,30 @@ def fetch_event_registrations(session, headers, event):
 
 
 def main():
+    global UNSTOP_TOKEN, UNSTOP_COOKIES
     sync_time = datetime.now(timezone.utc).isoformat()
+    session = get_http_session()
+
+    # Step 1: Ensure valid token via automated login if expired or absent
+    if not is_token_valid(UNSTOP_TOKEN):
+        if UNSTOP_EMAIL and UNSTOP_PASSWORD:
+            logging.info("Token missing or expiring soon. Performing autonomous login...")
+            fresh_token, fresh_cookies = login_to_unstop(UNSTOP_EMAIL, UNSTOP_PASSWORD, session)
+            if fresh_token:
+                UNSTOP_TOKEN = fresh_token
+                if fresh_cookies:
+                    UNSTOP_COOKIES = fresh_cookies
+        else:
+            logging.warning("No UNSTOP_EMAIL & UNSTOP_PASSWORD provided, using existing UNSTOP_TOKEN.")
+
     token_expiry = parse_jwt_expiry(UNSTOP_TOKEN) if UNSTOP_TOKEN else None
+    headers = get_headers(UNSTOP_TOKEN, UNSTOP_COOKIES)
 
     all_paid_participants = []
     events_summary = []
     total_fest_applicants = 0
 
     if not MOCK_MODE and UNSTOP_TOKEN:
-        session = get_http_session()
-        headers = get_headers()
         events = fetch_all_opportunities(session, headers)
 
         if not events:
@@ -372,6 +488,7 @@ def main():
     summary = {
         "last_synced_at": sync_time,
         "token_expires_at": token_expiry,
+        "auth_mode": "automated_login" if (UNSTOP_EMAIL and UNSTOP_PASSWORD) else "static_token",
         "total_unstop_registrations": total_fest_applicants,
         "total_paid_registrations": total_paid_count,
         "total_amount_collected": round(total_revenue, 2),

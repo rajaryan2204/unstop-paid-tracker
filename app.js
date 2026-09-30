@@ -177,73 +177,18 @@ async function loadData() {
  * Render Token Expiry Status
  */
 function renderTokenExpiry(summary) {
-  const tokenExpiryIso = summary.token_expires_at;
   const tokenBadge = document.getElementById('tokenBadge');
   const tokenDot = document.getElementById('tokenDot');
   const tokenText = document.getElementById('tokenText');
-
-  const bannerPill = document.getElementById('bannerTokenStatusPill');
-  const bannerDetails = document.getElementById('bannerTokenDetails');
-  const bannerIcon = document.getElementById('bannerTokenIcon');
   const bannerContainer = document.getElementById('tokenExpiryBanner');
 
-  if (!tokenExpiryIso) {
-    if (tokenText) tokenText.textContent = 'Token: Active';
-    return;
+  if (bannerContainer) {
+    bannerContainer.remove();
   }
 
-  const expiryDate = new Date(tokenExpiryIso);
-  const now = new Date();
-  const diffMs = expiryDate - now;
-  const diffHours = Math.round(diffMs / (1000 * 60 * 60));
-
-  const istFormatted = expiryDate.toLocaleString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Kolkata'
-  });
-
-  if (diffMs <= 0) {
-    if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-danger me-1.5';
-    if (tokenText) tokenText.textContent = 'Token: Expired';
-    if (tokenBadge) tokenBadge.className = 'badge bg-danger-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace text-danger';
-
-    if (bannerContainer) bannerContainer.className = 'alert alert-important alert-danger alert-dismissible d-flex align-items-center justify-content-between p-3 mb-3 shadow-sm';
-    if (bannerPill) {
-      bannerPill.textContent = 'EXPIRED';
-      bannerPill.className = 'badge bg-white text-danger fw-bold';
-    }
-    if (bannerDetails) bannerDetails.textContent = `Expired on: ${istFormatted} IST. Please update UNSTOP_TOKEN in GitHub repository secrets.`;
-    if (bannerIcon) bannerIcon.className = 'avatar avatar-sm bg-white text-danger rounded-3 me-3 shadow-sm';
-
-  } else if (diffHours < 6) {
-    if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-warning me-1.5';
-    if (tokenText) tokenText.textContent = `Token: ${diffHours}h left`;
-    if (tokenBadge) tokenBadge.className = 'badge bg-warning-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace text-warning';
-
-    if (bannerContainer) bannerContainer.className = 'alert alert-important alert-warning alert-dismissible d-flex align-items-center justify-content-between p-3 mb-3 shadow-sm';
-    if (bannerPill) {
-      bannerPill.textContent = 'EXPIRING SOON';
-      bannerPill.className = 'badge bg-white text-warning fw-bold';
-    }
-    if (bannerDetails) bannerDetails.textContent = `Expires on: ${istFormatted} IST (~${diffHours}h remaining). Refresh token before expiration.`;
-    if (bannerIcon) bannerIcon.className = 'avatar avatar-sm bg-white text-warning rounded-3 me-3 shadow-sm';
-
-  } else {
-    if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-green me-1.5';
-    if (tokenText) tokenText.textContent = `Token: ~${diffHours}h left`;
-    if (tokenBadge) tokenBadge.className = 'badge bg-green-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace text-green';
-
-    if (bannerContainer) bannerContainer.className = 'alert alert-important alert-success alert-dismissible d-flex align-items-center justify-content-between p-3 mb-3 shadow-sm';
-    if (bannerPill) {
-      bannerPill.textContent = 'ACTIVE';
-      bannerPill.className = 'badge bg-white text-success fw-bold';
-    }
-    if (bannerDetails) bannerDetails.textContent = `Token valid until: ${istFormatted} IST (~${diffHours}h remaining). Auto-sync active.`;
-    if (bannerIcon) bannerIcon.className = 'avatar avatar-sm bg-white text-success rounded-3 me-3 shadow-sm';
-  }
+  if (tokenText) tokenText.textContent = 'Cloud Sync: Active';
+  if (tokenDot) tokenDot.className = 'status-dot status-dot-animated bg-green me-1.5';
+  if (tokenBadge) tokenBadge.className = 'badge bg-green-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace text-green';
 }
 
 /**

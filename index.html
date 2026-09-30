@@ -110,10 +110,10 @@
         <!-- Right Action Tools & Status Indicators -->
         <div class="navbar-nav flex-row order-md-last align-items-center gap-2">
           
-          <!-- Token Expiry Health Badge -->
-          <div id="tokenBadge" class="badge bg-green-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace" title="Unstop API JWT Expiration">
+          <!-- Cloud Auto-Sync Health Badge -->
+          <div id="tokenBadge" class="badge bg-green-lt d-none d-lg-inline-flex align-items-center py-2 px-2.5 font-monospace" title="24/7 Cloud Auto-Sync Active">
             <span id="tokenDot" class="status-dot status-dot-animated bg-green me-1.5"></span>
-            <span id="tokenText">Token: Active</span>
+            <span id="tokenText">Cloud Sync: Active</span>
           </div>
 
           <!-- Live Sync Status -->
@@ -130,12 +130,6 @@
           <!-- Force Refresh Data -->
           <button type="button" onclick="loadData()" class="btn btn-icon btn-outline-secondary" title="Force Refresh Data">
             <i class="ti ti-refresh" id="refreshIcon"></i>
-          </button>
-
-          <!-- 1-Click Sync Bookmarklet Trigger -->
-          <button type="button" onclick="openBookmarkletModal()" class="btn btn-outline-primary btn-sm d-none d-md-inline-flex align-items-center">
-            <i class="ti ti-bolt me-1 text-primary"></i>
-            <span>1-Click Sync</span>
           </button>
 
           <!-- CSV Export Button -->
@@ -258,30 +252,6 @@
 
           </div>
 
-          <!-- ========================================== -->
-          <!-- 4. Token Health Alert Banner               -->
-          <!-- ========================================== -->
-          <div id="tokenExpiryBanner" class="alert alert-important alert-success alert-dismissible d-flex align-items-center justify-content-between p-3 mb-3 shadow-sm" role="alert">
-            <div class="d-flex align-items-center">
-              <span class="avatar avatar-sm bg-white text-success rounded-3 me-3 shadow-sm" id="bannerTokenIcon">
-                <i class="ti ti-key fs-3"></i>
-              </span>
-              <div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="alert-title mb-0 fw-bold">Unstop Token Health</span>
-                  <span id="bannerTokenStatusPill" class="badge bg-white text-success fw-bold">ACTIVE</span>
-                </div>
-                <div class="text-white-50 small mt-1" id="bannerTokenDetails">
-                  Token valid until: Oct 1, 2026, 12:39 AM IST (~23h remaining). Auto-sync active.
-                </div>
-              </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <button type="button" onclick="openBookmarkletModal()" class="btn btn-sm btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center">
-                <i class="ti ti-bolt me-1 text-primary"></i> 1-Click Sync
-              </button>
-            </div>
-          </div>
 
           <!-- ========================================== -->
           <!-- 5. Control Center: Unified Filter Card     -->
@@ -538,66 +508,7 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- 12. 1-Click Sync Bookmarklet Modal                      -->
-  <!-- ======================================================= -->
-  <div class="modal modal-blur fade" id="bookmarkletModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content shadow-lg">
-        <div class="modal-header border-bottom">
-          <h4 class="modal-title d-flex align-items-center fs-3">
-            <span class="avatar avatar-xs bg-primary-lt text-primary rounded me-2">
-              <i class="ti ti-bolt"></i>
-            </span>
-            1-Click Unstop Sync Bookmarklet
-          </h4>
-          <button type="button" class="btn-close" onclick="closeBookmarkletModal()" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
-          <p class="text-secondary mb-3">
-            Daily cURL ya tokens copy-paste karne ki zaroorat nahi hai. Is button ko apne browser ke Bookmarks bar me drag & drop kar lein:
-          </p>
 
-          <!-- Big Draggable Bookmark Button -->
-          <div class="p-4 rounded-3 border border-dashed text-center my-3 bg-body-tertiary">
-            <div class="small text-secondary mb-2 fw-medium">👇 Drag this button to your Bookmarks Bar:</div>
-            <a 
-              id="draggableBookmarkLink" 
-              href="#" 
-              onclick="alert('Please DRAG this button to your browser Bookmarks Bar, or copy the code below!'); return false;" 
-              class="btn btn-primary btn-lg shadow-sm font-monospace fw-bold"
-            >
-              <i class="ti ti-bolt me-2"></i> ⚡ Sync techFEST '26
-            </a>
-            <div class="small text-muted mt-2">Chrome, Edge, Safari, Brave ya Firefox bookmarks bar me drop karein</div>
-          </div>
-
-          <!-- Step-by-Step Directions -->
-          <div class="card card-sm mb-3 bg-body-tertiary border">
-            <div class="card-body">
-              <h5 class="card-title mb-2 text-reset">Kaise use karein (Sirf 2 Seconds):</h5>
-              <ol class="text-secondary small mb-0 ps-3">
-                <li class="mb-1.5">Unstop par apna Organiser Dashboard open karein (jaha aap login hain).</li>
-                <li class="mb-1.5">Apne bookmarks bar me <b>⚡ Sync techFEST '26</b> par click karein.</li>
-                <li>Ek sleek popup aayega jo direct GitHub secret update ya 1-click sync trigger kar dega!</li>
-              </ol>
-            </div>
-          </div>
-
-          <!-- Manual Code Copy -->
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="small text-secondary">Manual bookmarklet code:</span>
-            <button type="button" onclick="copyBookmarkletCode(this)" class="btn btn-sm btn-outline-secondary">
-              <i class="ti ti-copy me-1"></i> Copy Code
-            </button>
-          </div>
-        </div>
-        <div class="modal-footer border-top">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="closeBookmarkletModal()">Close Window</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Tabler Core JS (Bundles Bootstrap 5, Offcanvas, Modal, Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>

@@ -1,8 +1,9 @@
 {
-  "last_synced_at": "2026-09-30T10:37:36.704070+00:00",
-  "token_expires_at": "2026-09-30T19:09:31.752260+00:00",
-  "total_unstop_registrations": 3545,
-  "total_paid_registrations": 621,
+  "last_synced_at": "2026-09-30T11:07:36.733466+00:00",
+  "token_expires_at": "2026-10-01T11:07:39.036295+00:00",
+  "auth_mode": "automated_login",
+  "total_unstop_registrations": 3549,
+  "total_paid_registrations": 625,
   "total_amount_collected": 3793.0,
   "total_colleges": 43,
   "total_events_scanned": 62,
@@ -61,7 +62,7 @@
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 76,
+      "total_registrations": 77,
       "paid_registrations": 2
     },
     {
@@ -82,8 +83,8 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 63,
-      "paid_registrations": 6
+      "total_registrations": 64,
+      "paid_registrations": 8
     },
     {
       "id": 1744772,
@@ -194,7 +195,7 @@
       "id": 1744224,
       "title": "The Neural Nexus",
       "type": "competitions",
-      "total_registrations": 81,
+      "total_registrations": 82,
       "paid_registrations": 5
     },
     {
@@ -244,7 +245,7 @@
       "title": "Heuristic Havoc",
       "type": "competitions",
       "total_registrations": 50,
-      "paid_registrations": 1
+      "paid_registrations": 2
     },
     {
       "id": 1744214,
@@ -327,7 +328,7 @@
       "id": 1744174,
       "title": "Soldering Speedrun",
       "type": "competitions",
-      "total_registrations": 52,
+      "total_registrations": 53,
       "paid_registrations": 2
     },
     {
@@ -419,7 +420,7 @@
       "title": "Free Fire",
       "type": "competitions",
       "total_registrations": 91,
-      "paid_registrations": 8
+      "paid_registrations": 9
     },
     {
       "id": 1743774,
