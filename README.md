@@ -62,7 +62,7 @@ Repo me token secure rakhne ke liye:
    - **Branch**: `main` / `/(root)`
 3. **Save** par click karo.
 4. 1-2 minute baad aapka dashboard live ho jayega:  
-   `https://rajaryan2204.github.io/<repo-name>/`
+   `https://sagar-anmol.github.io/unstop-paid-tracker/`
 
 ---
 
@@ -80,7 +80,7 @@ Aapko 8 ghante wait karne ki zarurat nahi hai test karne ke liye:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/rajaryan2204/unstop-paid-tracker.git
+git clone https://github.com/sagar-anmol/unstop-paid-tracker.git
 cd unstop-paid-tracker
 
 # 2. Install dependencies
