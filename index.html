@@ -84,70 +84,9 @@
 <body data-bs-theme="dark">
 
   <!-- ========================================== -->
-  <!-- 1. Gatekeeper / Access Authentication View -->
+  <!-- Application Shell                          -->
   <!-- ========================================== -->
-  <div id="lockScreen" class="page page-center min-vh-100 d-flex flex-column justify-content-center py-4">
-    <div class="container container-tight">
-      <div class="text-center mb-4">
-        <div class="d-inline-flex p-3 rounded-4 bg-primary-lt border border-primary-subtle shadow-sm mb-2">
-          <span class="fs-1 fw-black text-primary font-monospace lh-1">TF'26</span>
-        </div>
-        <h1 class="h2 text-reset mb-1 fw-bold tracking-tight">techFEST '26 • SLIET</h1>
-        <p class="text-secondary small mb-2">Organizer Central Desk & Registration Database</p>
-        <span class="badge bg-warning-lt border border-warning-subtle text-uppercase tracking-wider px-2 py-1">
-          <i class="ti ti-shield-lock me-1"></i> Restricted Access Portal
-        </span>
-      </div>
-
-      <div class="card card-md shadow-lg" id="lockCard">
-        <div class="card-body">
-          <h2 class="card-title text-center mb-4 fs-3">Organizer Authorization</h2>
-          <form id="authForm" onsubmit="event.preventDefault(); handleAuthSubmit(event); return false;" autocomplete="off">
-            <div class="mb-3">
-              <label class="form-label required" for="passInput">Access Key</label>
-              <div class="input-group input-group-flat">
-                <span class="input-group-text">
-                  <i class="ti ti-key text-secondary"></i>
-                </span>
-                <input 
-                  type="password" 
-                  id="passInput" 
-                  class="form-control font-monospace" 
-                  placeholder="Enter access key (e.g. sliet@tf26)" 
-                  autocomplete="current-password" 
-                  required
-                >
-                <span class="input-group-text">
-                  <a href="#" onclick="event.preventDefault(); togglePassVisibility();" class="link-secondary" title="Toggle visibility" data-bs-toggle="tooltip">
-                    <i class="ti ti-eye" id="passEyeIcon"></i>
-                  </a>
-                </span>
-              </div>
-              <div id="authErrorMsg" class="invalid-feedback d-none text-danger mt-2">
-                <i class="ti ti-alert-triangle me-1"></i> Incorrect access key. Please try again.
-              </div>
-            </div>
-
-            <div class="form-footer">
-              <button type="submit" class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2">
-                <i class="ti ti-lock-open"></i>
-                <span>Unlock Central Desk</span>
-                <i class="ti ti-arrow-right"></i>
-              </button>
-            </div>
-          </form>
-        </div>
-        <div class="card-footer text-center text-secondary small py-3">
-          <i class="ti ti-info-circle me-1"></i> Authorized event coordinators only. Contact SLIET technical committee for access.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- 2. Authenticated Application Shell         -->
-  <!-- ========================================== -->
-  <div id="authenticatedApp" class="page d-none">
+  <div id="authenticatedApp" class="page">
     
     <!-- Top Navigation Bar -->
     <header class="navbar navbar-expand-md d-print-none sticky-top border-bottom">
@@ -204,11 +143,6 @@
             <i class="ti ti-download me-1"></i>
             <span class="d-none d-sm-inline">Export CSV</span>
             <span class="d-sm-none">Export</span>
-          </button>
-
-          <!-- Sign Out / Lock Button -->
-          <button type="button" onclick="lockDesk()" class="btn btn-icon btn-outline-danger" title="Lock Desk (Sign Out)">
-            <i class="ti ti-lock"></i>
           </button>
 
         </div>

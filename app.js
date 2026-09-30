@@ -1,8 +1,7 @@
 // techFEST '26 • SLIET Central Organizer Desk Controller
 // Tabler UI High-Performance Engine with Instant Cache, Offcanvas & Gatekeeper
 
-const ACCESS_KEY = 'sliet@tf26';
-let inMemoryAuth = false;
+
 
 let allParticipants = [];
 let currentFiltered = [];
@@ -21,7 +20,7 @@ let bookmarkletModalInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setupKeyboardShortcuts();
-  checkAuthentication();
+  loadData();
 });
 
 /**
@@ -56,132 +55,6 @@ function toggleTheme() {
   setTheme(current === 'dark' ? 'light' : 'dark');
 }
 
-/**
- * Gatekeeper Authentication with Multi-Storage & Query Param Fallback
- */
-function isUserAuthorized() {
-  if (inMemoryAuth) return true;
-
-  // 1. Check URL query params (?pass=sliet@tf26 or ?auth=sliet@tf26)
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const qPass = params.get('pass') || params.get('auth');
-    if (qPass && qPass.trim().toLowerCase() === ACCESS_KEY) {
-      setUserAuthorized(true);
-      return true;
-    }
-  } catch (e) {}
-
-  // 2. Check localStorage
-  try {
-    if (localStorage.getItem('tf26_authorized') === 'true') return true;
-  } catch (e) {}
-
-  // 3. Check sessionStorage
-  try {
-    if (sessionStorage.getItem('tf26_authorized') === 'true') return true;
-  } catch (e) {}
-
-  // 4. Check Cookie
-  try {
-    if (document.cookie.includes('tf26_auth=1')) return true;
-  } catch (e) {}
-
-  return false;
-}
-
-function setUserAuthorized(val) {
-  inMemoryAuth = !!val;
-  if (val) {
-    try { localStorage.setItem('tf26_authorized', 'true'); } catch (e) {}
-    try { sessionStorage.setItem('tf26_authorized', 'true'); } catch (e) {}
-    try { document.cookie = 'tf26_auth=1; max-age=604800; path=/; SameSite=Lax'; } catch (e) {}
-  } else {
-    try { localStorage.removeItem('tf26_authorized'); } catch (e) {}
-    try { sessionStorage.removeItem('tf26_authorized'); } catch (e) {}
-    try { document.cookie = 'tf26_auth=0; max-age=0; path=/'; } catch (e) {}
-  }
-}
-
-function checkAuthentication() {
-  const isAuth = isUserAuthorized();
-  const lockScreen = document.getElementById('lockScreen');
-  const appContainer = document.getElementById('authenticatedApp');
-
-  if (isAuth) {
-    if (lockScreen) lockScreen.classList.add('d-none');
-    if (appContainer) appContainer.classList.remove('d-none');
-    loadData();
-  } else {
-    if (lockScreen) lockScreen.classList.remove('d-none');
-    if (appContainer) appContainer.classList.add('d-none');
-    const passInput = document.getElementById('passInput');
-    if (passInput) setTimeout(() => passInput.focus(), 150);
-  }
-}
-
-function handleAuthSubmit(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  
-  const input = document.getElementById('passInput');
-  const errorMsg = document.getElementById('authErrorMsg');
-  const lockCard = document.getElementById('lockCard');
-  const val = (input ? input.value : '').trim().toLowerCase();
-
-  if (val === ACCESS_KEY) {
-    setUserAuthorized(true);
-    if (errorMsg) errorMsg.classList.add('d-none');
-    
-    // Unlock immediate UI
-    const lockScreen = document.getElementById('lockScreen');
-    const appContainer = document.getElementById('authenticatedApp');
-    if (lockScreen) lockScreen.classList.add('d-none');
-    if (appContainer) appContainer.classList.remove('d-none');
-
-    loadData();
-  } else {
-    if (errorMsg) errorMsg.classList.remove('d-none');
-    if (lockCard) {
-      lockCard.classList.remove('shake-card');
-      void lockCard.offsetWidth; // trigger reflow
-      lockCard.classList.add('shake-card');
-    }
-    if (input) {
-      input.value = '';
-      input.focus();
-    }
-  }
-  return false;
-}
-
-function togglePassVisibility() {
-  const input = document.getElementById('passInput');
-  const icon = document.getElementById('passEyeIcon');
-  if (!input) return;
-
-  if (input.type === 'password') {
-    input.type = 'text';
-    if (icon) icon.className = 'ti ti-eye-off';
-  } else {
-    input.type = 'password';
-    if (icon) icon.className = 'ti ti-eye';
-  }
-}
-
-function lockDesk() {
-  setUserAuthorized(false);
-  const lockScreen = document.getElementById('lockScreen');
-  const appContainer = document.getElementById('authenticatedApp');
-  const passInput = document.getElementById('passInput');
-  const errorMsg = document.getElementById('authErrorMsg');
-
-  if (errorMsg) errorMsg.classList.add('d-none');
-  if (passInput) passInput.value = '';
-  if (appContainer) appContainer.classList.add('d-none');
-  if (lockScreen) lockScreen.classList.remove('d-none');
-  if (passInput) setTimeout(() => passInput.focus(), 150);
-}
-
 function setupKeyboardShortcuts() {
   window.addEventListener('keydown', (e) => {
     // Escape closes offcanvas drawer
@@ -190,7 +63,7 @@ function setupKeyboardShortcuts() {
       closeBookmarkletModal();
     }
     // "/" focuses search input if not inside another text input
-    if (e.key === '/' && document.activeElement !== document.getElementById('searchInput') && document.activeElement !== document.getElementById('passInput')) {
+    if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
       e.preventDefault();
       const input = document.getElementById('searchInput');
       if (input) input.focus();
