@@ -1,5 +1,5 @@
 // src/components/DataTable.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   X, 
@@ -23,12 +23,15 @@ import {
 } from 'lucide-react';
 import { getAvatarStyle, getInitials } from '../utils/avatar';
 import { getCallRecords, CALL_STATUSES } from '../utils/callStore';
-import { filterParticipantsByUser } from '../utils/auth';
+import { getDomainForEvent, DOMAINS_DIRECTORY } from '../utils/auth';
 
 export default function DataTable({ 
   participants = [], 
   summary = {}, 
   currentUser,
+  activeDomainId,
+  selectedEventFilter = '',
+  onSelectEventFilter,
   onSelectParticipant, 
   onTriggerCall,
   onTriggerToast 
@@ -37,10 +40,15 @@ export default function DataTable({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPayment, setSelectedPayment] = useState('all');
   const [selectedCallStatus, setSelectedCallStatus] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState(selectedEventFilter || '');
   const [selectedCollege, setSelectedCollege] = useState('');
   const [sortBy, setSortBy] = useState('date-desc');
   
+  // Sync selectedEvent with prop if changed from DomainBanner
+  useEffect(() => {
+    setSelectedEvent(selectedEventFilter || '');
+  }, [selectedEventFilter]);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
@@ -49,17 +57,13 @@ export default function DataTable({
   // Fetch call records database
   const callRecords = useMemo(() => getCallRecords(), [participants]);
 
-  // Apply RBAC filtering based on currentUser
-  const userScopedParticipants = useMemo(() => {
-    return filterParticipantsByUser(currentUser, participants);
-  }, [currentUser, participants]);
-
-  const isUserScoped = currentUser && currentUser.role !== 'super_admin' && currentUser.role !== 'team_head';
+  // Active domain info if scoped
+  const activeDomain = activeDomainId ? DOMAINS_DIRECTORY[activeDomainId] : null;
 
   // Category counts based on accessible participants
   const categoryCounts = useMemo(() => {
-    const counts = { all: userScopedParticipants.length, competitions: 0, quizzes: 0, hackathons: 0, cultural: 0 };
-    userScopedParticipants.forEach(p => {
+    const counts = { all: participants.length, competitions: 0, quizzes: 0, hackathons: 0, cultural: 0 };
+    participants.forEach(p => {
       const t = (p.event_type || 'competitions').toLowerCase();
       if (t.includes('quiz')) counts.quizzes++;
       else if (t.includes('hack')) counts.hackathons++;
@@ -67,48 +71,34 @@ export default function DataTable({
       else counts.competitions++;
     });
     return counts;
-  }, [userScopedParticipants]);
+  }, [participants]);
 
   // Payment counts
   const paymentCounts = useMemo(() => {
-    const paid = userScopedParticipants.filter(p => Number(p.amount) > 0).length;
-    return { all: userScopedParticipants.length, paid, free: userScopedParticipants.length - paid };
-  }, [userScopedParticipants]);
+    const paid = participants.filter(p => Number(p.amount) > 0).length;
+    return { all: participants.length, paid, free: participants.length - paid };
+  }, [participants]);
 
   // Master events list for dropdown
   const masterEvents = useMemo(() => {
     const eventCounts = {};
-    userScopedParticipants.forEach(p => {
+    participants.forEach(p => {
       const name = (p.event_name || 'Event').trim();
       eventCounts[name] = (eventCounts[name] || 0) + 1;
     });
 
-    const list = summary?.events_list || [];
-    if (list.length > 0) {
-      const withEntries = list.filter(e => (eventCounts[(e.title || '').trim()] || e.paid_registrations || 0) > 0);
-      const awaiting = list.filter(e => (eventCounts[(e.title || '').trim()] || e.paid_registrations || 0) === 0);
-      
-      withEntries.sort((a, b) => {
-        const cntA = eventCounts[(a.title || '').trim()] || a.paid_registrations || 0;
-        const cntB = eventCounts[(b.title || '').trim()] || b.paid_registrations || 0;
-        return cntB - cntA;
-      });
-
-      return { withEntries, awaiting, total: list.length, eventCounts };
-    }
-
     const sortedEvents = Object.keys(eventCounts).sort((a, b) => eventCounts[b] - eventCounts[a]);
-    return { fallback: sortedEvents, eventCounts };
-  }, [userScopedParticipants, summary]);
+    return { sortedEvents, eventCounts };
+  }, [participants]);
 
   // Colleges list
   const collegesList = useMemo(() => {
-    return Array.from(new Set(userScopedParticipants.map(p => p.college).filter(Boolean))).sort();
-  }, [userScopedParticipants]);
+    return Array.from(new Set(participants.map(p => p.college).filter(Boolean))).sort();
+  }, [participants]);
 
   // Filter & Search logic
   const filteredParticipants = useMemo(() => {
-    return userScopedParticipants.filter(p => {
+    return participants.filter(p => {
       // 1. Category
       if (selectedCategory !== 'all') {
         const t = (p.event_type || 'competitions').toLowerCase();
@@ -178,7 +168,7 @@ export default function DataTable({
       }
       return 0;
     });
-  }, [userScopedParticipants, callRecords, selectedCategory, selectedPayment, selectedCallStatus, selectedEvent, selectedCollege, searchQuery, sortBy]);
+  }, [participants, callRecords, selectedCategory, selectedPayment, selectedCallStatus, selectedEvent, selectedCollege, searchQuery, sortBy]);
 
   // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredParticipants.length / (pageSize === 'all' ? 999999 : pageSize)));
@@ -203,6 +193,7 @@ export default function DataTable({
     setSelectedPayment('all');
     setSelectedCallStatus('all');
     setSelectedEvent('');
+    if (onSelectEventFilter) onSelectEventFilter('');
     setSelectedCollege('');
     setCurrentPage(1);
   };
@@ -242,19 +233,6 @@ export default function DataTable({
   return (
     <div className="surface-card rounded-xl overflow-hidden border border-white/[0.08] transition-all mb-10">
       
-      {/* Scoped RBAC Notice if restricted */}
-      {isUserScoped && (
-        <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
-            <span>
-              <strong>Scoped Operations View:</strong> Showing {userScopedParticipants.length} attendees restricted to <strong>{currentUser.teamName}</strong> ({currentUser.name} • {currentUser.title})
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-amber-400/80">RBAC Enforced</span>
-        </div>
-      )}
-
       {/* 1. Header Bar: Category Tabs + Payment Segments */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-white/[0.06] bg-[#11141A]">
         
@@ -343,18 +321,20 @@ export default function DataTable({
         <div className="lg:col-span-3">
           <select
             value={selectedEvent}
-            onChange={(e) => { setSelectedEvent(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => { 
+              const val = e.target.value;
+              setSelectedEvent(val);
+              if (onSelectEventFilter) onSelectEventFilter(val);
+              setCurrentPage(1); 
+            }}
             className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
           >
-            <option value="">All Competitions & Tracks ({userScopedParticipants.length})</option>
-            {masterEvents.withEntries && masterEvents.withEntries.map((ev, i) => (
-              <option key={i} value={ev.title}>
-                {ev.title} ({(masterEvents.eventCounts[(ev.title || '').trim()] || ev.paid_registrations || 0)})
-              </option>
-            ))}
-            {masterEvents.fallback && masterEvents.fallback.map((ev, i) => (
-              <option key={i} value={ev}>
-                {ev} ({masterEvents.eventCounts[ev] || 0})
+            <option value="">
+              {activeDomain ? `All ${activeDomain.name} Events (${participants.length})` : `All Events (${participants.length})`}
+            </option>
+            {masterEvents.sortedEvents.map((evName, i) => (
+              <option key={i} value={evName}>
+                {evName} ({masterEvents.eventCounts[evName] || 0})
               </option>
             ))}
           </select>
@@ -415,6 +395,11 @@ export default function DataTable({
           <div className="flex items-center gap-2 text-slate-300">
             <span className="font-mono text-sky-400 font-semibold">{filteredParticipants.length}</span>
             <span>attendees matched active filters</span>
+            {selectedEvent && (
+              <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20 font-mono text-[10px]">
+                Event: {selectedEvent}
+              </span>
+            )}
           </div>
           <button
             onClick={handleResetFilters}
@@ -435,7 +420,7 @@ export default function DataTable({
               <th className="py-2.5 px-3 min-w-[200px]">Candidate Details</th>
               <th className="py-2.5 px-3 min-w-[190px]">Phone & Direct Calling</th>
               <th className="py-2.5 px-3 min-w-[180px]">Institution & Course</th>
-              <th className="py-2.5 px-3 min-w-[170px]">Competition / Event</th>
+              <th className="py-2.5 px-3 min-w-[180px]">Competition & Domain</th>
               <th className="py-2.5 px-3 min-w-[130px]">Team Roster</th>
               <th className="py-2.5 px-3 min-w-[120px] text-right">Payment Status</th>
               <th className="py-2.5 px-3 w-12 text-center">Action</th>
@@ -472,6 +457,9 @@ export default function DataTable({
                 const rec = callRecords[String(p.id)];
                 const callCount = rec?.callCount || 0;
                 const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
+
+                // Resolve domain
+                const domainInfo = getDomainForEvent(p.event_name);
 
                 return (
                   <tr 
@@ -588,13 +576,25 @@ export default function DataTable({
                       )}
                     </td>
 
-                    {/* Event & Track Badge */}
+                    {/* Event, Track & Domain Badge */}
                     <td className="py-3 px-3">
                       <div className="font-medium text-white truncate max-w-[170px]" title={p.event_name}>
                         {p.event_name || 'Event'}
                       </div>
-                      <div className="mt-1">
+                      <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                         {renderTrackBadge(p.event_type)}
+                        {domainInfo && (
+                          <span 
+                            className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-medium border"
+                            style={{ 
+                              borderColor: `${domainInfo.accentColor}35`, 
+                              color: domainInfo.accentColor, 
+                              backgroundColor: `${domainInfo.accentColor}12` 
+                            }}
+                          >
+                            {domainInfo.name}
+                          </span>
+                        )}
                       </div>
                     </td>
 
@@ -668,6 +668,7 @@ export default function DataTable({
             const rec = callRecords[String(p.id)];
             const callCount = rec?.callCount || 0;
             const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
+            const domainInfo = getDomainForEvent(p.event_name);
 
             return (
               <div 
@@ -701,7 +702,17 @@ export default function DataTable({
                 </div>
 
                 <div className="text-xs text-slate-300">
-                  <div className="font-medium text-white">{p.event_name}</div>
+                  <div className="font-medium text-white flex items-center gap-1.5">
+                    <span>{p.event_name}</span>
+                    {domainInfo && (
+                      <span 
+                        className="px-1.5 py-0.2 rounded text-[9.5px] font-mono border"
+                        style={{ color: domainInfo.accentColor, borderColor: `${domainInfo.accentColor}30`, backgroundColor: `${domainInfo.accentColor}10` }}
+                      >
+                        {domainInfo.name}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-[11px] text-slate-400 truncate mt-0.5">{p.college}</div>
                 </div>
 

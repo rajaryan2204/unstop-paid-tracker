@@ -8,13 +8,12 @@ import {
   Sun, 
   ShieldCheck, 
   Activity,
-  User,
-  Users,
+  Layers,
   FileText,
-  AlertTriangle,
-  PhoneCall
+  Lock,
+  Crown
 } from 'lucide-react';
-import { ROLES } from '../utils/auth';
+import { DOMAINS_DIRECTORY } from '../utils/auth';
 
 export default function Header({ 
   onRefresh, 
@@ -26,6 +25,8 @@ export default function Header({
   onOpenVerificationQueue,
   onExportCSV,
   currentUser,
+  selectedDomainOverride,
+  onSelectDomainOverride,
   verificationCount = 0,
   theme,
   onToggleTheme,
@@ -35,13 +36,14 @@ export default function Header({
     ? new Date(summary.last_synced_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'Active';
 
-  const roleDef = ROLES[currentUser?.role] || {};
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isDomainHead = currentUser?.role === 'domain_head';
 
   return (
     <header className="sticky top-0 z-40 w-full glass-nav border-b border-white/[0.08] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         
-        {/* Brand Identity & Team Context */}
+        {/* Brand Identity & Domain Context */}
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-400/25 to-blue-600/10 border border-sky-400/35 flex items-center justify-center text-sky-400 font-bold text-xs tracking-tight shadow-[0_0_12px_rgba(56,189,248,0.2)]">
             TF
@@ -49,12 +51,31 @@ export default function Header({
           <div className="flex items-baseline gap-2">
             <span className="font-semibold text-sm text-white tracking-tight">techFEST '26</span>
             <span className="text-[10px] font-mono tracking-wider uppercase text-slate-400 hidden sm:inline-block">
-              Central Desk
+              {isDomainHead ? `${currentUser?.domainName} Desk` : 'Central Desk'}
             </span>
           </div>
 
+          {/* Super Admin Domain Switcher Dropdown */}
+          {isSuperAdmin && (
+            <div className="hidden lg:flex items-center gap-1.5 ml-3 pl-3 border-l border-white/[0.08]">
+              <Layers className="w-3.5 h-3.5 text-purple-400" />
+              <select
+                value={selectedDomainOverride || 'ALL'}
+                onChange={(e) => onSelectDomainOverride(e.target.value)}
+                className="bg-[#161A22] border border-white/[0.08] text-xs text-white rounded-lg px-2.5 py-1 outline-none font-medium focus:border-purple-500/50"
+              >
+                <option value="ALL">🌐 All 13 Domains (Master View)</option>
+                {Object.values(DOMAINS_DIRECTORY).map(d => (
+                  <option key={d.id} value={d.id}>
+                    {d.name} ({d.bay})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Quick Operations Nav Links */}
-          <div className="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l border-white/[0.08]">
+          <div className="hidden md:flex items-center gap-1.5 ml-2">
             <button
               onClick={onOpenVerificationQueue}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all"
@@ -69,6 +90,7 @@ export default function Header({
               )}
             </button>
 
+            {/* Audit Trail for Super Admin / Calling */}
             <button
               onClick={onOpenAuditLogs}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-purple-300 bg-purple-500/10 border border-purple-500/25 hover:bg-purple-500/20 transition-all"
@@ -86,18 +108,23 @@ export default function Header({
           {/* Active User Switcher / Profile Badge */}
           <button
             onClick={onOpenAuth}
-            className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#161A22] border border-white/[0.08] hover:border-white/20 transition-all text-left"
+            className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all text-left ${
+              isSuperAdmin 
+                ? 'bg-purple-500/10 border-purple-500/30 hover:border-purple-500/50' 
+                : 'bg-[#161A22] border-white/[0.08] hover:border-white/20'
+            }`}
             title="Switch User Role or Login"
           >
             <span className="w-5 h-5 rounded-md bg-white/[0.08] flex items-center justify-center font-bold text-[10px] text-white">
-              {currentUser?.avatarInitials || 'SA'}
+              {currentUser?.avatar || 'SA'}
             </span>
             <div className="hidden sm:block">
-              <div className="text-xs font-medium text-white leading-none truncate max-w-[120px]">
-                {currentUser?.name || 'Staff'}
+              <div className="text-xs font-medium text-white leading-none truncate max-w-[120px] flex items-center gap-1">
+                {isSuperAdmin && <Crown className="w-3 h-3 text-purple-400 shrink-0" />}
+                <span>{currentUser?.name || 'Staff'}</span>
               </div>
               <div className="text-[9px] font-mono text-slate-400 truncate max-w-[120px] mt-0.5">
-                {roleDef.name || 'Member'}
+                {currentUser?.username} • {currentUser?.title || 'Organizer'}
               </div>
             </div>
             <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />

@@ -11,10 +11,16 @@ import CallRemarkModal from './components/CallRemarkModal';
 import AuthModal from './components/AuthModal';
 import AuditLogsModal from './components/AuditLogsModal';
 import VerificationQueueModal from './components/VerificationQueueModal';
+import DomainBanner from './components/DomainBanner';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
-import { getActiveUser, setActiveUser } from './utils/auth';
+import { 
+  getActiveUser, 
+  setActiveUser, 
+  getParticipantsForUser, 
+  DOMAINS_DIRECTORY 
+} from './utils/auth';
 import { 
   logCallForParticipant, 
   getPaymentVerificationQueue, 
@@ -39,6 +45,8 @@ export default function App() {
   });
 
   const [currentUser, setCurrentUser] = useState(() => getActiveUser());
+  const [selectedDomainOverride, setSelectedDomainOverride] = useState('ALL');
+  const [selectedEventFilter, setSelectedEventFilter] = useState('');
   const [callDbVersion, setCallDbVersion] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -136,11 +144,37 @@ export default function App() {
     fetchData();
   }, [fetchData]);
 
+  // Active domain identification
+  const activeDomainId = useMemo(() => {
+    if (currentUser?.role === 'domain_head') {
+      return currentUser.domainId;
+    }
+    if (currentUser?.role === 'super_admin' && selectedDomainOverride !== 'ALL') {
+      return selectedDomainOverride;
+    }
+    return null;
+  }, [currentUser, selectedDomainOverride]);
+
+  // Scoped participants according to active user & domain
+  const scopedParticipants = useMemo(() => {
+    return getParticipantsForUser(currentUser, participants, selectedDomainOverride);
+  }, [currentUser, participants, selectedDomainOverride]);
+
+  // Displayed participants (applying event filter if set)
+  const displayedParticipants = useMemo(() => {
+    if (!selectedEventFilter) return scopedParticipants;
+    return scopedParticipants.filter(p => {
+      const target = (p.event_name || '').toLowerCase();
+      const query = selectedEventFilter.toLowerCase();
+      return target === query || target.includes(query) || query.includes(target);
+    });
+  }, [scopedParticipants, selectedEventFilter]);
+
   // Handle CSV Export
   const handleExportCSV = () => {
-    const success = exportParticipantsToCSV(participants);
+    const success = exportParticipantsToCSV(displayedParticipants);
     if (success) {
-      triggerToast({ type: 'success', message: `Exported ${participants.length} attendees to CSV` });
+      triggerToast({ type: 'success', message: `Exported ${displayedParticipants.length} attendees to CSV` });
     }
   };
 
@@ -148,9 +182,11 @@ export default function App() {
   const handleSelectUser = (user) => {
     setActiveUser(user);
     setCurrentUser(user);
+    setSelectedDomainOverride('ALL');
+    setSelectedEventFilter('');
     triggerToast({
       type: 'success',
-      message: `Active session: ${user.name} (${user.title || user.role})`
+      message: `Signed in as ${user.name} (${user.title || user.username})`
     });
   };
 
@@ -223,7 +259,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
-      {/* 1. Header with RBAC Profile & Verification Badges */}
+      {/* 1. Header with RBAC Profile, 13 Domain Switcher & Verification Badges */}
       <Header
         onRefresh={() => fetchData(true)}
         isRefreshing={isRefreshing}
@@ -234,6 +270,11 @@ export default function App() {
         onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
         onExportCSV={handleExportCSV}
         currentUser={currentUser}
+        selectedDomainOverride={selectedDomainOverride}
+        onSelectDomainOverride={(d) => {
+          setSelectedDomainOverride(d);
+          setSelectedEventFilter('');
+        }}
         verificationCount={pendingVerificationCount}
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -251,18 +292,32 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* 2. Unified KPI Metrics Strip */}
-            <KPIStrip summary={summary} participants={participants} />
+            {/* DOMAIN HERO BANNER: Shown when logged in as Domain Head or when Super Admin filters to a domain */}
+            {activeDomainId && (
+              <DomainBanner
+                domainId={activeDomainId}
+                currentUser={currentUser}
+                participants={scopedParticipants}
+                selectedEvent={selectedEventFilter}
+                onSelectEventFilter={setSelectedEventFilter}
+              />
+            )}
 
-            {/* 3. Event Activity Analytics Chart */}
-            <AnalyticsChart participants={participants} summary={summary} />
+            {/* 2. Unified KPI Metrics Strip (Dynamically scoped to active domain) */}
+            <KPIStrip summary={summary} participants={displayedParticipants} />
 
-            {/* 4. Master Operations Data Table with Direct Calling & RBAC */}
+            {/* 3. Event Activity Analytics Chart (Dynamically scoped to active domain) */}
+            <AnalyticsChart participants={displayedParticipants} summary={summary} />
+
+            {/* 4. Master Operations Data Table with Direct Calling & Domain Awareness */}
             <DataTable
-              key={callDbVersion}
-              participants={participants}
+              key={`${callDbVersion}_${activeDomainId || 'all'}_${selectedEventFilter}`}
+              participants={displayedParticipants}
               summary={summary}
               currentUser={currentUser}
+              activeDomainId={activeDomainId}
+              selectedEventFilter={selectedEventFilter}
+              onSelectEventFilter={setSelectedEventFilter}
               onSelectParticipant={setSelectedParticipant}
               onTriggerCall={handleTriggerCall}
               onTriggerToast={triggerToast}
@@ -292,7 +347,7 @@ export default function App() {
         onSubmit={handleSaveCall}
       />
 
-      {/* Operations RBAC Authentication & Profile Switcher Modal */}
+      {/* Operations 17 Logins & Credentials Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         currentUser={currentUser}

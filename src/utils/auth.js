@@ -1,157 +1,494 @@
 // src/utils/auth.js
-// TechFEST '26 Role-Based Access Control (RBAC) & Authentication System
+// TechFEST '26 Role-Based Access Control (RBAC), 13 Domains Directory & 17 Official Logins
 
-export const ROLES = {
-  SUPER_ADMIN: {
-    id: 'super_admin',
-    name: 'Super Admin',
-    level: 100,
-    badgeColor: 'border-rose-500/30 bg-rose-500/10 text-rose-400',
-    description: 'Central Desk master access. Full visibility across all domains, events, caller logs, and verification queues.'
+export const DOMAINS_DIRECTORY = {
+  robozar: {
+    id: 'robozar',
+    name: 'RoboZar',
+    bay: 'BAY-RZ01',
+    category: 'Robotics & Combat',
+    department: 'Robotics & Automation',
+    tagline: 'Full-Contact Mecha Battles, Drones & Autonomous Navigation',
+    accentColor: '#38BDF8',
+    events: [
+      'Robowar',
+      'Rapid Line',
+      'Rapid Line (LFR)',
+      'Sky Maneuver',
+      'Hovermania',
+      'RoboSoccer',
+      'RC Boat',
+      'RC Car',
+      'Micromouse Challenge'
+    ]
   },
-  TEAM_HEAD: {
-    id: 'team_head',
-    name: 'Team Head',
-    level: 80,
-    badgeColor: 'border-purple-500/30 bg-purple-500/10 text-purple-400',
-    description: 'Functional team lead (Invitation, Reception, Outreach). Combined registrations across assigned domains and calling operations.'
+  plexus: {
+    id: 'plexus',
+    name: 'Plexus',
+    bay: 'BAY-PX02',
+    category: 'Computer Science & AI',
+    department: 'Computer Science & Engineering',
+    tagline: 'Competitive Coding, AI Systems, Reverse Engineering & Web Sprints',
+    accentColor: '#818CF8',
+    events: [
+      'Competitive Programming Marathon',
+      'Ghost Code',
+      'Pixel Wizard',
+      'Machine Learning Model',
+      'The Neural Nexus',
+      'Debug and Deploy',
+      'Debug & Deploy',
+      'AI Chit-Chat',
+      'Heuristic Havoc',
+      'Logic Flow'
+    ]
   },
-  DOMAIN_COORDINATOR: {
-    id: 'domain_coordinator',
-    name: 'Domain Coordinator',
-    level: 60,
-    badgeColor: 'border-sky-500/30 bg-sky-500/10 text-sky-400',
-    description: 'Coordinates a specific vertical (Competitions, Quizzes, Hackathons, Cultural). Access limited to domain events.'
+  karyarachna: {
+    id: 'karyarachna',
+    name: 'Karyarachna',
+    bay: 'BAY-KR03',
+    category: 'Innovation & Prototyping',
+    department: 'Innovation & Incubation Hub',
+    tagline: 'Circular Prototyping, 36h Hackathon & Sustainable Jugaad',
+    accentColor: '#C084FC',
+    events: [
+      'Kritrim - Model Exhibition',
+      'Hackathon',
+      'Jugaad'
+    ]
   },
-  EVENT_COORDINATOR: {
-    id: 'event_coordinator',
-    name: 'Event Coordinator',
-    level: 40,
-    badgeColor: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
-    description: 'Manages one or more specific events. Access limited strictly to assigned events.'
+  kermis: {
+    id: 'kermis',
+    name: 'Kermis',
+    bay: 'BAY-KM04',
+    category: 'Esports & Strategy',
+    department: 'Digital Gaming & Mind Sports',
+    tagline: 'Battle Royale Esports (BGMI, Free Fire) & Rapid Chess League',
+    accentColor: '#F472B6',
+    events: [
+      'BGMI',
+      'Free Fire',
+      'Chess'
+    ]
   },
-  TEAM_MEMBER: {
-    id: 'team_member',
-    name: 'Team Member',
-    level: 20,
-    badgeColor: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
-    description: 'Calling and operational executive. Access limited to assigned calling target lists.'
+  genesis: {
+    id: 'genesis',
+    name: 'Genesis',
+    bay: 'BAY-GN05',
+    category: 'Business & Startups',
+    department: 'Management & Entrepreneurship',
+    tagline: 'Venture Pitches, Case Cracks, Brand Marketing & ESG Strategy',
+    accentColor: '#FBBF24',
+    events: [
+      'Pitchverse',
+      'Pitchverse - Virtual Strategy',
+      'Case Crack',
+      'Brand Blitz',
+      'Case Ethical Crosstalk'
+    ]
+  },
+  electronica: {
+    id: 'electronica',
+    name: 'Electronica',
+    bay: 'BAY-EC06',
+    category: 'Electronics & IoT',
+    department: 'Electronics & Communication Engineering',
+    tagline: 'Micro-Power Silicon, IoT Sensors & Hardware Prototyping',
+    accentColor: '#34D399',
+    events: [
+      'Circuit Craft',
+      'Digital Design Challenge',
+      'Innovation-X',
+      'Arduino Imagino'
+    ]
+  },
+  electrica: {
+    id: 'electrica',
+    name: 'Electrica',
+    bay: 'BAY-EL07',
+    category: 'Electrical & Energy',
+    department: 'Electrical & Instrumentation Engineering',
+    tagline: 'Net-Zero Power Grids, Soldering Speedruns & Wireless Power Transfer',
+    accentColor: '#F59E0B',
+    events: [
+      'Soldering Speedrun',
+      'Breadboard Battle',
+      'Grid Masters-SLD Challenge',
+      'Grid Masters - SLD Challenge',
+      'WPTC - Wireless Power Transfer'
+    ]
+  },
+  mechanica: {
+    id: 'mechanica',
+    name: 'Mechanica',
+    bay: 'BAY-MC08',
+    category: 'Mechanical Engineering',
+    department: 'Mechanical Engineering & Fabrication',
+    tagline: 'Precision 3D CAD Modeling, High-Load Hydraulics & Mechnovate',
+    accentColor: '#FB923C',
+    events: [
+      'Mechnovate',
+      'Designare',
+      'Hydraload',
+      'Fabriquer'
+    ]
+  },
+  chemica: {
+    id: 'chemica',
+    name: 'Chemica',
+    bay: 'BAY-CH09',
+    category: 'Chemical Technology',
+    department: 'Chemical Engineering & Bio-Polymers',
+    tagline: 'Green Bio-Polymers, Chemi-Thon, Soap Formulations & Analytical Mystery',
+    accentColor: '#A78BFA',
+    events: [
+      'Chemi-Thone',
+      'Soap Making',
+      'Jam Session',
+      'Chemi-Mystery',
+      'Chemi Craft',
+      'Poster and Paper Presentation'
+    ]
+  },
+  civicon: {
+    id: 'civicon',
+    name: 'Civicon',
+    bay: 'BAY-CV10',
+    category: 'Civil & Smart Cities',
+    department: 'Civil Engineering & Infrastructure',
+    tagline: 'Net-Zero Architecture, Truss Analysis, City Modeling & Seismic Design',
+    accentColor: '#2DD4BF',
+    events: [
+      'Truss Load',
+      'City Model Exhibition',
+      'Seismic Challenge',
+      'CAD Design Challenge',
+      'Technical Quiz Competition',
+      'Poster Presentation'
+    ]
+  },
+  inventia: {
+    id: 'inventia',
+    name: 'Inventia',
+    bay: 'BAY-IN11',
+    category: 'Interdisciplinary Innovation',
+    department: 'Sciences & Interdisciplinary Technologies',
+    tagline: 'Cross-Disciplinary Earth Solutions, Smart Agriculture & Techno-Vation',
+    accentColor: '#4ADE80',
+    events: [
+      'Techno-Vation',
+      'Smart Agriculture (SM-Agri)',
+      'SM-Agri',
+      'Cognitive Challenges'
+    ]
+  },
+  foodocrats: {
+    id: 'foodocrats',
+    name: 'Food-O-Crats',
+    bay: 'BAY-FC12',
+    category: 'Food Tech & Agriculture',
+    department: 'Food Engineering & Precision Nutrition',
+    tagline: 'Precision Food Preservation, Nutritional Forensics & Foodprint',
+    accentColor: '#E879F9',
+    events: [
+      'Food Forge',
+      'Food Forensics',
+      'Clue Craze',
+      'Foodprint',
+      'Tech4Earth'
+    ]
+  },
+  atomheimer: {
+    id: 'atomheimer',
+    name: 'Atomheimer',
+    bay: 'BAY-AT13',
+    category: 'Applied Sciences & Physics',
+    department: 'Physics, Chemistry & Applied Sciences',
+    tagline: 'Financial Modeling (The Big Bull), Aqua Aerodynamics & Science Quizzes',
+    accentColor: '#60A5FA',
+    events: [
+      'The Big Bull',
+      'The Big Bull (Diploma Students Only)',
+      'Aqua Clean',
+      'The Aqua-Epoch',
+      'Splash Rocket',
+      'Aerostrike',
+      'Quiz Nova'
+    ]
   }
 };
 
-export const TEAMS = [
-  { id: 'central', name: 'Central Desk / Core Secretariat' },
-  { id: 'invitation', name: 'Invitation Team' },
-  { id: 'reception', name: 'Reception & Helpdesk Team' },
-  { id: 'outreach', name: 'Outreach & Calling Team' },
-  { id: 'tech_domain', name: 'Technical & Competitions Domain' },
-  { id: 'hack_domain', name: 'Hackathons Domain' },
-  { id: 'quiz_domain', name: 'Quizzes Domain' },
-  { id: 'cult_domain', name: 'Cultural & Jam Domain' }
-];
-
-// Pre-configured persona accounts for fast 1-click testing & production staff
-export const PRESET_USERS = [
+// DIRECTORY OF ALL 17 OFFICIAL ACCOUNTS
+export const OFFICIAL_ACCOUNTS = [
+  // 1 & 2: Central Super Admins
   {
-    id: 'user_sagar',
-    name: 'Sagar Anmol',
-    role: 'super_admin',
-    team: 'central',
-    teamName: 'Central Desk',
-    title: 'Lead Organizer & Central Desk Head',
-    email: 'sagar@sliet.ac.in',
-    allowedDomains: ['ALL'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'SA'
-  },
-  {
-    id: 'user_raj',
+    username: 'raj',
+    password: 'raj@sliet',
     name: 'Raj Aryan',
     role: 'super_admin',
+    accountType: 'admin',
     team: 'central',
     teamName: 'Central Desk',
     title: 'Central Tech & Operations Lead',
-    email: 'raj.aryan9242@gmail.com',
-    allowedDomains: ['ALL'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'RA'
+    domainId: null,
+    avatar: 'RA',
+    description: 'Master access across all 13 domains, 62 events, calling logs & audit trails.'
   },
   {
-    id: 'user_invitation_head',
-    name: 'Priya Sharma',
-    role: 'team_head',
-    team: 'invitation',
-    teamName: 'Invitation Team',
-    title: 'Head of Invitation Operations',
-    email: 'invitation.head@sliet.ac.in',
-    allowedDomains: ['ALL'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'PS'
+    username: 'sagar',
+    password: 'sagar@sliet',
+    name: 'Sagar Anmol',
+    role: 'super_admin',
+    accountType: 'admin',
+    team: 'central',
+    teamName: 'Central Desk',
+    title: 'Lead Organizer & Central Desk Head',
+    domainId: null,
+    avatar: 'SA',
+    description: 'Master organizer access across all registrations, calling teams, and gateway verifications.'
+  },
+
+  // 3-15: 13 Domain Heads
+  {
+    username: 'plexus',
+    password: 'plexus@sliet',
+    name: 'Plexus Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'plexus',
+    domainName: 'Plexus',
+    bay: 'BAY-PX02',
+    team: 'plexus',
+    teamName: 'Plexus Domain',
+    title: 'Head of Computer Science & AI Domain',
+    avatar: 'PX',
+    description: 'Scoped strictly to Plexus events (Competitive Coding, Ghost Code, Pixel Wizard, ML).'
   },
   {
-    id: 'user_reception_head',
-    name: 'Aman Verma',
-    role: 'team_head',
+    username: 'mechanica',
+    password: 'mechanica@sliet',
+    name: 'Mechanica Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'mechanica',
+    domainName: 'Mechanica',
+    bay: 'BAY-MC08',
+    team: 'mechanica',
+    teamName: 'Mechanica Domain',
+    title: 'Head of Mechanical & Fabrication Domain',
+    avatar: 'MC',
+    description: 'Scoped strictly to Mechanica events (CAD, Hydraulics, Mechnovate, Fabrication).'
+  },
+  {
+    username: 'robozar',
+    password: 'robozar@sliet',
+    name: 'RoboZar Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'robozar',
+    domainName: 'RoboZar',
+    bay: 'BAY-RZ01',
+    team: 'robozar',
+    teamName: 'RoboZar Domain',
+    title: 'Head of Robotics & Combat Domain',
+    avatar: 'RZ',
+    description: 'Scoped strictly to RoboZar events (Robowar, Line Follower, Drone, Hovercraft).'
+  },
+  {
+    username: 'karyarachna',
+    password: 'karyarachna@sliet',
+    name: 'Karyarachna Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'karyarachna',
+    domainName: 'Karyarachna',
+    bay: 'BAY-KR03',
+    team: 'karyarachna',
+    teamName: 'Karyarachna Domain',
+    title: 'Head of Innovation & Hackathon Domain',
+    avatar: 'KR',
+    description: 'Scoped strictly to Karyarachna events (Kritrim Hardware, Hackathons, Jugaad).'
+  },
+  {
+    username: 'kermis',
+    password: 'kermis@sliet',
+    name: 'Kermis Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'kermis',
+    domainName: 'Kermis',
+    bay: 'BAY-KM04',
+    team: 'kermis',
+    teamName: 'Kermis Domain',
+    title: 'Head of Esports & Gaming League',
+    avatar: 'KM',
+    description: 'Scoped strictly to Kermis events (BGMI, Free Fire, Competitive Chess).'
+  },
+  {
+    username: 'genesis',
+    password: 'genesis@sliet',
+    name: 'Genesis Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'genesis',
+    domainName: 'Genesis',
+    bay: 'BAY-GN05',
+    team: 'genesis',
+    teamName: 'Genesis Domain',
+    title: 'Head of Business & Startup Incubator',
+    avatar: 'GN',
+    description: 'Scoped strictly to Genesis events (Pitchverse, Case Crack, Brand Blitz).'
+  },
+  {
+    username: 'electronica',
+    password: 'electronica@sliet',
+    name: 'Electronica Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'electronica',
+    domainName: 'Electronica',
+    bay: 'BAY-EC06',
+    team: 'electronica',
+    teamName: 'Electronica Domain',
+    title: 'Head of Electronics & IoT Arena',
+    avatar: 'EC',
+    description: 'Scoped strictly to Electronica events (Circuit Craft, Digital Design, Arduino).'
+  },
+  {
+    username: 'electrica',
+    password: 'electrica@sliet',
+    name: 'Electrica Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'electrica',
+    domainName: 'Electrica',
+    bay: 'BAY-EL07',
+    team: 'electrica',
+    teamName: 'Electrica Domain',
+    title: 'Head of Electrical & Clean Energy Domain',
+    avatar: 'EL',
+    description: 'Scoped strictly to Electrica events (Soldering, Breadboard, Smart Grid, WPTC).'
+  },
+  {
+    username: 'chemica',
+    password: 'chemica@sliet',
+    name: 'Chemica Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'chemica',
+    domainName: 'Chemica',
+    bay: 'BAY-CH09',
+    team: 'chemica',
+    teamName: 'Chemica Domain',
+    title: 'Head of Chemical & Bio-Polymer Domain',
+    avatar: 'CH',
+    description: 'Scoped strictly to Chemica events (Chemi-Thon, Soap Making, Jam Session, Mystery).'
+  },
+  {
+    username: 'civicon',
+    password: 'civicon@sliet',
+    name: 'Civicon Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'civicon',
+    domainName: 'Civicon',
+    bay: 'BAY-CV10',
+    team: 'civicon',
+    teamName: 'Civicon Domain',
+    title: 'Head of Civil & Smart Architecture Domain',
+    avatar: 'CV',
+    description: 'Scoped strictly to Civicon events (Truss Load, City Model, Seismic, CAD).'
+  },
+  {
+    username: 'inventia',
+    password: 'inventia@sliet',
+    name: 'Inventia Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'inventia',
+    domainName: 'Inventia',
+    bay: 'BAY-IN11',
+    team: 'inventia',
+    teamName: 'Inventia Domain',
+    title: 'Head of Interdisciplinary Solutions Domain',
+    avatar: 'IN',
+    description: 'Scoped strictly to Inventia events (Techno-Vation, Smart Agriculture, Cognitive).'
+  },
+  {
+    username: 'foodocrats',
+    password: 'foodocrats@sliet',
+    aliasUsername: 'food-o-crats',
+    name: 'Food-O-Crats Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'foodocrats',
+    domainName: 'Food-O-Crats',
+    bay: 'BAY-FC12',
+    team: 'foodocrats',
+    teamName: 'Food-O-Crats Domain',
+    title: 'Head of Food Engineering & Agri Domain',
+    avatar: 'FC',
+    description: 'Scoped strictly to Food-O-Crats events (Food Forge, Forensics, Foodprint, Clue Craze).'
+  },
+  {
+    username: 'atomheimer',
+    password: 'atomheimer@sliet',
+    name: 'Atomheimer Domain Head',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'atomheimer',
+    domainName: 'Atomheimer',
+    bay: 'BAY-AT13',
+    team: 'atomheimer',
+    teamName: 'Atomheimer Domain',
+    title: 'Head of Applied Sciences & Physics Domain',
+    avatar: 'AT',
+    description: 'Scoped strictly to Atomheimer events (The Big Bull, Aqua Clean, Aerostrike, Quiz Nova).'
+  },
+
+  // 16 & 17: Operations Calling & Reception Teams
+  {
+    username: 'reception',
+    password: 'reception@sliet',
+    name: 'Reception & Helpdesk',
+    role: 'operations_calling',
+    accountType: 'operations',
     team: 'reception',
-    teamName: 'Reception & Helpdesk',
-    title: 'Reception & Registration Desk Lead',
-    email: 'reception.head@sliet.ac.in',
-    allowedDomains: ['ALL'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'AV'
+    teamName: 'Reception Team',
+    title: 'Registration Desk & Participant Support',
+    domainId: null,
+    avatar: 'RC',
+    description: 'Front-desk operations, spot registrations, and participant call support.'
   },
   {
-    id: 'user_outreach_member',
-    name: 'Rohit Kumar',
-    role: 'team_member',
+    username: 'outreach',
+    password: 'outreach@sliet',
+    name: 'Outreach Calling Team',
+    role: 'operations_calling',
+    accountType: 'operations',
     team: 'outreach',
     teamName: 'Outreach Team',
-    title: 'Outreach Calling Specialist',
-    email: 'rohit.calling@sliet.ac.in',
-    allowedDomains: ['ALL'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'RK'
-  },
-  {
-    id: 'user_hackathon_coord',
-    name: 'Vikram Singh',
-    role: 'domain_coordinator',
-    team: 'hack_domain',
-    teamName: 'Hackathons Domain',
-    title: 'Hackathon Domain Coordinator',
-    email: 'hackathons@sliet.ac.in',
-    allowedDomains: ['Hackathon'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'VS'
-  },
-  {
-    id: 'user_quiz_coord',
-    name: 'Ananya Roy',
-    role: 'domain_coordinator',
-    team: 'quiz_domain',
-    teamName: 'Quizzes Domain',
-    title: 'Quizzes Domain Coordinator',
-    email: 'quizzes@sliet.ac.in',
-    allowedDomains: ['Quiz'],
-    allowedEvents: ['ALL'],
-    avatarInitials: 'AR'
+    title: 'Calling Campaign & Payment Follow-up Lead',
+    domainId: null,
+    avatar: 'OT',
+    description: 'Dedicated calling desk for payment reminders, fee collection, and conversion.'
   }
 ];
 
-const SESSION_STORAGE_KEY = 'tf_auth_session_v1';
+const SESSION_STORAGE_KEY = 'tf_auth_session_v3';
 
 export function getActiveUser() {
   try {
     const raw = localStorage.getItem(SESSION_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && parsed.id) return parsed;
+      if (parsed && parsed.username) return parsed;
     }
   } catch (e) {
     console.error('Error reading auth session:', e);
   }
-  // Default to Super Admin (Sagar Anmol) for first load
-  return PRESET_USERS[0];
+  // Default to Super Admin (Sagar Anmol)
+  return OFFICIAL_ACCOUNTS[1];
 }
 
 export function setActiveUser(user) {
@@ -171,62 +508,110 @@ export function clearActiveUser() {
 }
 
 /**
- * Evaluates whether a user has permission to see a given participant
+ * Authenticates user credentials against the 17 verified accounts.
+ * Returns { success: true, user } or { success: false, error }
  */
-export function canUserViewParticipant(user, participant) {
-  if (!user || !participant) return false;
-  if (user.role === 'super_admin') return true;
-
-  // Team Heads have combined visibility across their teams
-  if (user.role === 'team_head') return true;
-
-  // Domain Coordinator: check participant event_type
-  if (user.role === 'domain_coordinator') {
-    if (!user.allowedDomains || user.allowedDomains.includes('ALL')) return true;
-    const pType = (participant.event_type || '').toLowerCase();
-    return user.allowedDomains.some(d => pType.includes(d.toLowerCase()));
+export function authenticateUser(usernameInput, passwordInput) {
+  if (!usernameInput || !passwordInput) {
+    return { success: false, error: 'Please enter both username and password.' };
   }
 
-  // Event Coordinator / Member: check specific event name
-  if (user.role === 'event_coordinator' || user.role === 'event_member') {
-    if (!user.allowedEvents || user.allowedEvents.includes('ALL')) return true;
-    const pEvent = (participant.event_name || '').toLowerCase();
-    return user.allowedEvents.some(e => pEvent.includes(e.toLowerCase()));
+  const cleanUser = usernameInput.trim().toLowerCase();
+  const cleanPass = passwordInput.trim();
+
+  const account = OFFICIAL_ACCOUNTS.find(acc => 
+    acc.username.toLowerCase() === cleanUser || 
+    (acc.aliasUsername && acc.aliasUsername.toLowerCase() === cleanUser)
+  );
+
+  if (!account) {
+    return { 
+      success: false, 
+      error: `Invalid username "${cleanUser}". Use domain name (e.g. plexus, mechanica), admin (raj, sagar), or operations (reception, outreach).` 
+    };
   }
 
-  // Team Member (Calling Team)
-  if (user.role === 'team_member') {
-    // Calling members can access participants assigned to their campaign
-    return true;
+  if (account.password !== cleanPass) {
+    return { 
+      success: false, 
+      error: `Incorrect password for ${account.name}. Hint: use ${account.username}@sliet` 
+    };
   }
 
-  return true;
+  return { success: true, user: account };
 }
 
 /**
- * Filter a participant list according to active user's permissions
+ * Checks if a specific event belongs to a domain
  */
-export function filterParticipantsByUser(user, participants = []) {
-  if (!user || user.role === 'super_admin' || user.role === 'team_head') {
-    return participants;
-  }
-  return participants.filter(p => canUserViewParticipant(user, p));
+export function isEventInDomain(domainId, eventName) {
+  if (!domainId || !eventName) return false;
+  const domain = DOMAINS_DIRECTORY[domainId];
+  if (!domain) return false;
+
+  const target = eventName.toLowerCase().trim();
+  return domain.events.some(ev => {
+    const evLower = ev.toLowerCase().trim();
+    return target === evLower || target.includes(evLower) || evLower.includes(target);
+  });
 }
 
 /**
- * Permissions check helpers
+ * Resolves which domain an event belongs to (or null)
  */
-export function canViewAuditLogs(user) {
-  if (!user) return false;
-  return user.role === 'super_admin' || user.role === 'team_head';
+export function getDomainForEvent(eventName) {
+  if (!eventName) return null;
+  const target = eventName.toLowerCase().trim();
+
+  for (const [dId, dInfo] of Object.entries(DOMAINS_DIRECTORY)) {
+    const match = dInfo.events.some(ev => {
+      const evLower = ev.toLowerCase().trim();
+      return target === evLower || target.includes(evLower) || evLower.includes(target);
+    });
+    if (match) return dInfo;
+  }
+  return null;
 }
 
-export function canVerifyPayment(user) {
-  if (!user) return false;
-  return user.role === 'super_admin' || user.role === 'team_head';
+/**
+ * Filters participants for the active user session.
+ * - If user is domain_head: STRICTLY filtered to that domain's events.
+ * - If user is super_admin and domainOverride is set: filtered to that domain.
+ * - Otherwise: returns all participants.
+ */
+export function getParticipantsForUser(user, participants = [], domainOverride = null) {
+  if (!Array.isArray(participants)) return [];
+  if (!user) return participants;
+
+  const targetDomainId = user.role === 'domain_head' ? user.domainId : domainOverride;
+
+  if (targetDomainId && targetDomainId !== 'ALL') {
+    return participants.filter(p => isEventInDomain(targetDomainId, p.event_name));
+  }
+
+  return participants;
 }
 
-export function canExportAllData(user) {
-  if (!user) return false;
-  return user.role === 'super_admin' || user.role === 'team_head';
+/**
+ * Computes domain-specific statistical metrics
+ */
+export function getDomainStats(domainId, participants = []) {
+  const domain = DOMAINS_DIRECTORY[domainId];
+  if (!domain) return null;
+
+  const domainParticipants = participants.filter(p => isEventInDomain(domainId, p.event_name));
+  const paidCount = domainParticipants.filter(p => Number(p.amount) > 0).length;
+  const totalRevenue = domainParticipants.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const colleges = new Set(domainParticipants.map(p => p.college).filter(Boolean));
+
+  return {
+    domain,
+    totalParticipants: domainParticipants.length,
+    paidCount,
+    freeCount: domainParticipants.length - paidCount,
+    totalRevenue,
+    uniqueColleges: colleges.size,
+    eventsCount: domain.events.length,
+    eventsList: domain.events
+  };
 }
