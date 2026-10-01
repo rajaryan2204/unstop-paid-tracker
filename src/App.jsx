@@ -386,7 +386,8 @@ export default function App() {
 
             {/* 4. Master Operations Data Table with Direct Calling & Domain Awareness */}
             <DataTable
-              key={`${callDbVersion}_${activeDomainId || 'all'}_${selectedEventFilter}`}
+              key={`${activeDomainId || 'all'}_${selectedEventFilter}`}
+              callDbVersion={callDbVersion}
               participants={displayedParticipants}
               summary={summary}
               currentUser={currentUser}
@@ -404,7 +405,8 @@ export default function App() {
 
       {/* Slide-over Candidate Inspector Drawer */}
       <CandidateDrawer
-        key={`drawer_${callDbVersion}_${selectedParticipant?.id}`}
+        key={`drawer_${selectedParticipant?.id}`}
+        callDbVersion={callDbVersion}
         participant={selectedParticipant}
         onClose={() => setSelectedParticipant(null)}
         onTriggerCall={handleTriggerCall}

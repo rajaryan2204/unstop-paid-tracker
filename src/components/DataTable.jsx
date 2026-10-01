@@ -31,6 +31,7 @@ export default function DataTable({
   currentUser,
   activeDomainId,
   selectedEventFilter = '',
+  callDbVersion = 0,
   onSelectEventFilter,
   onSelectParticipant, 
   onTriggerCall,
@@ -54,8 +55,8 @@ export default function DataTable({
   const [pageSize, setPageSize] = useState(50);
   const [copiedEmail, setCopiedEmail] = useState(null);
 
-  // Fetch call records database
-  const callRecords = useMemo(() => getCallRecords(), [participants]);
+  // Fetch call records database (reactive to callDbVersion from Neon cloud)
+  const callRecords = useMemo(() => getCallRecords(), [participants, callDbVersion]);
 
   // Active domain info if scoped
   const activeDomain = activeDomainId ? DOMAINS_DIRECTORY[activeDomainId] : null;
@@ -454,7 +455,7 @@ export default function DataTable({
                 const hasMembers = p.team_members && p.team_members.length > 0;
 
                 // Call CRM record
-                const rec = callRecords[String(p.id)];
+                const rec = callRecords[String(p.id)] || (p.internal_id ? callRecords[String(p.internal_id)] : null);
                 const callCount = rec?.callCount || 0;
                 const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
 
@@ -539,22 +540,30 @@ export default function DataTable({
                             )}
                           </div>
 
-                          {/* Dynamic Calling Status Badge */}
+                          {/* Dynamic Calling Status Badge & Remark */}
                           {statusDef ? (
-                            <div className="flex items-center gap-1">
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-mono border ${statusDef.badge}`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
-                                <span>{statusDef.shortLabel}</span>
-                              </span>
-                              {rec.leadNumber && (
-                                <span className="text-[10px] font-mono text-slate-500">
-                                  L: {rec.leadNumber}
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border font-medium ${statusDef.badge}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
+                                  <span>{statusDef.label || statusDef.shortLabel}</span>
                                 </span>
+                                {rec.leadNumber && (
+                                  <span className="text-[10px] font-mono text-slate-500">
+                                    #{rec.leadNumber}
+                                  </span>
+                                )}
+                              </div>
+                              {rec.lastRemark && rec.lastRemark !== 'No remarks entered.' && (
+                                <div className="text-[10px] text-slate-400 truncate max-w-[190px] italic" title={rec.lastRemark}>
+                                  "{rec.lastRemark}"
+                                </div>
                               )}
                             </div>
                           ) : (
-                            <div className="text-[10px] font-mono text-slate-500">
-                              Never Called
+                            <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                              <span>Never Called</span>
                             </div>
                           )}
                         </div>
@@ -665,7 +674,7 @@ export default function DataTable({
             const cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
             const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}` : null;
             const amt = Number(p.amount) || 0;
-            const rec = callRecords[String(p.id)];
+            const rec = callRecords[String(p.id)] || (p.internal_id ? callRecords[String(p.internal_id)] : null);
             const callCount = rec?.callCount || 0;
             const statusDef = rec?.lastStatus ? CALL_STATUSES[rec.lastStatus] : null;
             const domainInfo = getDomainForEvent(p.event_name);
@@ -718,24 +727,32 @@ export default function DataTable({
 
                 {/* Call Status & Direct Action Buttons */}
                 <div className="flex items-center justify-between pt-1" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-1.5">
+                  <div className="min-w-0 pr-2">
                     {statusDef ? (
-                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${statusDef.badge}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
-                        <span>{statusDef.shortLabel}</span>
-                      </span>
+                      <div>
+                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border font-medium ${statusDef.badge}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${statusDef.indicator}`} />
+                          <span>{statusDef.label || statusDef.shortLabel}</span>
+                        </span>
+                        {rec.lastRemark && rec.lastRemark !== 'No remarks entered.' && (
+                          <div className="text-[10px] text-slate-400 truncate max-w-[170px] italic mt-0.5" title={rec.lastRemark}>
+                            "{rec.lastRemark}"
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      <span className="text-[10px] font-mono text-slate-500">
-                        Never Called
+                      <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                        <span>Never Called</span>
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {p.phone && p.phone !== 'N/A' && (
                       <button
                         onClick={() => onTriggerCall && onTriggerCall(p)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all"
                       >
                         <PhoneCall className="w-3 h-3 text-sky-400" />
                         <span>Call ({callCount})</span>

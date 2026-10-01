@@ -1,5 +1,5 @@
 // src/components/CandidateDrawer.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { 
   X, 
   Phone, 
@@ -20,7 +20,7 @@ import {
 import { getAvatarStyle, getInitials } from '../utils/avatar';
 import { getParticipantCallRecord, CALL_STATUSES } from '../utils/callStore';
 
-export default function CandidateDrawer({ participant, onClose, onTriggerCall }) {
+export default function CandidateDrawer({ participant, onClose, onTriggerCall, callDbVersion = 0 }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -42,7 +42,10 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall })
   const hasMembers = participant.team_members && Array.isArray(participant.team_members) && participant.team_members.length > 0;
 
   // Retrieve call history & timeline
-  const callRecord = getParticipantCallRecord(participant.id);
+  const callRecord = useMemo(() => {
+    if (!participant) return null;
+    return getParticipantCallRecord(participant.id) || (participant.internal_id ? getParticipantCallRecord(participant.internal_id) : null);
+  }, [participant, callDbVersion]);
   const callCount = callRecord?.callCount || 0;
   const history = callRecord?.history || [];
   const latestStatusDef = callRecord?.lastStatus ? CALL_STATUSES[callRecord.lastStatus] : null;
@@ -181,11 +184,22 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall })
                     Operations Call Timeline ({callCount} Calls)
                   </span>
                 </div>
-                {latestStatusDef && (
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${latestStatusDef.badge}`}>
-                    {latestStatusDef.label}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {latestStatusDef && (
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono border font-medium ${latestStatusDef.badge}`}>
+                      {latestStatusDef.label}
+                    </span>
+                  )}
+                  {participant.phone && participant.phone !== 'N/A' && (
+                    <button
+                      onClick={() => onTriggerCall && onTriggerCall(participant)}
+                      className="px-2 py-0.5 rounded text-[10px] font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all flex items-center gap-1"
+                    >
+                      <PhoneCall className="w-2.5 h-2.5 text-sky-400" />
+                      <span>+ Log Call / Status</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {history.length > 0 ? (
