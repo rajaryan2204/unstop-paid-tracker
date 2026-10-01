@@ -39,7 +39,7 @@ export function getSqlClient() {
   }
   if (!sqlClient) {
     try {
-      sqlClient = neon(url.trim());
+      sqlClient = neon(url.trim(), { disableWarningInBrowsers: true });
     } catch (e) {
       console.warn('Invalid Neon Database URL:', e.message);
       return null;
@@ -79,7 +79,7 @@ export async function testNeonConnection(candidateUrl) {
     return { success: false, error: 'Connection string must start with postgresql://' };
   }
   try {
-    const testSql = neon(candidateUrl.trim());
+    const testSql = neon(candidateUrl.trim(), { disableWarningInBrowsers: true });
     await testSql`SELECT 1 AS live_check`;
     return { success: true };
   } catch (err) {
