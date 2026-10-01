@@ -16,11 +16,16 @@ import {
   Search,
   CheckCircle2,
   SlidersHorizontal,
-  ExternalLink
+  ExternalLink,
+  Smartphone,
+  Laptop,
+  Tablet,
+  MapPin
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DOMAINS_DIRECTORY } from '../utils/auth';
+import { getDeviceInfo } from '../utils/device';
 
 export default function Header({ 
   currentUser,
@@ -32,6 +37,7 @@ export default function Header({
   onOpenVerificationQueue,
   onOpenBookmarklet,
   onOpenTokenHealth,
+  onOpenDeviceActivity,
   onExportCSV,
   selectedDomainOverride,
   onSelectDomainOverride,
@@ -43,6 +49,7 @@ export default function Header({
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const currentDev = getDeviceInfo();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -151,6 +158,29 @@ export default function Header({
             </span>
           </div>
 
+          {/* Instagram-style Active Device & Location Pill */}
+          <button
+            onClick={onOpenDeviceActivity}
+            className="hidden lg:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-700 transition-colors cursor-pointer"
+            title="Where You're Logged In: View active device hardware, IP & location"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            {currentDev.deviceType === 'mobile' ? (
+              <Smartphone className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            ) : currentDev.deviceType === 'tablet' ? (
+              <Tablet className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            ) : (
+              <Laptop className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            )}
+            <span className="font-mono text-[11px] font-medium text-zinc-800 truncate max-w-[110px] xl:max-w-[150px]">
+              {currentDev.deviceModel}
+            </span>
+            <span className="text-zinc-300">•</span>
+            <span className="text-[11px] text-zinc-500 font-sans truncate max-w-[110px]">
+              📍 {currentDev.location.split(',')[0]}
+            </span>
+          </button>
+
           {/* Refresh Action */}
           <button
             onClick={onRefresh}
@@ -205,6 +235,28 @@ export default function Header({
                   <div className="text-[11px] font-mono text-zinc-500 mt-0.5 truncate">
                     ID: {currentUser?.username} • {currentUser?.teamName || 'Staff'}
                   </div>
+                </div>
+
+                {/* Instagram-style 'Where You're Logged In' */}
+                <div className="py-1 border-b border-zinc-100">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onOpenDeviceActivity();
+                    }}
+                    className="w-full px-3.5 py-2.5 text-left text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors flex items-center justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-semibold text-zinc-900">Where You're Logged In</div>
+                        <div className="text-[10px] text-zinc-500 font-mono truncate">
+                          {currentDev.deviceModel} • 📍 {currentDev.location}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                  </button>
                 </div>
 
                 {/* Operations Tools (Super Admin Only) */}

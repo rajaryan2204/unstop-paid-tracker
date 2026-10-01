@@ -15,6 +15,7 @@ import VerificationQueueModal from './components/VerificationQueueModal';
 import DomainBanner from './components/DomainBanner';
 import LoginScreen from './components/LoginScreen';
 import PasswordManagerModal from './components/PasswordManagerModal';
+import DeviceActivityModal from './components/DeviceActivityModal';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
@@ -67,6 +68,7 @@ export default function App() {
   const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
   const [isVerificationQueueOpen, setIsVerificationQueueOpen] = useState(false);
   const [isPasswordManagerOpen, setIsPasswordManagerOpen] = useState(false);
+  const [isDeviceActivityOpen, setIsDeviceActivityOpen] = useState(false);
   
   // Active call logging modal state
   const [callingCandidate, setCallingCandidate] = useState(null);
@@ -351,6 +353,7 @@ export default function App() {
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
         onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
+        onOpenDeviceActivity={() => setIsDeviceActivityOpen(true)}
         onExportCSV={handleExportCSV}
         currentUser={currentUser}
         selectedDomainOverride={selectedDomainOverride}
@@ -480,6 +483,13 @@ export default function App() {
         currentUser={currentUser}
         onClose={() => setIsPasswordManagerOpen(false)}
         onTriggerToast={triggerToast}
+      />
+
+      {/* Instagram-style 'Where You're Logged In' Device & Location Activity Modal */}
+      <DeviceActivityModal
+        isOpen={isDeviceActivityOpen}
+        currentUser={currentUser}
+        onClose={() => setIsDeviceActivityOpen(false)}
       />
 
       {/* Floating Toast Notification */}

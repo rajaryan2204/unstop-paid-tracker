@@ -95,7 +95,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         remark: 'Ringing, no response. Will retry in evening.',
         leadNumber: '',
         device: 'Apple iPhone • Safari',
-        deviceType: 'mobile'
+        deviceType: 'mobile',
+        location: 'Sangrur, Punjab',
+        ip: '103.24.120.45'
       },
       {
         id: 'call_2',
@@ -108,7 +110,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         remark: 'Candidate was in college lectures. Asked to call back after 6 PM.',
         leadNumber: '9876543210',
         device: 'Samsung Galaxy S24 • Chrome',
-        deviceType: 'mobile'
+        deviceType: 'mobile',
+        location: 'Ludhiana, Punjab',
+        ip: '49.36.182.91'
       },
       {
         id: 'call_3',
@@ -121,7 +125,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         remark: 'Convinced for Robowars track. Explaining prize pool. Promised to pay tonight.',
         leadNumber: '9876543210',
         device: 'Apple iPhone • Safari',
-        deviceType: 'mobile'
+        deviceType: 'mobile',
+        location: 'Sangrur, Punjab',
+        ip: '103.24.120.45'
       },
       {
         id: 'call_4',
@@ -134,7 +140,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         remark: 'Participant said paid ₹199 via UPI to TechFEST QR. Sent screenshot to WhatsApp.',
         leadNumber: '9876543210',
         device: 'MacBook / Mac • Chrome',
-        deviceType: 'desktop'
+        deviceType: 'desktop',
+        location: 'Sangrur, Punjab',
+        ip: '103.112.54.21'
       }
     ]
   }
@@ -155,7 +163,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     nextStatus: 'PAYMENT_CLAIMED',
     device: 'MacBook / Mac • Chrome',
     deviceType: 'desktop',
-    details: 'Logged Call #4 via MacBook / Mac • Chrome. Status changed to Payment Completed (Sent to Verification Desk).'
+    location: 'Sangrur, Punjab',
+    ip: '103.112.54.21',
+    details: 'Logged Call #4 via MacBook / Mac • Chrome (📍 Sangrur, Punjab). Status changed to Payment Completed (Sent to Verification Desk).'
   },
   {
     id: 'log_seed_3',
@@ -171,7 +181,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     nextStatus: 'INTERESTED',
     device: 'Apple iPhone • Safari',
     deviceType: 'mobile',
-    details: 'Logged Call #3 via Apple iPhone • Safari. Marked Interested / Follow Up.'
+    location: 'Sangrur, Punjab',
+    ip: '103.24.120.45',
+    details: 'Logged Call #3 via Apple iPhone • Safari (📍 Sangrur, Punjab). Marked Interested / Follow Up.'
   },
   {
     id: 'log_seed_2',
@@ -187,7 +199,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     nextStatus: 'CALL_LATER',
     device: 'Samsung Galaxy S24 • Chrome',
     deviceType: 'mobile',
-    details: 'Logged Call #2 via Samsung Galaxy S24 • Chrome. Callback scheduled.'
+    location: 'Ludhiana, Punjab',
+    ip: '49.36.182.91',
+    details: 'Logged Call #2 via Samsung Galaxy S24 • Chrome (📍 Ludhiana, Punjab). Callback scheduled.'
   },
   {
     id: 'log_seed_1',
@@ -203,7 +217,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     nextStatus: 'NOT_PICKED',
     device: 'Apple iPhone • Safari',
     deviceType: 'mobile',
-    details: 'Logged Call #1 via Apple iPhone • Safari. Participant did not pick up.'
+    location: 'Sangrur, Punjab',
+    ip: '103.24.120.45',
+    details: 'Logged Call #1 via Apple iPhone • Safari (📍 Sangrur, Punjab). Participant did not pick up.'
   }
 ];
 
@@ -253,16 +269,22 @@ export function addAuditLog(entry) {
   const currentDev = getDeviceInfo();
   const device = entry.device || currentDev.deviceName;
   const deviceType = entry.deviceType || currentDev.deviceType;
+  const location = entry.location || currentDev.location;
+  const ip = entry.ip || currentDev.ip;
 
   const newEntry = {
     id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
     timestamp: new Date().toISOString(),
     device,
     deviceType,
+    location,
+    ip,
     ...entry
   };
   if (!newEntry.device) newEntry.device = device;
   if (!newEntry.deviceType) newEntry.deviceType = deviceType;
+  if (!newEntry.location) newEntry.location = location;
+  if (!newEntry.ip) newEntry.ip = ip;
 
   logs.unshift(newEntry);
   saveAuditLogs(logs.slice(0, 500)); // retain latest 500 logs
@@ -393,7 +415,9 @@ export function logCallForParticipant({
     remark: remark?.trim() || 'No remarks entered.',
     leadNumber: leadNumber?.trim() || existing.leadNumber || '',
     device: currentDev.deviceName,
-    deviceType: currentDev.deviceType
+    deviceType: currentDev.deviceType,
+    location: currentDev.location,
+    ip: currentDev.ip
   };
 
   const prevStatus = existing.lastStatus || 'NONE';
@@ -425,7 +449,9 @@ export function logCallForParticipant({
     nextStatus: status,
     device: currentDev.deviceName,
     deviceType: currentDev.deviceType,
-    details: `Logged Call #${newCallNumber} via ${currentDev.deviceName}. Status: ${CALL_STATUSES[status]?.label || status}. Remark: ${callEntry.remark}`
+    location: currentDev.location,
+    ip: currentDev.ip,
+    details: `Logged Call #${newCallNumber} via ${currentDev.deviceName} (📍 ${currentDev.location}). Status: ${CALL_STATUSES[status]?.label || status}. Remark: ${callEntry.remark}`
   });
 
   // Background Cloud Sync to Neon PostgreSQL

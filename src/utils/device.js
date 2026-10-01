@@ -1,7 +1,13 @@
 // src/utils/device.js
-// High-fidelity client device detection for TechFEST '26 Operations Calling & Audit Trail
+// High-fidelity client device detection & Instagram-style IP/Location tracking
+// for TechFEST '26 Operations Calling CRM & Security Audit Trail
 
 const CUSTOM_DEVICE_KEY = 'tf_device_custom_name';
+const GEO_CACHE_KEY = 'tf_network_geo_cache';
+const SESSIONS_KEY = 'tf_login_sessions_v2';
+
+// In-memory cache for ultra-fast synchronous access
+let cachedGeoInfo = null;
 
 /**
  * Clean and format Android hardware models into recognizable consumer names
@@ -26,7 +32,7 @@ function cleanAndroidModel(rawModel) {
     return `Google ${match[0]}`.trim();
   }
 
-  // OnePlus
+  // OnePlus / Oppo
   if (/OnePlus|NE2211|CPH2449|CPH2451/i.test(m)) {
     if (/OnePlus\s+[0-9]+/i.test(m)) return m;
     return `OnePlus Device (${m})`;
@@ -47,9 +53,139 @@ function cleanAndroidModel(rawModel) {
 }
 
 /**
+ * Intelligent fallback location based on regional timezone (e.g. SLIET Punjab campus)
+ */
+function getFallbackLocation() {
+  const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Kolkata';
+  let city = 'Sangrur';
+  let region = 'Punjab';
+  let country = 'India';
+
+  if (tz.includes('Kolkata')) {
+    city = 'Sangrur / Longowal';
+    region = 'Punjab';
+    country = 'India';
+  }
+
+  return {
+    ip: '103.24.120.45 (Local Campus)',
+    city,
+    region,
+    country,
+    countryCode: 'IN',
+    isp: 'SLIET Wi-Fi / Cellular',
+    formattedLocation: `${city}, ${region}`,
+    fullLocation: `${city}, ${region}, ${country}`,
+    isLive: false,
+    cachedAt: Date.now()
+  };
+}
+
+/**
+ * Synchronous getter for current network and location info (instant UI render)
+ */
+export function getNetworkLocationInfo() {
+  if (cachedGeoInfo) return cachedGeoInfo;
+
+  try {
+    const stored = localStorage.getItem(GEO_CACHE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.formattedLocation) {
+        cachedGeoInfo = parsed;
+        return parsed;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  cachedGeoInfo = getFallbackLocation();
+  return cachedGeoInfo;
+}
+
+/**
+ * Real-time Geolocation API fetcher (like Instagram Login Activity)
+ * Uses ipwho.is with fallback to ipapi.co and local timezone
+ */
+export async function fetchNetworkLocationInfo(forceRefresh = false) {
+  if (!forceRefresh) {
+    const current = getNetworkLocationInfo();
+    // Cache is valid for 1 hour
+    if (current && current.isLive && Date.now() - (current.cachedAt || 0) < 1000 * 60 * 60) {
+      return current;
+    }
+  }
+
+  try {
+    // 1. Primary: ipwho.is (Free, CORS-friendly, reliable)
+    const res = await fetch('https://ipwho.is/', { cache: 'no-cache' });
+    const data = await res.json();
+
+    if (data && data.success) {
+      const info = {
+        ip: data.ip || '103.xx.xx.xx',
+        city: data.city || 'Sangrur',
+        region: data.region || 'Punjab',
+        country: data.country || 'India',
+        countryCode: data.country_code || 'IN',
+        isp: data.connection?.isp || data.connection?.org || 'Broadband / 5G',
+        formattedLocation: `${data.city || 'Sangrur'}, ${data.region || 'Punjab'}`,
+        fullLocation: `${data.city || 'Sangrur'}, ${data.region || 'Punjab'}, ${data.country || 'India'}`,
+        isLive: true,
+        cachedAt: Date.now()
+      };
+
+      cachedGeoInfo = info;
+      localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(info));
+      return info;
+    }
+  } catch (err) {
+    // Try secondary fallback if primary fails
+    try {
+      const fRes = await fetch('https://ipapi.co/json/');
+      const fData = await fRes.json();
+      if (fData && fData.city) {
+        const info = {
+          ip: fData.ip,
+          city: fData.city,
+          region: fData.region,
+          country: fData.country_name,
+          countryCode: fData.country_code,
+          isp: fData.org || 'Broadband',
+          formattedLocation: `${fData.city}, ${fData.region}`,
+          fullLocation: `${fData.city}, ${fData.region}, ${fData.country_name}`,
+          isLive: true,
+          cachedAt: Date.now()
+        };
+        cachedGeoInfo = info;
+        localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(info));
+        return info;
+      }
+    } catch (e) {
+      // offline or sandboxed
+    }
+  }
+
+  // Fallback to regional campus defaults
+  const fallback = getFallbackLocation();
+  cachedGeoInfo = fallback;
+  return fallback;
+}
+
+// Auto-initialize geolocation in background on module load
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetchNetworkLocationInfo().catch(() => {});
+  }, 500);
+}
+
+/**
  * Analyze navigator and userAgent to identify exact physical hardware, OS & browser
  */
 export function getDeviceInfo() {
+  const geo = getNetworkLocationInfo();
+
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return {
       deviceName: 'Central Operations Terminal',
@@ -57,7 +193,12 @@ export function getDeviceInfo() {
       browser: 'Web App',
       os: 'Cloud',
       deviceType: 'desktop',
-      isMobile: false
+      isMobile: false,
+      location: geo.formattedLocation,
+      fullLocation: geo.fullLocation,
+      ip: geo.ip,
+      isp: geo.isp,
+      fullDeviceString: `Central Terminal • 📍 ${geo.formattedLocation}`
     };
   }
 
@@ -90,7 +231,6 @@ export function getDeviceInfo() {
     const match = ua.match(/Android[^;]+;\s*([^;)]+)/i);
     deviceModel = match && match[1] ? cleanAndroidModel(match[1]) : 'Android Device';
   } else if (isMac) {
-    // Distinguish MacBook from Desktop Mac if possible
     deviceModel = 'MacBook / Mac';
     deviceType = 'desktop';
     os = 'macOS';
@@ -142,6 +282,12 @@ export function getDeviceInfo() {
     ? `${customStation.trim()} (${baseDeviceName})` 
     : baseDeviceName;
 
+  const screenResolution = typeof window !== 'undefined' && window.screen 
+    ? `${window.screen.width}x${window.screen.height}` 
+    : 'Standard Screen';
+
+  const fullDeviceString = `${finalDeviceName} • 📍 ${geo.formattedLocation}`;
+
   return {
     deviceName: finalDeviceName,
     baseDeviceName,
@@ -150,7 +296,13 @@ export function getDeviceInfo() {
     browser,
     os,
     deviceType,
-    isMobile: deviceType === 'mobile' || deviceType === 'tablet'
+    isMobile: deviceType === 'mobile' || deviceType === 'tablet',
+    screen: screenResolution,
+    location: geo.formattedLocation,
+    fullLocation: geo.fullLocation,
+    ip: geo.ip,
+    isp: geo.isp,
+    fullDeviceString
   };
 }
 
@@ -178,4 +330,130 @@ export function setCustomDeviceName(name) {
   } catch (e) {
     console.error('Error saving device nickname:', e);
   }
+}
+
+// -----------------------------------------------------------------
+// Instagram-style "Where You're Logged In" Session Tracking Engine
+// -----------------------------------------------------------------
+
+const SEED_LOGIN_SESSIONS = [
+  {
+    id: 'sess_seed_1',
+    username: 'plexus',
+    userName: 'Aman Deep',
+    teamName: 'Plexus Bay',
+    role: 'domain_head',
+    deviceModel: 'Apple iPhone 15',
+    browser: 'Safari Mobile',
+    os: 'iOS 17.5',
+    deviceType: 'mobile',
+    ip: '103.24.120.45',
+    location: 'Sangrur, Punjab',
+    fullLocation: 'Sangrur, Punjab, India',
+    isp: 'Reliance Jio Infocomm',
+    loginTime: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    isCurrentDevice: false
+  },
+  {
+    id: 'sess_seed_2',
+    username: 'mechanica',
+    userName: 'Priya Sharma',
+    teamName: 'Mechanica Bay',
+    role: 'domain_head',
+    deviceModel: 'Samsung Galaxy S24',
+    browser: 'Chrome Mobile',
+    os: 'Android 14',
+    deviceType: 'mobile',
+    ip: '49.36.182.91',
+    location: 'Ludhiana, Punjab',
+    fullLocation: 'Ludhiana, Punjab, India',
+    isp: 'Bharti Airtel',
+    loginTime: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    isCurrentDevice: false
+  },
+  {
+    id: 'sess_seed_3',
+    username: 'raj.aryan',
+    userName: 'Raj Aryan',
+    teamName: 'Central Desk',
+    role: 'super_admin',
+    deviceModel: 'MacBook Pro 14"',
+    browser: 'Chrome',
+    os: 'macOS Sonoma',
+    deviceType: 'desktop',
+    ip: '103.112.54.21',
+    location: 'Sangrur, Punjab',
+    fullLocation: 'Sangrur, Punjab, India',
+    isp: 'SLIET Campus Wi-Fi',
+    loginTime: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    isCurrentDevice: false
+  }
+];
+
+export function getActiveLoginSessions() {
+  try {
+    const raw = localStorage.getItem(SESSIONS_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list) && list.length > 0) return list;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return SEED_LOGIN_SESSIONS;
+}
+
+export function saveActiveLoginSessions(sessions) {
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+  } catch (e) {
+    console.error('Error saving login sessions:', e);
+  }
+}
+
+/**
+ * Record a new login session when a user signs in (like Instagram Login Activity)
+ */
+export function recordLoginSession(user) {
+  if (!user || !user.username) return;
+
+  const dev = getDeviceInfo();
+  const geo = getNetworkLocationInfo();
+  const sessions = getActiveLoginSessions();
+
+  const newSession = {
+    id: 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    username: user.username,
+    userName: user.name || user.username,
+    teamName: user.teamName || user.department || 'Central Operations',
+    role: user.role || 'domain_head',
+    deviceModel: dev.deviceModel,
+    browser: dev.browser,
+    os: dev.os,
+    deviceType: dev.deviceType,
+    ip: geo.ip,
+    location: geo.formattedLocation,
+    fullLocation: geo.fullLocation,
+    isp: geo.isp,
+    loginTime: new Date().toISOString(),
+    isCurrentDevice: true
+  };
+
+  // Mark all older sessions as not current
+  const updated = sessions.map(s => ({ ...s, isCurrentDevice: false }));
+  updated.unshift(newSession);
+
+  // Retain up to 25 latest active sessions
+  saveActiveLoginSessions(updated.slice(0, 25));
+  return newSession;
+}
+
+/**
+ * Terminate/Log out a specific device session
+ */
+export function terminateLoginSession(sessionId) {
+  const sessions = getActiveLoginSessions();
+  const filtered = sessions.filter(s => s.id !== sessionId);
+  saveActiveLoginSessions(filtered);
+  return filtered;
 }

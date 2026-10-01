@@ -5,6 +5,7 @@ import {
   writeCustomPasswordToNeon, 
   deleteCustomPasswordFromNeon 
 } from './neonDb';
+import { recordLoginSession } from './device';
 
 export const DOMAINS_DIRECTORY = {
   robozar: {
@@ -562,6 +563,9 @@ export function getActiveUser() {
 export function setActiveUser(user) {
   try {
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+    if (user) {
+      recordLoginSession(user);
+    }
   } catch (e) {
     console.error('Error saving auth session:', e);
   }

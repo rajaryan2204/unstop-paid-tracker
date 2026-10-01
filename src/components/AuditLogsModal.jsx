@@ -46,13 +46,15 @@ export default function AuditLogsModal({ isOpen, onClose }) {
 
   const handleExportCSV = () => {
     if (filteredLogs.length === 0) return;
-    const headers = ['Timestamp', 'Actor Name', 'Actor Role', 'Actor Team', 'Device', 'Action', 'Target ID', 'Target Name', 'Event', 'Previous Status', 'Next Status', 'Details'];
+    const headers = ['Timestamp', 'Actor Name', 'Actor Role', 'Actor Team', 'Device', 'Location', 'IP Address', 'Action', 'Target ID', 'Target Name', 'Event', 'Previous Status', 'Next Status', 'Details'];
     const rows = filteredLogs.map(l => [
       `"${l.timestamp || ''}"`,
       `"${l.actorName || ''}"`,
       `"${l.actorRole || ''}"`,
       `"${l.actorTeam || ''}"`,
       `"${l.device || 'Web Client'}"`,
+      `"${l.location || 'Sangrur, Punjab'}"`,
+      `"${l.ip || '103.xx.xx.xx'}"`,
       `"${l.action || ''}"`,
       `"${l.targetId || ''}"`,
       `"${l.targetName || ''}"`,
@@ -195,7 +197,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
                       {log.device && (
                         <span 
                           className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-zinc-600 bg-zinc-100 border border-zinc-200"
-                          title={`Logged via: ${log.device}`}
+                          title={`Logged via: ${log.device}${log.location ? ` • Location: ${log.location}` : ''}${log.ip ? ` • IP: ${log.ip}` : ''}`}
                         >
                           {log.deviceType === 'mobile' ? (
                             <Smartphone className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
@@ -204,7 +206,13 @@ export default function AuditLogsModal({ isOpen, onClose }) {
                           ) : (
                             <Laptop className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
                           )}
-                          <span className="truncate max-w-[120px] sm:max-w-[170px]">{log.device}</span>
+                          <span className="truncate max-w-[100px] sm:max-w-[140px]">{log.device}</span>
+                          {log.location && (
+                            <>
+                              <span className="text-zinc-300">•</span>
+                              <span className="text-zinc-500 truncate max-w-[80px]">📍 {log.location.split(',')[0]}</span>
+                            </>
+                          )}
                         </span>
                       )}
                       <span className="text-[11px] font-mono text-slate-500">

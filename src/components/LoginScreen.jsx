@@ -7,13 +7,18 @@ import {
   AlertCircle, 
   Eye, 
   EyeOff,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone,
+  Laptop,
+  Tablet,
+  MapPin
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { authenticateUser } from '../utils/auth';
+import { getDeviceInfo } from '../utils/device';
 
 export default function LoginScreen({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -21,6 +26,7 @@ export default function LoginScreen({ onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const dev = getDeviceInfo();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -177,6 +183,28 @@ export default function LoginScreen({ onLoginSuccess }) {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Instagram-style Active Device & Location Security Badge */}
+        <div className="mt-3 px-4 py-2.5 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-between text-[11px] text-zinc-600 shadow-2xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span className="text-zinc-500 shrink-0">Logging from:</span>
+            <span className="font-semibold text-zinc-900 font-mono flex items-center gap-1 truncate">
+              {dev.deviceType === 'mobile' ? (
+                <Smartphone className="w-3 h-3 text-zinc-600 shrink-0" />
+              ) : dev.deviceType === 'tablet' ? (
+                <Tablet className="w-3 h-3 text-zinc-600 shrink-0" />
+              ) : (
+                <Laptop className="w-3 h-3 text-zinc-600 shrink-0" />
+              )}
+              <span className="truncate max-w-[130px] sm:max-w-[180px]">{dev.deviceModel}</span>
+            </span>
+          </div>
+          <span className="text-zinc-600 flex items-center gap-1 font-medium shrink-0 ml-2">
+            <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+            <span>{dev.location.split(',')[0]}</span>
+          </span>
         </div>
 
         {/* Footer */}

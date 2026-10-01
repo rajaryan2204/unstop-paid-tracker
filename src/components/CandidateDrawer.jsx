@@ -255,7 +255,7 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                               {call.device && (
                                 <span 
                                   className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-zinc-600 bg-zinc-100 border border-zinc-200"
-                                  title={`Logged via device: ${call.device}`}
+                                  title={`Logged via: ${call.device} • Location: ${call.location || 'SLIET Punjab'}${call.ip ? ` • IP: ${call.ip}` : ''}`}
                                 >
                                   {call.deviceType === 'mobile' ? (
                                     <Smartphone className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
@@ -264,7 +264,13 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                                   ) : (
                                     <Laptop className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
                                   )}
-                                  <span className="truncate max-w-[130px] sm:max-w-[180px]">{call.device}</span>
+                                  <span className="truncate max-w-[110px] sm:max-w-[150px]">{call.device}</span>
+                                  {call.location && (
+                                    <>
+                                      <span className="text-zinc-300">•</span>
+                                      <span className="text-zinc-500 truncate max-w-[90px]">📍 {call.location.split(',')[0]}</span>
+                                    </>
+                                  )}
                                 </span>
                               )}
                               <span className="text-[10px] font-mono text-slate-500 shrink-0">
