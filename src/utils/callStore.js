@@ -1,5 +1,14 @@
 // src/utils/callStore.js
 // TechFEST '26 Operations Calling CRM, Timeline History & Audit Trail Engine
+import { 
+  fetchCallRecordsFromNeon, 
+  fetchAuditLogsFromNeon, 
+  fetchPaymentVerificationsFromNeon,
+  writeCallLogToNeon, 
+  writeAuditLogToNeon, 
+  writePaymentVerificationToNeon,
+  dbStatus
+} from './neonDb';
 
 export const CALL_STATUSES = {
   PAYMENT_CLAIMED: {
@@ -235,6 +244,93 @@ export function addAuditLog(entry) {
 }
 
 /**
+ * Full two-way sync with Neon PostgreSQL:
+ * Pulls call logs, audit records, and verifications from Neon cloud,
+ * merges them into local storage, and emits event to update UI.
+ */
+export async function syncWithNeonDatabase() {
+  if (dbStatus.isSyncing) return;
+  dbStatus.isSyncing = true;
+
+  try {
+    const [neonCalls, neonAudits, neonVerifications] = await Promise.all([
+      fetchCallRecordsFromNeon(),
+      fetchAuditLogsFromNeon(300),
+      fetchPaymentVerificationsFromNeon()
+    ]);
+
+    // 1. Merge call records
+    const localRecords = getCallRecords();
+    const mergedRecords = { ...localRecords };
+
+    Object.entries(neonCalls).forEach(([pId, neonRec]) => {
+      if (!mergedRecords[pId]) {
+        mergedRecords[pId] = neonRec;
+      } else {
+        const existingHistory = mergedRecords[pId].history || [];
+        const neonHistory = neonRec.history || [];
+        const seenIds = new Set(existingHistory.map(h => h.id));
+
+        neonHistory.forEach(h => {
+          if (!seenIds.has(h.id)) {
+            existingHistory.push(h);
+            seenIds.add(h.id);
+          }
+        });
+
+        existingHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        mergedRecords[pId].history = existingHistory;
+        mergedRecords[pId].callCount = existingHistory.length;
+        if (existingHistory[0]) {
+          mergedRecords[pId].lastCalledAt = existingHistory[0].timestamp;
+          mergedRecords[pId].lastStatus = existingHistory[0].status;
+          mergedRecords[pId].lastRemark = existingHistory[0].remark;
+          mergedRecords[pId].leadNumber = existingHistory[0].leadNumber || mergedRecords[pId].leadNumber;
+        }
+      }
+    });
+
+    saveCallRecords(mergedRecords);
+
+    // 2. Merge audit logs
+    if (neonAudits && neonAudits.length > 0) {
+      const localAudits = getAuditLogs();
+      const seenAuditIds = new Set(neonAudits.map(a => a.id));
+      const combined = [...neonAudits];
+      localAudits.forEach(a => {
+        if (!seenAuditIds.has(a.id)) {
+          combined.push(a);
+        }
+      });
+      combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      saveAuditLogs(combined.slice(0, 500));
+    }
+
+    // 3. Merge payment verifications
+    if (neonVerifications && Object.keys(neonVerifications).length > 0) {
+      const localVerifications = getManualVerifications();
+      const mergedVerifications = { ...localVerifications, ...neonVerifications };
+      localStorage.setItem(MANUAL_VERIFICATIONS_KEY, JSON.stringify(mergedVerifications));
+    }
+
+    dbStatus.isConnected = true;
+    dbStatus.lastSyncTime = new Date();
+    dbStatus.error = null;
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('tf_neon_synced', { 
+        detail: { timestamp: new Date().toISOString() } 
+      }));
+    }
+  } catch (err) {
+    console.error('Error syncing with Neon PostgreSQL:', err);
+    dbStatus.error = err.message;
+  } finally {
+    dbStatus.isSyncing = false;
+  }
+}
+
+/**
  * Log a new call with caller details, compulsory status, and remark
  */
 export function logCallForParticipant({
@@ -288,7 +384,7 @@ export function logCallForParticipant({
   saveCallRecords(records);
 
   // Add immutable Audit Log entry
-  addAuditLog({
+  const auditEntry = addAuditLog({
     actorName: callerUser.name,
     actorRole: callerUser.role,
     actorTeam: callerUser.teamName || callerUser.team,
@@ -300,6 +396,23 @@ export function logCallForParticipant({
     nextStatus: status,
     details: `Logged Call #${newCallNumber}. Status: ${CALL_STATUSES[status]?.label || status}. Remark: ${callEntry.remark}`
   });
+
+  // Background Cloud Sync to Neon PostgreSQL
+  writeCallLogToNeon({
+    id: callEntry.id,
+    participantId: pId,
+    callNumber: newCallNumber,
+    timestamp: nowIso,
+    callerName: callerUser.name,
+    callerRole: callerUser.role,
+    callerTeam: callerUser.teamName || callerUser.team,
+    status,
+    remark: callEntry.remark,
+    leadNumber: callEntry.leadNumber
+  }).catch(e => console.error('Neon writeCallLog error:', e));
+
+  writeAuditLogToNeon(auditEntry)
+    .catch(e => console.error('Neon writeAuditLog error:', e));
 
   return updatedRecord;
 }
@@ -379,7 +492,7 @@ export function setManualVerification(participantId, status, adminUser, reason =
     console.error('Error saving manual verification:', e);
   }
 
-  addAuditLog({
+  const auditEntry = addAuditLog({
     actorName: adminUser.name,
     actorRole: adminUser.role,
     actorTeam: adminUser.teamName || adminUser.team,
@@ -391,4 +504,11 @@ export function setManualVerification(participantId, status, adminUser, reason =
     nextStatus: status,
     details: `Manual verification set to: ${status}. Reason/Txn: ${reason}`
   });
+
+  // Background Cloud Sync to Neon PostgreSQL
+  writePaymentVerificationToNeon(participantId, status, adminUser.name, reason)
+    .catch(e => console.error('Neon writePaymentVerification error:', e));
+
+  writeAuditLogToNeon(auditEntry)
+    .catch(e => console.error('Neon writeAuditLog error:', e));
 }

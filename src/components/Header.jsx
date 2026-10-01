@@ -34,7 +34,8 @@ export default function Header({
   verificationCount = 0,
   theme,
   onToggleTheme,
-  summary
+  summary,
+  neonStatus
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -106,6 +107,18 @@ export default function Header({
         {/* Right: Clean Restrained Controls (Mobile & Desktop) */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           
+          {/* Neon PostgreSQL Cloud Status Pill */}
+          <div 
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#161A22] border border-white/[0.08] text-[11px] font-mono text-slate-300"
+            title={neonStatus?.isConnected ? `Neon PostgreSQL Connected (${neonStatus.lastSyncTime ? new Date(neonStatus.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Live'})` : 'Connecting to Neon PostgreSQL...'}
+          >
+            <span className={`w-2 h-2 rounded-full ${neonStatus?.isSyncing ? 'bg-amber-400 animate-pulse' : (neonStatus?.isConnected ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-slate-500')}`} />
+            <span className="hidden md:inline text-slate-400">DB:</span>
+            <span className={`text-[10px] font-semibold ${neonStatus?.isConnected ? 'text-emerald-400' : 'text-slate-400'}`}>
+              {neonStatus?.isSyncing ? 'Syncing...' : (neonStatus?.isConnected ? 'Neon Live' : 'Connecting')}
+            </span>
+          </div>
+
           {/* Refresh Button */}
           <button
             onClick={onRefresh}

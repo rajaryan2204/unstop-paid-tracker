@@ -1,5 +1,10 @@
 // src/utils/auth.js
 // TechFEST '26 Role-Based Access Control (RBAC), 13 Domains Directory & Official Logins
+import { 
+  fetchCustomPasswordsFromNeon, 
+  writeCustomPasswordToNeon, 
+  deleteCustomPasswordFromNeon 
+} from './neonDb';
 
 export const DOMAINS_DIRECTORY = {
   robozar: {
@@ -485,6 +490,22 @@ export function getPasswordForAccount(username) {
 }
 
 /**
+ * Sync custom passwords from Neon PostgreSQL
+ */
+export async function syncPasswordsWithNeon() {
+  try {
+    const cloudPasswords = await fetchCustomPasswordsFromNeon();
+    if (cloudPasswords && Object.keys(cloudPasswords).length > 0) {
+      const local = getCustomPasswords();
+      const merged = { ...local, ...cloudPasswords };
+      saveCustomPasswords(merged);
+    }
+  } catch (err) {
+    console.error('Error syncing passwords with Neon:', err);
+  }
+}
+
+/**
  * Super Admin Password Reset Tool
  * Allows Raj and Sagar to change/reset passwords for any account
  */
@@ -501,6 +522,10 @@ export function setAccountPassword(adminUser, targetUsername, newPassword) {
   custom[clean] = newPassword.trim();
   saveCustomPasswords(custom);
 
+  // Background Cloud Sync to Neon PostgreSQL
+  writeCustomPasswordToNeon(clean, newPassword.trim(), adminUser.username)
+    .catch(e => console.error('Neon writeCustomPassword error:', e));
+
   return true;
 }
 
@@ -512,6 +537,11 @@ export function resetAccountPasswordToDefault(adminUser, targetUsername) {
   const custom = getCustomPasswords();
   delete custom[clean];
   saveCustomPasswords(custom);
+
+  // Background Cloud Delete in Neon PostgreSQL
+  deleteCustomPasswordFromNeon(clean)
+    .catch(e => console.error('Neon deleteCustomPassword error:', e));
+
   return true;
 }
 

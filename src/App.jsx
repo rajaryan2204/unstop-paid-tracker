@@ -22,13 +22,16 @@ import {
   setActiveUser, 
   clearActiveUser,
   getParticipantsForUser, 
+  syncPasswordsWithNeon,
   DOMAINS_DIRECTORY 
 } from './utils/auth';
 import { 
   logCallForParticipant, 
   getPaymentVerificationQueue, 
+  syncWithNeonDatabase,
   CALL_STATUSES 
 } from './utils/callStore';
+import { subscribeDbStatus } from './utils/neonDb';
 
 import initialData from '../data.json';
 
@@ -70,6 +73,7 @@ export default function App() {
 
   const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('tf_theme') || 'dark');
+  const [neonStatus, setNeonStatus] = useState({ isConnected: false, isSyncing: false });
 
   // Trigger toast with auto-hide
   const triggerToast = useCallback((toastData) => {
@@ -132,7 +136,9 @@ export default function App() {
       }
 
       if (isManual) {
-        triggerToast({ type: 'success', message: 'Dashboard updated with latest records' });
+        syncWithNeonDatabase();
+        syncPasswordsWithNeon();
+        triggerToast({ type: 'success', message: 'Dashboard & Neon Database synced!' });
       }
     } catch (err) {
       if (isManual) {
@@ -147,6 +153,41 @@ export default function App() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Subscribe to Neon DB connection status
+  useEffect(() => {
+    const unsubscribe = subscribeDbStatus(setNeonStatus);
+    return () => unsubscribe();
+  }, []);
+
+  // Initial cloud sync & periodic polling every 12 seconds
+  useEffect(() => {
+    const doSync = () => {
+      syncWithNeonDatabase();
+      syncPasswordsWithNeon();
+    };
+
+    doSync();
+    const interval = setInterval(doSync, 12000);
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) doSync();
+    };
+    window.addEventListener('focus', doSync);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const handleNeonSynced = () => {
+      setCallDbVersion(v => v + 1);
+    };
+    window.addEventListener('tf_neon_synced', handleNeonSynced);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', doSync);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('tf_neon_synced', handleNeonSynced);
+    };
+  }, []);
 
   // Active domain identification
   const activeDomainId = useMemo(() => {
@@ -312,6 +353,7 @@ export default function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         summary={summary}
+        neonStatus={neonStatus}
       />
 
       {/* Main Container */}
