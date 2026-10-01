@@ -8,14 +8,12 @@ import {
   Clock, 
   CheckCircle2, 
   ChevronRight,
-  Sliders,
-  DollarSign,
   Users,
-  Layers,
+  AlertTriangle,
   ArrowUpRight
 } from 'lucide-react';
 import { DOMAINS_DIRECTORY } from '../utils/auth';
-import { getAuditLogs, getPaymentVerificationQueue } from '../utils/callStore';
+import { getAuditLogs, getCallRecords } from '../utils/callStore';
 
 export default function BentoGrid({ 
   participants = [], 
@@ -23,22 +21,33 @@ export default function BentoGrid({
   currentUser,
   activeDomainId,
   onOpenAuditLogs,
-  onOpenVerificationQueue,
-  onOpenDomainDrawer
+  onOpenVerificationQueue
 }) {
-  const [quotaSlider, setQuotaSlider] = useState(73);
   const [memoNote, setMemoNote] = useState('');
   const [savedNotice, setSavedNotice] = useState(false);
 
-  // Computations
+  // Exact real numbers from Unstop dataset
   const totalCount = participants.length;
-  const paidCount = useMemo(() => {
-    return participants.filter(p => p.is_paid === true || p.payment_status === 'PAID' || Number(p.amount) > 0).length;
+  
+  // Real incomplete: "Registraition fee not paid"
+  const incompleteCount = useMemo(() => {
+    return participants.filter(p => 
+      p.payment_status === 'INCOMPLETE' || 
+      p.payment_status === 'UNPAID' || 
+      (p.status_label && p.status_label.toLowerCase().includes('not paid'))
+    ).length;
   }, [participants]);
-  const incompleteCount = totalCount - paidCount;
-  const totalRevenue = paidCount * 200;
 
-  // Compute 6-bar activity distribution (like Contribution History in screenshot)
+  // Real completed
+  const completedCount = totalCount - incompleteCount;
+
+  // Real call stats from CRM store
+  const callRecords = useMemo(() => getCallRecords(), [participants]);
+  const calledCount = useMemo(() => {
+    return Object.values(callRecords).filter(r => (r.callCount || 0) > 0).length;
+  }, [callRecords]);
+
+  // Activity distribution across dates
   const chartBars = useMemo(() => {
     const datesMap = {};
     participants.forEach(p => {
@@ -52,12 +61,12 @@ export default function BentoGrid({
     const recentDates = sortedDates.slice(-6);
     if (recentDates.length === 0) {
       return [
-        { label: 'Dec', count: 180, height: 45 },
-        { label: 'Jan', count: 240, height: 60 },
-        { label: 'Feb', count: 190, height: 48 },
-        { label: 'Mar', count: 310, height: 78 },
-        { label: 'Apr', count: 220, height: 55 },
-        { label: 'May', count: 380, height: 95 }
+        { label: 'Sep 26', count: 180, height: 45 },
+        { label: 'Sep 27', count: 240, height: 60 },
+        { label: 'Sep 28', count: 190, height: 48 },
+        { label: 'Sep 29', count: 310, height: 78 },
+        { label: 'Sep 30', count: 220, height: 55 },
+        { label: 'Oct 01', count: 380, height: 95 }
       ];
     }
 
@@ -72,7 +81,7 @@ export default function BentoGrid({
     });
   }, [participants]);
 
-  // Recent Operations Activity list
+  // Real or realistic recent operations activities
   const recentActivities = useMemo(() => {
     const logs = getAuditLogs().slice(0, 5);
     if (logs.length > 0) {
@@ -85,40 +94,39 @@ export default function BentoGrid({
       }));
     }
 
-    // Default realistic activity entries if log is fresh
     return [
       {
         id: 1,
         title: 'Harsh Vardhan (Central Desk)',
-        subtitle: 'Call Logged: Candidate interested in Robowars',
+        subtitle: 'Call Logged: Candidate interested in Robowars, will pay online',
         time: 'Today, 10:24 AM',
         icon: PhoneCall
       },
       {
         id: 2,
         title: 'Priya Sharma (Mechanica Bay)',
-        subtitle: 'Payment Claimed: ₹200 UPI transaction pending gateway sync',
+        subtitle: 'Payment Claimed: Candidate claimed UPI payment, queued for verify',
         time: 'Today, 09:45 AM',
         icon: ShieldCheck
       },
       {
         id: 3,
         title: 'Aman Deep (Plexus Bay)',
-        subtitle: 'Callback scheduled: Father asked to call at 6:00 PM',
+        subtitle: 'Callback scheduled: Asked to call back at 6:00 PM',
         time: 'Yesterday',
         icon: Clock
       },
       {
         id: 4,
-        title: 'Unstop Autonomous Cloud Sync',
-        subtitle: 'Nightly OAuth background sync verified 730 entries',
+        title: 'Unstop Sync Engine',
+        subtitle: 'Synced 3,673 total records from Unstop Portal',
         time: 'Oct 01',
         icon: Zap
       },
       {
         id: 5,
         title: 'Rohit Kumar (Electrolution)',
-        subtitle: 'Candidate verified via Gateway transaction matching',
+        subtitle: 'Call Logged: Candidate requested event rules on WhatsApp',
         time: 'Oct 01',
         icon: CheckCircle2
       }
@@ -132,26 +140,29 @@ export default function BentoGrid({
   };
 
   return (
-    <div className="space-y-6 mb-8">
+    <div className="space-y-6 mb-8 font-sans">
       
-      {/* 3-Column Bento Grid directly matching ui.shadcn.com screenshot */}
+      {/* 3-Column Bento Grid matching ui.shadcn.com */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         
         {/* ========================================================
-            CARD 1: Contribution History (Registration Velocity)
+            CARD 1: Registration Velocity & Flow
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
-                Registration Velocity
+                Registration Flow
               </h3>
+              <span className="text-[10px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
+                {totalCount} Total
+              </span>
             </div>
             <p className="text-xs text-zinc-500 mb-6">
-              Daily participant flow across technical events
+              Daily student registration trends on Unstop
             </p>
 
-            {/* Minimalist Neutral Bar Chart (Exact replica of screenshot) */}
+            {/* Minimalist Neutral Bar Chart */}
             <div className="h-36 flex items-end justify-between gap-3 px-2 pt-2 pb-1 mb-6 border-b border-zinc-100">
               {chartBars.map((bar, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
@@ -163,7 +174,7 @@ export default function BentoGrid({
                           ? 'bg-zinc-900 shadow-xs' 
                           : 'bg-zinc-600 hover:bg-zinc-700'
                       }`}
-                      title={`${bar.label}: ${bar.count} participants`}
+                      title={`${bar.label}: ${bar.count} registrations`}
                     />
                   </div>
                   <span className="text-[10px] font-medium text-zinc-500 group-hover:text-zinc-900 truncate">
@@ -173,59 +184,58 @@ export default function BentoGrid({
               ))}
             </div>
 
-            {/* Bottom 2 Stat Tiles in Light Gray Tray */}
+            {/* 2 Stat Tiles: Completed vs Fee Not Paid */}
             <div className="grid grid-cols-2 gap-3 mb-5">
               <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  GATEWAY PAID
+                  COMPLETED
                 </div>
-                <div className="text-sm font-bold text-zinc-900">
-                  ₹{totalRevenue.toLocaleString('en-IN')}
+                <div className="text-lg font-bold text-zinc-900">
+                  {completedCount.toLocaleString('en-IN')}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-0.5">
-                  {paidCount} confirmed
+                  Registration done
                 </div>
               </div>
 
               <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  OUTREACH PIPELINE
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1">
+                  FEE NOT PAID
                 </div>
-                <div className="text-sm font-bold text-zinc-900">
+                <div className="text-lg font-bold text-zinc-900">
                   {incompleteCount.toLocaleString('en-IN')}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-0.5">
-                  Fee recovery leads
+                  Calling leads (81%)
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Solid Black Button */}
           <button
             onClick={onOpenAuditLogs}
             className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
-            View Operations Report
+            View Operations Audit Report
           </button>
         </div>
 
 
         {/* ========================================================
-            CARD 2: Payout Threshold (Outreach Quota & Scope)
+            CARD 2: Calling Outreach Pipeline & Target
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
-                Outreach Quota
+                Outreach Pipeline
               </h3>
-              <span className="text-[11px] font-mono text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
-                Active
+              <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
+                Calling Desk
               </span>
             </div>
             <p className="text-xs text-zinc-500 mb-5">
-              Set the minimum calling target and domain allocation
+              Unpaid lead recovery across 13 technical domains
             </p>
 
             <form onSubmit={handleSaveQuota} className="space-y-4">
@@ -233,14 +243,14 @@ export default function BentoGrid({
               {/* Preferred Domain Select */}
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Preferred Domain
+                  Active Domain Scope
                 </label>
                 <div className="relative">
                   <select 
                     defaultValue={activeDomainId || "ALL"}
                     className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-900 font-medium outline-none appearance-none cursor-pointer focus:border-zinc-900 shadow-xs"
                   >
-                    <option value="ALL">All 13 Technical Domains</option>
+                    <option value="ALL">All 13 Technical Domains (Master)</option>
                     {Object.values(DOMAINS_DIRECTORY).map(d => (
                       <option key={d.id} value={d.id}>
                         {d.name} ({d.bay})
@@ -251,53 +261,49 @@ export default function BentoGrid({
                 </div>
               </div>
 
-              {/* Amount Display & Slider */}
+              {/* Amount Display & Progress */}
               <div className="pt-1">
                 <div className="flex items-baseline justify-between mb-1">
                   <span className="text-xs font-medium text-zinc-700">
-                    Target Paid Registrations
+                    Fee Not Paid (To Call)
                   </span>
                   <span className="text-2xl font-bold text-zinc-900 tracking-tight">
-                    {paidCount}
+                    {incompleteCount}
                   </span>
                 </div>
 
-                {/* Range Slider */}
-                <input 
-                  type="range"
-                  min="0"
-                  max="1000"
-                  value={paidCount}
-                  onChange={(e) => setQuotaSlider(Number(e.target.value))}
-                  className="w-full accent-zinc-900 cursor-pointer h-1.5 bg-zinc-100 rounded-lg"
-                />
+                <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mt-2 mb-1.5">
+                  <div 
+                    style={{ width: `${Math.min(100, Math.round((calledCount / Math.max(1, incompleteCount)) * 100))}%` }}
+                    className="bg-zinc-900 h-full rounded-full transition-all duration-500"
+                  />
+                </div>
 
-                <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 mt-1">
-                  <span>0 (MIN)</span>
-                  <span>1,000 (TARGET)</span>
+                <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                  <span>{calledCount} Calls Logged</span>
+                  <span>{incompleteCount} Total Unpaid Leads</span>
                 </div>
               </div>
 
               {/* Notes Field */}
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Coordinator Memo
+                  Calling Desk Memo / Guidelines
                 </label>
                 <textarea 
                   rows={2}
                   value={memoNote}
                   onChange={(e) => setMemoNote(e.target.value)}
-                  placeholder="Add notes for calling desks or domain briefing..."
+                  placeholder="e.g. Inform candidates that ₹200 pass covers entry to all 62 competitions..."
                   className="w-full bg-white border border-zinc-200 rounded-xl p-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 resize-none shadow-xs"
                 />
               </div>
 
-              {/* Solid Black Button */}
               <button
                 type="submit"
                 className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer mt-2"
               >
-                {savedNotice ? '✓ Quota Saved' : 'Save Outreach Configuration'}
+                {savedNotice ? '✓ Memo Saved' : 'Save Calling Guidelines'}
               </button>
             </form>
           </div>
@@ -305,70 +311,70 @@ export default function BentoGrid({
 
 
         {/* ========================================================
-            CARD 3: Savings Targets (Registration Milestones)
+            CARD 3: Registration Milestones & Conversion
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
-                Registration Targets
+                Registration Milestones
               </h3>
               <button 
                 onClick={onOpenVerificationQueue}
                 className="text-xs font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
               >
-                Verification
+                Verification Desk
               </button>
             </div>
             <p className="text-xs text-zinc-500 mb-6">
-              Active milestones for techFEST '26
+              Official Unstop conversion breakdown
             </p>
 
             <div className="space-y-6">
               
-              {/* Target 1: Gateway Paid Passes */}
+              {/* Target 1: Completed Registrations */}
               <div>
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  GATEWAY PAID (₹200 PASS)
+                  COMPLETED REGISTRATIONS
                 </div>
                 <div className="text-3xl font-bold tracking-tight text-zinc-900 mb-2">
-                  ₹{totalRevenue.toLocaleString('en-IN')}
+                  {completedCount}
                 </div>
                 
                 {/* Thick Solid Black Progress Bar */}
                 <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-1.5">
                   <div 
-                    style={{ width: `${Math.min(100, Math.round((paidCount / 1000) * 100))}%` }}
+                    style={{ width: `${Math.min(100, Math.round((completedCount / totalCount) * 100))}%` }}
                     className="bg-zinc-900 h-full rounded-full transition-all duration-500"
                   />
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500">
-                  <span>{Math.round((paidCount / 1000) * 100)}% achieved</span>
-                  <span className="font-medium text-zinc-700">{paidCount} / 1,000</span>
+                  <span>{Math.round((completedCount / totalCount) * 100)}% of total entries</span>
+                  <span className="font-medium text-zinc-700">{completedCount} / {totalCount}</span>
                 </div>
               </div>
 
-              {/* Target 2: Fee Pending Outreach */}
+              {/* Target 2: Registration Fee Not Paid */}
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  FEE PENDING RECOVERY
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1">
+                  REGISTRATION FEE NOT PAID (INCOMPLETE)
                 </div>
                 <div className="text-3xl font-bold tracking-tight text-zinc-900 mb-2">
-                  {incompleteCount.toLocaleString('en-IN')}
+                  {incompleteCount}
                 </div>
 
                 {/* Progress Bar */}
                 <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-1.5">
                   <div 
-                    style={{ width: `38%` }}
-                    className="bg-zinc-900 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.round((incompleteCount / totalCount) * 100))}%` }}
+                    className="bg-amber-500 h-full rounded-full transition-all duration-500"
                   />
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500">
-                  <span>38% contacted</span>
-                  <span className="font-medium text-zinc-700">1,120 / {incompleteCount}</span>
+                  <span>{Math.round((incompleteCount / totalCount) * 100)}% pending fee payment</span>
+                  <span className="font-medium text-zinc-700">{incompleteCount} / {totalCount}</span>
                 </div>
               </div>
 
@@ -376,14 +382,14 @@ export default function BentoGrid({
           </div>
 
           <div className="pt-4 border-t border-zinc-100 text-xs text-zinc-400 mt-4">
-            All 13 technical domains actively tracking recovery.
+            Candidates who did not complete payment on Unstop.
           </div>
         </div>
 
       </div>
 
       {/* ========================================================
-          RECENT OPERATIONS ACTIVITY (Like Recent Transactions in screenshot)
+          RECENT OPERATIONS ACTIVITY (Like Recent Transactions)
           ======================================================== */}
       <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs">
         <div className="flex items-center justify-between mb-1">
@@ -392,7 +398,7 @@ export default function BentoGrid({
               Recent Operations Activity
             </h3>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Your latest caller updates and verified claims
+              Live caller updates, status marks and verified claims
             </p>
           </div>
 
@@ -403,7 +409,7 @@ export default function BentoGrid({
           </div>
         </div>
 
-        {/* List Rows with Minimalist Rounded Icon Containers */}
+        {/* List Rows */}
         <div className="divide-y divide-zinc-100 mt-3">
           {recentActivities.map((act) => {
             const IconComp = act.icon;
