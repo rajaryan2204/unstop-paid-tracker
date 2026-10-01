@@ -1,9 +1,9 @@
 {
-  "last_synced_at": "2026-10-01T00:59:41.569622+00:00",
-  "token_expires_at": "2026-10-02T00:59:42.520721+00:00",
+  "last_synced_at": "2026-10-01T08:08:21.920033+00:00",
+  "token_expires_at": "2026-10-02T08:08:22.790136+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3605,
-  "total_paid_registrations": 629,
+  "total_unstop_registrations": 3637,
+  "total_paid_registrations": 631,
   "total_amount_collected": 3793.0,
   "total_colleges": 43,
   "total_events_scanned": 62,
@@ -27,14 +27,14 @@
       "id": 1744809,
       "title": "WPTC - Wireless Power Transfer",
       "type": "competitions",
-      "total_registrations": 47,
+      "total_registrations": 48,
       "paid_registrations": 0
     },
     {
       "id": 1744782,
       "title": "Quiz Nova",
       "type": "quizzes",
-      "total_registrations": 106,
+      "total_registrations": 109,
       "paid_registrations": 40
     },
     {
@@ -48,21 +48,21 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 91,
+      "total_registrations": 95,
       "paid_registrations": 14
     },
     {
       "id": 1744778,
       "title": "Foodprint",
       "type": "competitions",
-      "total_registrations": 65,
+      "total_registrations": 66,
       "paid_registrations": 8
     },
     {
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 78,
+      "total_registrations": 80,
       "paid_registrations": 2
     },
     {
@@ -83,7 +83,7 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 70,
+      "total_registrations": 71,
       "paid_registrations": 8
     },
     {
@@ -97,7 +97,7 @@
       "id": 1744771,
       "title": "Techno-Vation",
       "type": "competitions",
-      "total_registrations": 61,
+      "total_registrations": 62,
       "paid_registrations": 7
     },
     {
@@ -111,7 +111,7 @@
       "id": 1744769,
       "title": "CAD Design Challenge",
       "type": "competitions",
-      "total_registrations": 50,
+      "total_registrations": 51,
       "paid_registrations": 1
     },
     {
@@ -209,8 +209,8 @@
       "id": 1744221,
       "title": "RC Boat",
       "type": "competitions",
-      "total_registrations": 48,
-      "paid_registrations": 47
+      "total_registrations": 49,
+      "paid_registrations": 48
     },
     {
       "id": 1744220,
@@ -244,28 +244,28 @@
       "id": 1744215,
       "title": "Heuristic Havoc",
       "type": "competitions",
-      "total_registrations": 53,
+      "total_registrations": 54,
       "paid_registrations": 2
     },
     {
       "id": 1744214,
       "title": "Breadboard Battle",
       "type": "competitions",
-      "total_registrations": 54,
+      "total_registrations": 55,
       "paid_registrations": 0
     },
     {
       "id": 1744213,
       "title": "Chemi Craft",
       "type": "competitions",
-      "total_registrations": 47,
+      "total_registrations": 48,
       "paid_registrations": 1
     },
     {
       "id": 1744211,
       "title": "Mechnovate",
       "type": "competitions",
-      "total_registrations": 49,
+      "total_registrations": 50,
       "paid_registrations": 0
     },
     {
@@ -307,8 +307,8 @@
       "id": 1744180,
       "title": "Truss Load",
       "type": "competitions",
-      "total_registrations": 53,
-      "paid_registrations": 50
+      "total_registrations": 54,
+      "paid_registrations": 51
     },
     {
       "id": 1744178,
@@ -321,21 +321,21 @@
       "id": 1744177,
       "title": "Chemi-Thone",
       "type": "competitions",
-      "total_registrations": 50,
+      "total_registrations": 51,
       "paid_registrations": 0
     },
     {
       "id": 1744174,
       "title": "Soldering Speedrun",
       "type": "competitions",
-      "total_registrations": 54,
+      "total_registrations": 58,
       "paid_registrations": 3
     },
     {
       "id": 1744172,
       "title": "Grid Masters-SLD Challenge",
       "type": "competitions",
-      "total_registrations": 51,
+      "total_registrations": 52,
       "paid_registrations": 1
     },
     {
@@ -356,7 +356,7 @@
       "id": 1744167,
       "title": "Poster and Paper Presentation",
       "type": "competitions",
-      "total_registrations": 49,
+      "total_registrations": 50,
       "paid_registrations": 1
     },
     {
@@ -370,14 +370,14 @@
       "id": 1744165,
       "title": "Hovermania",
       "type": "competitions",
-      "total_registrations": 48,
+      "total_registrations": 49,
       "paid_registrations": 0
     },
     {
       "id": 1744164,
       "title": "Chemi-Mystery",
       "type": "competitions",
-      "total_registrations": 48,
+      "total_registrations": 49,
       "paid_registrations": 2
     },
     {
@@ -412,7 +412,7 @@
       "id": 1744148,
       "title": "BGMI",
       "type": "competitions",
-      "total_registrations": 70,
+      "total_registrations": 71,
       "paid_registrations": 0
     },
     {
@@ -426,14 +426,14 @@
       "id": 1743774,
       "title": "Kritrim - Model Exhibition",
       "type": "competitions",
-      "total_registrations": 54,
+      "total_registrations": 55,
       "paid_registrations": 3
     },
     {
       "id": 1742433,
       "title": "Jugaad",
       "type": "hackathons",
-      "total_registrations": 56,
+      "total_registrations": 57,
       "paid_registrations": 2
     },
     {
