@@ -239,10 +239,10 @@ export default function DataTable({
   };
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-all mb-10">
+    <div className="bg-white rounded-2xl overflow-hidden border border-zinc-200/80 shadow-xs transition-all mb-10" id="candidates-table">
       
       {/* 1. Header Bar: Category Tabs + Payment Segments */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-slate-200 bg-white">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-zinc-200/80 bg-white">
         
         {/* Category Segment Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
@@ -276,22 +276,22 @@ export default function DataTable({
         </div>
 
         {/* Payment Filter Segmented Tray */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200/80 shrink-0 mb-2 md:mb-0">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-100 border border-zinc-200/80 shrink-0 mb-2 md:mb-0">
           {[
-            { id: 'all', label: 'All', count: paymentCounts.all, countClass: 'text-slate-500' },
-            { id: 'paid', label: 'Complete', count: paymentCounts.paid, countClass: 'text-emerald-700 font-semibold' },
-            { id: 'incomplete', label: 'Incomplete', count: paymentCounts.incomplete, countClass: 'text-amber-800 font-semibold' },
-            { id: 'free', label: 'Free', count: paymentCounts.free, countClass: 'text-slate-500' }
+            { id: 'all', label: 'All', count: paymentCounts.all, countClass: 'text-zinc-500' },
+            { id: 'paid', label: 'Complete', count: paymentCounts.paid, countClass: 'text-zinc-900 font-semibold' },
+            { id: 'incomplete', label: 'Incomplete', count: paymentCounts.incomplete, countClass: 'text-zinc-700 font-semibold' },
+            { id: 'free', label: 'Free', count: paymentCounts.free, countClass: 'text-zinc-500' }
           ].map(p => {
             const isActive = selectedPayment === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => { setSelectedPayment(p.id); setCurrentPage(1); }}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   isActive 
-                    ? 'bg-white text-slate-900 shadow-xs font-semibold' 
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-zinc-900 shadow-xs font-semibold' 
+                    : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
                 <span>{p.label}</span>
@@ -528,10 +528,10 @@ export default function DataTable({
                             <button
                               onClick={() => onTriggerCall && onTriggerCall(p)}
                               title="Direct Phone Call & Log Remarks"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-all shadow-xs cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer"
                             >
-                              <PhoneCall className="w-3 h-3 text-sky-600" />
-                              <span className="font-mono text-[10px]">{callCount > 0 ? callCount : 'Call'}</span>
+                              <PhoneCall className="w-3 h-3 text-white" />
+                              <span className="font-mono text-[10px]">{callCount > 0 ? `${callCount} calls` : 'Call'}</span>
                             </button>
 
                             {/* WhatsApp Button */}

@@ -1,6 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
+import BentoGrid from './components/BentoGrid';
 import KPIStrip from './components/KPIStrip';
 import AnalyticsChart from './components/AnalyticsChart';
 import DataTable from './components/DataTable';
@@ -83,8 +84,8 @@ export default function App() {
   useEffect(() => {
     if (theme === 'light') {
       document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#F8FAFC';
-      document.body.style.color = '#0F172A';
+      document.body.style.backgroundColor = '#F4F4F5';
+      document.body.style.color = '#18181B';
     } else {
       document.documentElement.classList.add('dark');
       document.body.style.backgroundColor = '#0B0D11';
@@ -329,7 +330,7 @@ export default function App() {
   // Gate dashboard behind dedicated Login Screen on load
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500/20 selection:text-sky-800">
+      <div className="min-h-screen bg-[#F4F4F5] text-[#18181B] font-sans selection:bg-zinc-200 selection:text-zinc-900">
         <LoginScreen onLoginSuccess={handleLoginSuccess} />
         <Toast toast={toast} onClose={() => setToast(null)} />
       </div>
@@ -337,7 +338,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500/20 selection:text-sky-800">
+    <div className="min-h-screen bg-[#F4F4F5] text-[#18181B] font-sans selection:bg-zinc-200 selection:text-zinc-900">
       
       {/* 1. Header with RBAC Profile, 13 Domain Switcher & Verification Badges */}
       <Header
@@ -365,7 +366,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Loading Spinner Indicator */}
         {isLoading ? (
@@ -386,11 +387,15 @@ export default function App() {
               />
             )}
 
-            {/* 2. Unified KPI Metrics Strip (Dynamically scoped to active domain) */}
-            <KPIStrip summary={summary} participants={displayedParticipants} />
-
-            {/* 3. Event Activity Analytics Chart (Dynamically scoped to active domain) */}
-            <AnalyticsChart participants={displayedParticipants} summary={summary} />
+            {/* 2. Modern 3-Column Bento Grid Dashboard directly matching ui.shadcn.com */}
+            <BentoGrid
+              participants={displayedParticipants}
+              summary={summary}
+              currentUser={currentUser}
+              activeDomainId={activeDomainId}
+              onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
+              onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
+            />
 
             {/* 4. Master Operations Data Table with Direct Calling & Domain Awareness */}
             <DataTable
