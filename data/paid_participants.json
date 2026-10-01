@@ -17528,13 +17528,34 @@
     "email": "er.ishantpandey48@gmail.com",
     "phone": "+919153632909",
     "college": "Sant Longowal Institute of Engineering and Technology, Longowal, Punjab",
-    "team_name": "Individual",
-    "team_size": 1,
+    "team_name": "Civil Avangers",
+    "team_size": 4,
     "team_members": [
       {
         "name": "Ishant Pandey",
         "email": "er.ishantpandey48@gmail.com",
         "phone": "+919153632909",
+        "college": "Sant Longowal Institute of Engineering and Technology, Longowal, Punjab",
+        "course": "Civil Engineering"
+      },
+      {
+        "name": "Satyam kumar",
+        "email": "jhasatyam5880@gamil.com",
+        "phone": "+919942322278",
+        "college": "Sant Longowal Institute of Engineering and Technology, Longowal, Punjab",
+        "course": "Civil Engineering"
+      },
+      {
+        "name": "Vikram Kumar",
+        "email": "vikramsahu3071@gamil.com",
+        "phone": "+918709252779",
+        "college": "Sant Longowal Institute of Engineering and Technology, Longowal, Punjab",
+        "course": "Civil Engineering"
+      },
+      {
+        "name": "Adarsh kumar",
+        "email": "mradarshk32@gamil.com",
+        "phone": "+919572038358",
         "college": "Sant Longowal Institute of Engineering and Technology, Longowal, Punjab",
         "course": "Civil Engineering"
       }
