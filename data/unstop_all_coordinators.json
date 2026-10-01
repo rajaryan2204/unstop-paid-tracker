@@ -1,0 +1,2348 @@
+{
+  "robozar": {
+    "domain_name": "RoboZar",
+    "events": {
+      "RC Boat": {
+        "id": 1744221,
+        "title": "RC Boat",
+        "contacts": [
+          {
+            "id": 2366083,
+            "name": "Naman kumar sinha(overall coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744221,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373430,
+            "name": "NAYAN KUMAR(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744221,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373431,
+            "name": "Nikita Chawla(Event coordinator)",
+            "designation": null,
+            "contact_no": "+918890825146",
+            "contactable_id": 1744221,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "rcboatcor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369186,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744221,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Sky Maneuver": {
+        "id": 1744218,
+        "title": "Sky Maneuver",
+        "contacts": [
+          {
+            "id": 2366086,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744218,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373432,
+            "name": "NAYAN KUMAR(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744218,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373433,
+            "name": "Dikshant Yadav(Event coordinator)",
+            "designation": null,
+            "contact_no": "+919530242241",
+            "contactable_id": 1744218,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "dikshant_253050009@sliet.ac.in",
+            "sort_order": 3
+          },
+          {
+            "id": 2369189,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744218,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "RoboSoccer": {
+        "id": 1744207,
+        "title": "RoboSoccer",
+        "contacts": [
+          {
+            "id": 2366080,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744207,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373434,
+            "name": "NAYAN KUMAR(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744207,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373435,
+            "name": "Divyansh Keshav(Event coordinator)",
+            "designation": null,
+            "contact_no": "+917004905265",
+            "contactable_id": 1744207,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robosoccercor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369187,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744207,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "RC Car": {
+        "id": 1744169,
+        "title": "RC Car",
+        "contacts": [
+          {
+            "id": 2366100,
+            "name": "Naman kumar sinha (overall coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744169,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373436,
+            "name": "Nayan kumar(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744169,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373437,
+            "name": "Harish Kumawat(Event coordinator)",
+            "designation": null,
+            "contact_no": "+919216408409",
+            "contactable_id": 1744169,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "rccarcor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369185,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744169,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Hovermania": {
+        "id": 1744165,
+        "title": "Hovermania",
+        "contacts": [
+          {
+            "id": 2366059,
+            "name": "Naman kumar",
+            "designation": null,
+            "contact_no": "+91856893952",
+            "contactable_id": 1744165,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373440,
+            "name": "Nayan kumar(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744165,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373441,
+            "name": "Prateek singh(Event coordinator)",
+            "designation": null,
+            "contact_no": "+916239612532",
+            "contactable_id": 1744165,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "hovermaniacor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369188,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744165,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Micromouse Challenge": {
+        "id": 1744161,
+        "title": "Micromouse Challenge",
+        "contacts": [
+          {
+            "id": 2366073,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744161,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373444,
+            "name": "NAYAN KUMAR(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744161,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373445,
+            "name": "Maneesh Kumar(Event coordinator)",
+            "designation": null,
+            "contact_no": "+917518467124",
+            "contactable_id": 1744161,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "micromousechallengecor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369184,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744161,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Robowar": {
+        "id": 1744154,
+        "title": "Robowar",
+        "contacts": [
+          {
+            "id": 2366078,
+            "name": "Domain Coordinator:  Nayan Kumar",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744154,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2366077,
+            "name": "Overall Coordinator: Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744154,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 3
+          },
+          {
+            "id": 2366079,
+            "name": "Event Coordinator:  Monu Saharan",
+            "designation": null,
+            "contact_no": "+917296819251",
+            "contactable_id": 1744154,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robowarcor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369191,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744154,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Rapid Line": {
+        "id": 1744150,
+        "title": "Rapid Line",
+        "contacts": [
+          {
+            "id": 2366046,
+            "name": "Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744150,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2373448,
+            "name": "Nayan Kumar(Domain coordinator)",
+            "designation": null,
+            "contact_no": "+919835190210",
+            "contactable_id": 1744150,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "robozarcor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2373449,
+            "name": "Ananya Bharti(Event coordinator)",
+            "designation": null,
+            "contact_no": "+917485856609",
+            "contactable_id": 1744150,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "rapidlinecor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369190,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744150,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "RC Boat",
+        "event_id": 1744221,
+        "name": "Naman kumar sinha(overall coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Boat",
+        "event_id": 1744221,
+        "name": "NAYAN KUMAR(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Boat",
+        "event_id": 1744221,
+        "name": "Nikita Chawla(Event coordinator)",
+        "phone": "+918890825146",
+        "email": "rcboatcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Boat",
+        "event_id": 1744221,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Sky Maneuver",
+        "event_id": 1744218,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Sky Maneuver",
+        "event_id": 1744218,
+        "name": "NAYAN KUMAR(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Sky Maneuver",
+        "event_id": 1744218,
+        "name": "Dikshant Yadav(Event coordinator)",
+        "phone": "+919530242241",
+        "email": "dikshant_253050009@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Sky Maneuver",
+        "event_id": 1744218,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RoboSoccer",
+        "event_id": 1744207,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RoboSoccer",
+        "event_id": 1744207,
+        "name": "NAYAN KUMAR(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RoboSoccer",
+        "event_id": 1744207,
+        "name": "Divyansh Keshav(Event coordinator)",
+        "phone": "+917004905265",
+        "email": "robosoccercor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RoboSoccer",
+        "event_id": 1744207,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Car",
+        "event_id": 1744169,
+        "name": "Naman kumar sinha (overall coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Car",
+        "event_id": 1744169,
+        "name": "Nayan kumar(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Car",
+        "event_id": 1744169,
+        "name": "Harish Kumawat(Event coordinator)",
+        "phone": "+919216408409",
+        "email": "rccarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "RC Car",
+        "event_id": 1744169,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hovermania",
+        "event_id": 1744165,
+        "name": "Naman kumar",
+        "phone": "+91856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hovermania",
+        "event_id": 1744165,
+        "name": "Nayan kumar(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hovermania",
+        "event_id": 1744165,
+        "name": "Prateek singh(Event coordinator)",
+        "phone": "+916239612532",
+        "email": "hovermaniacor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hovermania",
+        "event_id": 1744165,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Micromouse Challenge",
+        "event_id": 1744161,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Micromouse Challenge",
+        "event_id": 1744161,
+        "name": "NAYAN KUMAR(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Micromouse Challenge",
+        "event_id": 1744161,
+        "name": "Maneesh Kumar(Event coordinator)",
+        "phone": "+917518467124",
+        "email": "micromousechallengecor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Micromouse Challenge",
+        "event_id": 1744161,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Robowar",
+        "event_id": 1744154,
+        "name": "Domain Coordinator:  Nayan Kumar",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Robowar",
+        "event_id": 1744154,
+        "name": "Overall Coordinator: Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Robowar",
+        "event_id": 1744154,
+        "name": "Event Coordinator:  Monu Saharan",
+        "phone": "+917296819251",
+        "email": "robowarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Robowar",
+        "event_id": 1744154,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Rapid Line",
+        "event_id": 1744150,
+        "name": "Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Rapid Line",
+        "event_id": 1744150,
+        "name": "Nayan Kumar(Domain coordinator)",
+        "phone": "+919835190210",
+        "email": "robozarcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Rapid Line",
+        "event_id": 1744150,
+        "name": "Ananya Bharti(Event coordinator)",
+        "phone": "+917485856609",
+        "email": "rapidlinecor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Rapid Line",
+        "event_id": 1744150,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "plexus": {
+    "domain_name": "Plexus",
+    "events": {
+      "Pixel Wizard": {
+        "id": 1744228,
+        "title": "Pixel Wizard",
+        "contacts": [
+          {
+            "id": 2366566,
+            "name": "Aman",
+            "designation": null,
+            "contact_no": "+918307949109",
+            "contactable_id": 1744228,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pixelwizardcor@techfest26.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366567,
+            "name": "Sumit Bansal",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744228,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "plexuscor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2366008,
+            "name": "Shubham Kumar Singh",
+            "designation": null,
+            "contact_no": "+919771174465",
+            "contactable_id": 1744228,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 3
+          },
+          {
+            "id": 2366009,
+            "name": "Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744228,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "naman_2435070@sliet.ac.in",
+            "sort_order": 4
+          },
+          {
+            "id": 2369200,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744228,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 5
+          }
+        ]
+      },
+      "The Neural Nexus": {
+        "id": 1744224,
+        "title": "The Neural Nexus",
+        "contacts": [
+          {
+            "id": 2366579,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744224,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2366580,
+            "name": "Sumit Bansal (Domain Coordinator)",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744224,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "plexuscor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2366581,
+            "name": "Bhawna Singla (Event Coordinator)",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744224,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "aichitchatcor@techfest26.com",
+            "sort_order": 3
+          }
+        ]
+      },
+      "Debug and Deploy": {
+        "id": 1744220,
+        "title": "Debug and Deploy",
+        "contacts": [
+          {
+            "id": 2369533,
+            "name": "Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744220,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "naman_2435070@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2369534,
+            "name": "Shubham Kumar Singh",
+            "designation": null,
+            "contact_no": "+919771174465",
+            "contactable_id": 1744220,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 2
+          },
+          {
+            "id": 2369535,
+            "name": "Sumit Bansal",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744220,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "plexuscor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369536,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744220,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          },
+          {
+            "id": 2369537,
+            "name": "Shashank",
+            "designation": null,
+            "contact_no": "+919672351830",
+            "contactable_id": 1744220,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "debugdeploycor@techfest26.com",
+            "sort_order": 5
+          }
+        ]
+      },
+      "Ghost Code": {
+        "id": 1744216,
+        "title": "Ghost Code",
+        "contacts": [
+          {
+            "id": 2366015,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744216,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "naman_2435070@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2366588,
+            "name": "Sumit Bansal (Domain Coordinator)",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744216,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "plexuscor@techfest26.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2366589,
+            "name": "Kartik Kumar (Event Coordinator)",
+            "designation": null,
+            "contact_no": "+917310098838",
+            "contactable_id": 1744216,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "ghostcodecor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369199,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744216,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Heuristic Havoc": {
+        "id": 1744215,
+        "title": "Heuristic Havoc",
+        "contacts": [
+          {
+            "id": 2366591,
+            "name": "Naman Kumar Sinha (Overall Coordinator)",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744215,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2366590,
+            "name": "Sumit Bansal (Domain  Coordinator)",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744215,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sumit_2441034@sliet.ac.in",
+            "sort_order": 3
+          },
+          {
+            "id": 2366592,
+            "name": "Raja Kumar (Event Coordinator)",
+            "designation": null,
+            "contact_no": "+916299416264",
+            "contactable_id": 1744215,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "cpmarathoncor@techfest26.com",
+            "sort_order": 4
+          },
+          {
+            "id": 2369198,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744215,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Logic Flow": {
+        "id": 1742408,
+        "title": "Logic Flow",
+        "contacts": []
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Pixel Wizard",
+        "event_id": 1744228,
+        "name": "Aman",
+        "phone": "+918307949109",
+        "email": "pixelwizardcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Pixel Wizard",
+        "event_id": 1744228,
+        "name": "Sumit Bansal",
+        "phone": "+917340435001",
+        "email": "plexuscor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Pixel Wizard",
+        "event_id": 1744228,
+        "name": "Shubham Kumar Singh",
+        "phone": "+919771174465",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Pixel Wizard",
+        "event_id": 1744228,
+        "name": "Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "naman_2435070@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Pixel Wizard",
+        "event_id": 1744228,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Neural Nexus",
+        "event_id": 1744224,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Neural Nexus",
+        "event_id": 1744224,
+        "name": "Sumit Bansal (Domain Coordinator)",
+        "phone": "+917340435001",
+        "email": "plexuscor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Neural Nexus",
+        "event_id": 1744224,
+        "name": "Bhawna Singla (Event Coordinator)",
+        "phone": "N/A",
+        "email": "aichitchatcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Debug and Deploy",
+        "event_id": 1744220,
+        "name": "Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "naman_2435070@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Debug and Deploy",
+        "event_id": 1744220,
+        "name": "Shubham Kumar Singh",
+        "phone": "+919771174465",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Debug and Deploy",
+        "event_id": 1744220,
+        "name": "Sumit Bansal",
+        "phone": "+917340435001",
+        "email": "plexuscor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Debug and Deploy",
+        "event_id": 1744220,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Debug and Deploy",
+        "event_id": 1744220,
+        "name": "Shashank",
+        "phone": "+919672351830",
+        "email": "debugdeploycor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Ghost Code",
+        "event_id": 1744216,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "naman_2435070@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Ghost Code",
+        "event_id": 1744216,
+        "name": "Sumit Bansal (Domain Coordinator)",
+        "phone": "+917340435001",
+        "email": "plexuscor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Ghost Code",
+        "event_id": 1744216,
+        "name": "Kartik Kumar (Event Coordinator)",
+        "phone": "+917310098838",
+        "email": "ghostcodecor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Ghost Code",
+        "event_id": 1744216,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Heuristic Havoc",
+        "event_id": 1744215,
+        "name": "Naman Kumar Sinha (Overall Coordinator)",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Heuristic Havoc",
+        "event_id": 1744215,
+        "name": "Sumit Bansal (Domain  Coordinator)",
+        "phone": "+917340435001",
+        "email": "sumit_2441034@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Heuristic Havoc",
+        "event_id": 1744215,
+        "name": "Raja Kumar (Event Coordinator)",
+        "phone": "+916299416264",
+        "email": "cpmarathoncor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Heuristic Havoc",
+        "event_id": 1744215,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "karyarachna": {
+    "domain_name": "Karyarachna",
+    "events": {
+      "Hackathon": {
+        "id": 1744227,
+        "title": "Hackathon",
+        "contacts": [
+          {
+            "id": 2366597,
+            "name": "Overall Coordinator: Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744227,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2366598,
+            "name": "Domain Coordinator: Pritam Burman",
+            "designation": null,
+            "contact_no": "+918101052034",
+            "contactable_id": 1744227,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pritam_2446057@sliet.ac.in",
+            "sort_order": 2
+          },
+          {
+            "id": 2366599,
+            "name": "Event Coordinator: Harshit Kumar",
+            "designation": null,
+            "contact_no": "+917973381997",
+            "contactable_id": 1744227,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "harshit_254074019@sliet.ac.in",
+            "sort_order": 3
+          },
+          {
+            "id": 2369497,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744227,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Kritrim - Model Exhibition": {
+        "id": 1743774,
+        "title": "Kritrim - Model Exhibition",
+        "contacts": [
+          {
+            "id": 2369328,
+            "name": "Overall Coordinator: Naman Kumar Sinha ",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1743774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2369329,
+            "name": " Domain Coordinator: Pritam Barman",
+            "designation": null,
+            "contact_no": "+918101052034",
+            "contactable_id": 1743774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pritam_2446057@sliet.ac.in",
+            "sort_order": 2
+          },
+          {
+            "id": 2369330,
+            "name": " Event Coordinator:Ritika",
+            "designation": null,
+            "contact_no": "+919939449601",
+            "contactable_id": 1743774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "ritikakumari0106@gmail.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369496,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1743774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      },
+      "Jugaad": {
+        "id": 1742433,
+        "title": "Jugaad",
+        "contacts": [
+          {
+            "id": 2369334,
+            "name": "Overall Coordinator: Naman Kumar Sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1742433,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2369335,
+            "name": "Domain Coordinator: Pritam Burman",
+            "designation": null,
+            "contact_no": "+918101052034",
+            "contactable_id": 1742433,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pritambarman642@gmail.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2369336,
+            "name": "Event Coordinator: Mukul Raj",
+            "designation": null,
+            "contact_no": "+917091355166",
+            "contactable_id": 1742433,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "mukulraj2007@gmail.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2369498,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1742433,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 4
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Hackathon",
+        "event_id": 1744227,
+        "name": "Overall Coordinator: Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hackathon",
+        "event_id": 1744227,
+        "name": "Domain Coordinator: Pritam Burman",
+        "phone": "+918101052034",
+        "email": "pritam_2446057@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hackathon",
+        "event_id": 1744227,
+        "name": "Event Coordinator: Harshit Kumar",
+        "phone": "+917973381997",
+        "email": "harshit_254074019@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Hackathon",
+        "event_id": 1744227,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Kritrim - Model Exhibition",
+        "event_id": 1743774,
+        "name": "Overall Coordinator: Naman Kumar Sinha ",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Kritrim - Model Exhibition",
+        "event_id": 1743774,
+        "name": " Domain Coordinator: Pritam Barman",
+        "phone": "+918101052034",
+        "email": "pritam_2446057@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Kritrim - Model Exhibition",
+        "event_id": 1743774,
+        "name": " Event Coordinator:Ritika",
+        "phone": "+919939449601",
+        "email": "ritikakumari0106@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Kritrim - Model Exhibition",
+        "event_id": 1743774,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Jugaad",
+        "event_id": 1742433,
+        "name": "Overall Coordinator: Naman Kumar Sinha",
+        "phone": "+917856893952",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Jugaad",
+        "event_id": 1742433,
+        "name": "Domain Coordinator: Pritam Burman",
+        "phone": "+918101052034",
+        "email": "pritambarman642@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Jugaad",
+        "event_id": 1742433,
+        "name": "Event Coordinator: Mukul Raj",
+        "phone": "+917091355166",
+        "email": "mukulraj2007@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Jugaad",
+        "event_id": 1742433,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "kermis": {
+    "domain_name": "Kermis",
+    "events": {
+      "Chess": {
+        "id": 1744757,
+        "title": "Chess",
+        "contacts": []
+      },
+      "BGMI": {
+        "id": 1744148,
+        "title": "BGMI",
+        "contacts": []
+      },
+      "Free Fire": {
+        "id": 1744147,
+        "title": "Free Fire",
+        "contacts": []
+      }
+    },
+    "coordinators": []
+  },
+  "genesis": {
+    "domain_name": "Genesis",
+    "events": {
+      "Pitchverse - Virtual Strategy": {
+        "id": 1744238,
+        "title": "Pitchverse - Virtual Strategy",
+        "contacts": [
+          {
+            "id": 2369500,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744238,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 1
+          }
+        ]
+      },
+      "Case Crack": {
+        "id": 1744234,
+        "title": "Case Crack",
+        "contacts": [
+          {
+            "id": 2366760,
+            "name": "Priya Bharti",
+            "designation": null,
+            "contact_no": "+918810854523",
+            "contactable_id": 1744234,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "casecrackcor@techfest26.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366759,
+            "name": "Swasti",
+            "designation": null,
+            "contact_no": "+917505279956",
+            "contactable_id": 1744234,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "swastimehrabjr@gmail.com",
+            "sort_order": 2
+          },
+          {
+            "id": 2369507,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744234,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 3
+          }
+        ]
+      },
+      "Brand Blitz": {
+        "id": 1744232,
+        "title": "Brand Blitz",
+        "contacts": [
+          {
+            "id": 2365592,
+            "name": "Aditya Kumar Gupta",
+            "designation": null,
+            "contact_no": "+917399645983",
+            "contactable_id": 1744232,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adityafb7399@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2369508,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744232,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Case Ethical Crosstalk": {
+        "id": 1744231,
+        "title": "Case Ethical Crosstalk",
+        "contacts": [
+          {
+            "id": 2369509,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744231,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 1
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Pitchverse - Virtual Strategy",
+        "event_id": 1744238,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Case Crack",
+        "event_id": 1744234,
+        "name": "Priya Bharti",
+        "phone": "+918810854523",
+        "email": "casecrackcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Case Crack",
+        "event_id": 1744234,
+        "name": "Swasti",
+        "phone": "+917505279956",
+        "email": "swastimehrabjr@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Case Crack",
+        "event_id": 1744234,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Brand Blitz",
+        "event_id": 1744232,
+        "name": "Aditya Kumar Gupta",
+        "phone": "+917399645983",
+        "email": "adityafb7399@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Brand Blitz",
+        "event_id": 1744232,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Case Ethical Crosstalk",
+        "event_id": 1744231,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "electronica": {
+    "domain_name": "Electronica",
+    "events": {
+      "Circuit Craft": {
+        "id": 1744230,
+        "title": "Circuit Craft",
+        "contacts": [
+          {
+            "id": 2369499,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744230,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 1
+          }
+        ]
+      },
+      "Digital Design Challenge": {
+        "id": 1744229,
+        "title": "Digital Design Challenge",
+        "contacts": []
+      },
+      "Arduino Imagino": {
+        "id": 1744210,
+        "title": "Arduino Imagino",
+        "contacts": []
+      },
+      "Innovation-X": {
+        "id": 1744206,
+        "title": "Innovation-X",
+        "contacts": []
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Circuit Craft",
+        "event_id": 1744230,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "electrica": {
+    "domain_name": "Electrica",
+    "events": {
+      "WPTC - Wireless Power Transfer": {
+        "id": 1744809,
+        "title": "WPTC - Wireless Power Transfer",
+        "contacts": [
+          {
+            "id": 2365593,
+            "name": "Pawan Tanay",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744809,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pawan_2444115@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365594,
+            "name": "Avinash Jindal",
+            "designation": null,
+            "contact_no": "+919418178905",
+            "contactable_id": 1744809,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "avinash_254053011@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Breadboard Battle": {
+        "id": 1744214,
+        "title": "Breadboard Battle",
+        "contacts": [
+          {
+            "id": 2374905,
+            "name": "Aditya Dhayal",
+            "designation": null,
+            "contact_no": "+919116987701",
+            "contactable_id": 1744214,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "aditya_254054008@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2374906,
+            "name": "Pawan",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744214,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pawa_2444115@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Soldering Speedrun": {
+        "id": 1744174,
+        "title": "Soldering Speedrun",
+        "contacts": [
+          {
+            "id": 2365496,
+            "name": "Pawan Tanay",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744174,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pawantanay01@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2365497,
+            "name": "Ankur",
+            "designation": null,
+            "contact_no": "+919821988440",
+            "contactable_id": 1744174,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "ankur_254054013@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Grid Masters-SLD Challenge": {
+        "id": 1744172,
+        "title": "Grid Masters-SLD Challenge",
+        "contacts": [
+          {
+            "id": 2365482,
+            "name": "Pawan Tanay",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744172,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "pawan_2444115@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365488,
+            "name": "Harshita",
+            "designation": null,
+            "contact_no": "+919485820012",
+            "contactable_id": 1744172,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "harshita_254053018@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "WPTC - Wireless Power Transfer",
+        "event_id": 1744809,
+        "name": "Pawan Tanay",
+        "phone": "N/A",
+        "email": "pawan_2444115@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "WPTC - Wireless Power Transfer",
+        "event_id": 1744809,
+        "name": "Avinash Jindal",
+        "phone": "+919418178905",
+        "email": "avinash_254053011@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Breadboard Battle",
+        "event_id": 1744214,
+        "name": "Aditya Dhayal",
+        "phone": "+919116987701",
+        "email": "aditya_254054008@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Breadboard Battle",
+        "event_id": 1744214,
+        "name": "Pawan",
+        "phone": "N/A",
+        "email": "pawa_2444115@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Soldering Speedrun",
+        "event_id": 1744174,
+        "name": "Pawan Tanay",
+        "phone": "N/A",
+        "email": "pawantanay01@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Soldering Speedrun",
+        "event_id": 1744174,
+        "name": "Ankur",
+        "phone": "+919821988440",
+        "email": "ankur_254054013@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Grid Masters-SLD Challenge",
+        "event_id": 1744172,
+        "name": "Pawan Tanay",
+        "phone": "N/A",
+        "email": "pawan_2444115@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Grid Masters-SLD Challenge",
+        "event_id": 1744172,
+        "name": "Harshita",
+        "phone": "+919485820012",
+        "email": "harshita_254053018@sliet.ac.in",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "mechanica": {
+    "domain_name": "Mechanica",
+    "events": {
+      "Mechnovate": {
+        "id": 1744211,
+        "title": "Mechnovate",
+        "contacts": []
+      },
+      "Designare": {
+        "id": 1744204,
+        "title": "Designare",
+        "contacts": []
+      },
+      "Hydraload": {
+        "id": 1744178,
+        "title": "Hydraload",
+        "contacts": []
+      },
+      "Fabriquer": {
+        "id": 1744170,
+        "title": "Fabriquer",
+        "contacts": []
+      }
+    },
+    "coordinators": []
+  },
+  "chemica": {
+    "domain_name": "Chemica",
+    "events": {
+      "Chemi Craft": {
+        "id": 1744213,
+        "title": "Chemi Craft",
+        "contacts": []
+      },
+      "Jam Session": {
+        "id": 1744205,
+        "title": "Jam Session",
+        "contacts": []
+      },
+      "Chemi-Thone": {
+        "id": 1744177,
+        "title": "Chemi-Thone",
+        "contacts": []
+      },
+      "Poster and Paper Presentation": {
+        "id": 1744167,
+        "title": "Poster and Paper Presentation",
+        "contacts": []
+      },
+      "Soap Making": {
+        "id": 1744166,
+        "title": "Soap Making",
+        "contacts": []
+      },
+      "Chemi-Mystery": {
+        "id": 1744164,
+        "title": "Chemi-Mystery",
+        "contacts": []
+      }
+    },
+    "coordinators": []
+  },
+  "civicon": {
+    "domain_name": "Civicon",
+    "events": {
+      "Technical Quiz Competition": {
+        "id": 1744818,
+        "title": "Technical Quiz Competition",
+        "contacts": [
+          {
+            "id": 2366345,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744818,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anilkumawat01612@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366346,
+            "name": "Ashutosh kumar",
+            "designation": null,
+            "contact_no": "+918434167423",
+            "contactable_id": 1744818,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adpk3038@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Poster Presentation": {
+        "id": 1744770,
+        "title": "Poster Presentation",
+        "contacts": [
+          {
+            "id": 2366313,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744770,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anilkumawat01612@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366314,
+            "name": "Jasmeen kaur",
+            "designation": null,
+            "contact_no": "+919779166144",
+            "contactable_id": 1744770,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "Jasmeen_254024015@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "CAD Design Challenge": {
+        "id": 1744769,
+        "title": "CAD Design Challenge",
+        "contacts": [
+          {
+            "id": 2366320,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744769,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anilkumawat01612@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366321,
+            "name": "Prince",
+            "designation": null,
+            "contact_no": "+917858876978",
+            "contactable_id": 1744769,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "princelkrkumar706186@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Seismic Challenge": {
+        "id": 1744768,
+        "title": "Seismic Challenge",
+        "contacts": [
+          {
+            "id": 2366053,
+            "name": "Aditya Kumar",
+            "designation": null,
+            "contact_no": "+919863569698",
+            "contactable_id": 1744768,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adikumar6909@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366344,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744768,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anilkumawat01612@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      },
+      "City Model Exhibition": {
+        "id": 1744767,
+        "title": "City Model Exhibition",
+        "contacts": [
+          {
+            "id": 2366352,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744767,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anilkumawat01612@gmail.com",
+            "sort_order": 1
+          },
+          {
+            "id": 2366353,
+            "name": "Surya kumar",
+            "designation": null,
+            "contact_no": "+919012323442",
+            "contactable_id": 1744767,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "surya56323232@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Truss Load": {
+        "id": 1744180,
+        "title": "Truss Load",
+        "contacts": [
+          {
+            "id": 2365940,
+            "name": "Anil kumawat",
+            "designation": null,
+            "contact_no": "+919351050693",
+            "contactable_id": 1744180,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "anil_2447003@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365941,
+            "name": "Sachin",
+            "designation": null,
+            "contact_no": "+916399932480",
+            "contactable_id": 1744180,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "chhavisachin323@gmail.com",
+            "sort_order": 2
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Technical Quiz Competition",
+        "event_id": 1744818,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anilkumawat01612@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Technical Quiz Competition",
+        "event_id": 1744818,
+        "name": "Ashutosh kumar",
+        "phone": "+918434167423",
+        "email": "adpk3038@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Poster Presentation",
+        "event_id": 1744770,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anilkumawat01612@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Poster Presentation",
+        "event_id": 1744770,
+        "name": "Jasmeen kaur",
+        "phone": "+919779166144",
+        "email": "Jasmeen_254024015@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "CAD Design Challenge",
+        "event_id": 1744769,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anilkumawat01612@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "CAD Design Challenge",
+        "event_id": 1744769,
+        "name": "Prince",
+        "phone": "+917858876978",
+        "email": "princelkrkumar706186@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Seismic Challenge",
+        "event_id": 1744768,
+        "name": "Aditya Kumar",
+        "phone": "+919863569698",
+        "email": "adikumar6909@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Seismic Challenge",
+        "event_id": 1744768,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anilkumawat01612@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "City Model Exhibition",
+        "event_id": 1744767,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anilkumawat01612@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "City Model Exhibition",
+        "event_id": 1744767,
+        "name": "Surya kumar",
+        "phone": "+919012323442",
+        "email": "surya56323232@gmail.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Truss Load",
+        "event_id": 1744180,
+        "name": "Anil kumawat",
+        "phone": "+919351050693",
+        "email": "anil_2447003@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Truss Load",
+        "event_id": 1744180,
+        "name": "Sachin",
+        "phone": "+916399932480",
+        "email": "chhavisachin323@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "inventia": {
+    "domain_name": "Inventia",
+    "events": {
+      "Cognitive Challenges": {
+        "id": 1744773,
+        "title": "Cognitive Challenges",
+        "contacts": []
+      },
+      "Smart Agriculture (SM-Agri)": {
+        "id": 1744772,
+        "title": "Smart Agriculture (SM-Agri)",
+        "contacts": []
+      },
+      "Techno-Vation": {
+        "id": 1744771,
+        "title": "Techno-Vation",
+        "contacts": []
+      }
+    },
+    "coordinators": []
+  },
+  "foodocrats": {
+    "domain_name": "Food-O-Crats",
+    "events": {
+      "Tech4Earth": {
+        "id": 1744779,
+        "title": "Tech4Earth",
+        "contacts": []
+      },
+      "Foodprint": {
+        "id": 1744778,
+        "title": "Foodprint",
+        "contacts": [
+          {
+            "id": 2365994,
+            "name": "Granthick Sarkar",
+            "designation": null,
+            "contact_no": "+916280426074",
+            "contactable_id": 1744778,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "granthick_254063101@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365995,
+            "name": "Adarsh Kumar",
+            "designation": null,
+            "contact_no": "+916204209297",
+            "contactable_id": 1744778,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adarsh_2435061@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Clue Craze": {
+        "id": 1744777,
+        "title": "Clue Craze",
+        "contacts": [
+          {
+            "id": 2365991,
+            "name": "Granthick Sarkar",
+            "designation": null,
+            "contact_no": "+916280426074",
+            "contactable_id": 1744777,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "granthick_254063101@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365992,
+            "name": "Adarsh Kumar",
+            "designation": null,
+            "contact_no": "+916204209297",
+            "contactable_id": 1744777,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adarsh_2435061@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Food Forensics": {
+        "id": 1744776,
+        "title": "Food Forensics",
+        "contacts": [
+          {
+            "id": 2365989,
+            "name": "Granthick Sarkar",
+            "designation": null,
+            "contact_no": "+916280426074",
+            "contactable_id": 1744776,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "granthick_25463101@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365990,
+            "name": "Adarsh Kumar",
+            "designation": null,
+            "contact_no": "+916204209297",
+            "contactable_id": 1744776,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adarsh_2435061@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      },
+      "Food Forge": {
+        "id": 1744774,
+        "title": "Food Forge",
+        "contacts": [
+          {
+            "id": 2365976,
+            "name": "Granthick Sarkar",
+            "designation": null,
+            "contact_no": "+916280426074",
+            "contactable_id": 1744774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "granthick_254063101@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2365977,
+            "name": "Adarsh Kumar",
+            "designation": null,
+            "contact_no": "+916204209297",
+            "contactable_id": 1744774,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "adarsh_2435061@sliet.ac.in",
+            "sort_order": 2
+          }
+        ]
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "Foodprint",
+        "event_id": 1744778,
+        "name": "Granthick Sarkar",
+        "phone": "+916280426074",
+        "email": "granthick_254063101@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Foodprint",
+        "event_id": 1744778,
+        "name": "Adarsh Kumar",
+        "phone": "+916204209297",
+        "email": "adarsh_2435061@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Clue Craze",
+        "event_id": 1744777,
+        "name": "Granthick Sarkar",
+        "phone": "+916280426074",
+        "email": "granthick_254063101@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Clue Craze",
+        "event_id": 1744777,
+        "name": "Adarsh Kumar",
+        "phone": "+916204209297",
+        "email": "adarsh_2435061@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Food Forensics",
+        "event_id": 1744776,
+        "name": "Granthick Sarkar",
+        "phone": "+916280426074",
+        "email": "granthick_25463101@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Food Forensics",
+        "event_id": 1744776,
+        "name": "Adarsh Kumar",
+        "phone": "+916204209297",
+        "email": "adarsh_2435061@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Food Forge",
+        "event_id": 1744774,
+        "name": "Granthick Sarkar",
+        "phone": "+916280426074",
+        "email": "granthick_254063101@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "Food Forge",
+        "event_id": 1744774,
+        "name": "Adarsh Kumar",
+        "phone": "+916204209297",
+        "email": "adarsh_2435061@sliet.ac.in",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "atomheimer": {
+    "domain_name": "Atomheimer",
+    "events": {
+      "The Aqua-Epoch": {
+        "id": 1744819,
+        "title": "The Aqua-Epoch",
+        "contacts": [
+          {
+            "id": 2366011,
+            "name": "Naman kumar sinha",
+            "designation": null,
+            "contact_no": "+917856893952",
+            "contactable_id": 1744819,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "naman_2435070@sliet.ac.in",
+            "sort_order": 1
+          },
+          {
+            "id": 2366012,
+            "name": "Shubham kumar singh",
+            "designation": null,
+            "contact_no": "+919771174465",
+            "contactable_id": 1744819,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "techfest@sliet.ac.in",
+            "sort_order": 2
+          },
+          {
+            "id": 2366013,
+            "name": "Sumit Bansal",
+            "designation": null,
+            "contact_no": "+917340435001",
+            "contactable_id": 1744819,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "plexuscor@techfest26.com",
+            "sort_order": 3
+          },
+          {
+            "id": 2366014,
+            "name": "Brajesh Verma",
+            "designation": null,
+            "contact_no": "+919257902466",
+            "contactable_id": 1744819,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "machinelearningmodelcor@techfest26.com",
+            "sort_order": 4
+          },
+          {
+            "id": 2369201,
+            "name": "Sagar Kumar",
+            "designation": null,
+            "contact_no": null,
+            "contactable_id": 1744819,
+            "contactable_type": "App\\Model\\Opportunity",
+            "email": "sliethub@gmail.com",
+            "sort_order": 5
+          }
+        ]
+      },
+      "Quiz Nova": {
+        "id": 1744782,
+        "title": "Quiz Nova",
+        "contacts": []
+      },
+      "The Big Bull": {
+        "id": 1744780,
+        "title": "The Big Bull",
+        "contacts": []
+      },
+      "Aerostrike": {
+        "id": 1744223,
+        "title": "Aerostrike",
+        "contacts": []
+      },
+      "Aqua Clean": {
+        "id": 1744219,
+        "title": "Aqua Clean",
+        "contacts": []
+      },
+      "Splash Rocket": {
+        "id": 1744160,
+        "title": "Splash Rocket",
+        "contacts": []
+      }
+    },
+    "coordinators": [
+      {
+        "event_name": "The Aqua-Epoch",
+        "event_id": 1744819,
+        "name": "Naman kumar sinha",
+        "phone": "+917856893952",
+        "email": "naman_2435070@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Aqua-Epoch",
+        "event_id": 1744819,
+        "name": "Shubham kumar singh",
+        "phone": "+919771174465",
+        "email": "techfest@sliet.ac.in",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Aqua-Epoch",
+        "event_id": 1744819,
+        "name": "Sumit Bansal",
+        "phone": "+917340435001",
+        "email": "plexuscor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Aqua-Epoch",
+        "event_id": 1744819,
+        "name": "Brajesh Verma",
+        "phone": "+919257902466",
+        "email": "machinelearningmodelcor@techfest26.com",
+        "designation": "Event Coordinator"
+      },
+      {
+        "event_name": "The Aqua-Epoch",
+        "event_id": 1744819,
+        "name": "Sagar Kumar",
+        "phone": "N/A",
+        "email": "sliethub@gmail.com",
+        "designation": "Event Coordinator"
+      }
+    ]
+  },
+  "general": {
+    "domain_name": "Central / Other",
+    "events": {},
+    "coordinators": []
+  }
+}

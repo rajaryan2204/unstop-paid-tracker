@@ -1,4 +1,3 @@
-// src/components/CandidateDrawer.jsx
 import React, { useEffect, useMemo } from 'react';
 import { 
   X, 
@@ -17,6 +16,10 @@ import {
   AlertTriangle,
   History
 } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 import { getAvatarStyle, getInitials } from '../utils/avatar';
 import { getParticipantCallRecord, CALL_STATUSES } from '../utils/callStore';
 
@@ -76,9 +79,9 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                   <h3 className="font-semibold text-white text-sm truncate max-w-[200px]">
                     {participant.name || 'Participant'}
                   </h3>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                  <Badge variant="info" className="text-[10px] font-mono">
                     {participant.event_type || 'Event'}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="text-[11px] font-mono text-slate-400 truncate mt-0.5">
                   ID: {participant.id} • Ref: {participant.payment_id || '--'}
@@ -86,13 +89,15 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
               </div>
             </div>
 
-            <button
+            <Button
+              variant="ghost"
+              size="iconSm"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="text-slate-400 hover:text-white"
               title="Close (Esc)"
             >
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Body Content */}
@@ -101,14 +106,16 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
             {/* Quick Contact Actions Bar */}
             <div className="grid grid-cols-3 gap-2">
               {participant.phone && participant.phone !== 'N/A' && (
-                <button
+                <Button
+                  variant="sky"
+                  size="sm"
                   onClick={() => onTriggerCall && onTriggerCall(participant)}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all shadow-[0_0_15px_-3px_rgba(56,189,248,0.2)]"
+                  className="font-semibold shadow-[0_0_15px_-3px_rgba(56,189,248,0.2)]"
                   title="Call via phone and log remarks"
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
                   <span>Call ({callCount})</span>
-                </button>
+                </Button>
               )}
 
               {waLink && (
@@ -116,7 +123,7 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                   href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all shadow-[0_0_15px_-3px_rgba(37,211,102,0.2)]"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all shadow-[0_0_15px_-3px_rgba(37,211,102,0.2)]"
                 >
                   <span>WhatsApp</span>
                 </a>
@@ -125,7 +132,7 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
               {mailLink && (
                 <a
                   href={mailLink}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Email</span>
@@ -134,17 +141,32 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
             </div>
 
             {/* Payment & Verification Status Banner */}
-            {amt > 0 ? (
+            {amt > 0 || participant.payment_status === 'PAID' ? (
               <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-300/80 mb-0.5">
                   Payment Status
                 </div>
                 <div className="flex items-center gap-2 font-semibold text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Paid ₹{amt.toLocaleString('en-IN')} (Gateway Confirmed)</span>
+                  <span>Paid {amt > 0 ? `₹${amt.toLocaleString('en-IN')}` : ''} (Gateway Confirmed)</span>
                 </div>
-                <div className="text-[11px] font-mono text-emerald-300/70 mt-1 select-all">
-                  Txn ID: {participant.payment_id}
+                {participant.payment_id && (
+                  <div className="text-[11px] font-mono text-emerald-300/70 mt-1 select-all">
+                    Txn ID: {participant.payment_id}
+                  </div>
+                )}
+              </div>
+            ) : participant.payment_status === 'INCOMPLETE' || (participant.status_label && participant.status_label.toLowerCase().includes('not paid')) ? (
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-amber-300/80 mb-0.5">
+                  Registration Status
+                </div>
+                <div className="flex items-center gap-2 font-semibold text-sm">
+                  <Clock className="w-4 h-4 text-amber-400" />
+                  <span>Incomplete • Registration Fee Pending</span>
+                </div>
+                <div className="text-[11px] font-mono text-amber-300/70 mt-1">
+                  Candidate has not completed payment on Unstop (Outreach Priority)
                 </div>
               </div>
             ) : callRecord?.lastStatus === 'PAYMENT_CLAIMED' ? (

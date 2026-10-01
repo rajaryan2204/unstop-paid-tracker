@@ -260,7 +260,15 @@ def normalize_record(record: dict, index: int, event_info: dict) -> dict:
 
     regn_id = record.get("regn_id") or str(record.get("id")) or f"REG-{index:04d}"
     registered_at = record.get("last_seen") or record.get("created_at") or datetime.now(timezone.utc).isoformat()
-    status_label = record.get("registrationStatus") or "Complete Registration"
+    
+    is_paid = is_registration_paid(record)
+    reg_status_raw = str(record.get("registrationStatus") or record.get("regi_status") or "").strip()
+    if is_paid:
+        status_label = "Complete Registration" if not reg_status_raw or "not paid" in reg_status_raw.lower() else reg_status_raw
+        payment_status = "PAID"
+    else:
+        status_label = "Registraition fee not paid" if not reg_status_raw else reg_status_raw
+        payment_status = "INCOMPLETE"
 
     return {
         "id": regn_id,
@@ -277,7 +285,8 @@ def normalize_record(record: dict, index: int, event_info: dict) -> dict:
         "team_members": members,
         "payment_id": f"UNSTOP-{record.get('id')}",
         "amount": amount,
-        "payment_status": "PAID",
+        "payment_status": payment_status,
+        "is_paid": is_paid,
         "status_label": status_label,
         "registered_at": registered_at,
         "resume_url": record.get("resume_url"),
@@ -426,6 +435,7 @@ def main():
     token_expiry = parse_jwt_expiry(UNSTOP_TOKEN) if UNSTOP_TOKEN else None
     headers = get_headers(UNSTOP_TOKEN, UNSTOP_COOKIES)
 
+    all_participants = []
     all_paid_participants = []
     events_summary = []
     total_fest_applicants = 0
@@ -450,47 +460,55 @@ def main():
             paid_records = [r for r in records if is_registration_paid(r)]
             total_fest_applicants += len(records)
 
-            if len(records) > 0:
-                logging.info(f"[{idx+1}/{len(events)}] '{title}' (ID {eid}): {len(records)} registered | {len(paid_records)} Paid")
-
             events_summary.append({
                 "id": eid,
                 "title": title,
                 "type": ev.get("type", "competitions"),
                 "total_registrations": len(records),
-                "paid_registrations": len(paid_records)
+                "paid_registrations": len(paid_records),
+                "incomplete_registrations": len(records) - len(paid_records)
             })
 
-            for r in paid_records:
-                norm = normalize_record(r, len(all_paid_participants) + 1, ev)
-                all_paid_participants.append(norm)
+            for r in records:
+                norm = normalize_record(r, len(all_participants) + 1, ev)
+                all_participants.append(norm)
+                if norm.get("is_paid"):
+                    all_paid_participants.append(norm)
 
-            time.sleep(0.3)  # Polite pacing to avoid rate limits
+            if len(records) > 0:
+                logging.info(f"[{idx+1}/{len(events)}] '{title}' (ID {eid}): {len(records)} registered | {len(paid_records)} Paid | {len(records) - len(paid_records)} Incomplete")
+
+            time.sleep(0.15)  # Polite pacing to avoid rate limits
 
     # If API not configured or zero returned, retain cached data if present
-    if not all_paid_participants:
-        if os.path.exists(OUTPUT_FILE) and os.path.getsize(OUTPUT_FILE) > 30:
-            logging.info(f"Retaining existing cached data from {OUTPUT_FILE}")
-            with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
-                all_paid_participants = json.load(f)
+    if not all_participants:
+        if os.path.exists(ROOT_DATA_FILE) and os.path.getsize(ROOT_DATA_FILE) > 30:
+            logging.info(f"Retaining existing cached data from {ROOT_DATA_FILE}")
+            with open(ROOT_DATA_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                all_participants = cached_data.get("participants", [])
+                all_paid_participants = [p for p in all_participants if p.get("is_paid")]
             if os.path.exists(SUMMARY_FILE):
                 with open(SUMMARY_FILE, "r", encoding="utf-8") as f:
                     prev_summary = json.load(f)
                     events_summary = prev_summary.get("events_list", [])
-                    total_fest_applicants = prev_summary.get("total_unstop_registrations", 0)
+                    total_fest_applicants = prev_summary.get("total_unstop_registrations", len(all_participants))
 
     # Compute summary
+    total_count = len(all_participants)
     total_paid_count = len(all_paid_participants)
+    total_incomplete_count = total_count - total_paid_count
     total_revenue = sum(p.get("amount", 0) for p in all_paid_participants)
-    colleges = list({p.get("college") for p in all_paid_participants if p.get("college") and p.get("college") != "N/A"})
+    colleges = list({p.get("college") for p in all_participants if p.get("college") and p.get("college") != "N/A"})
     active_events = [e for e in events_summary if e.get("paid_registrations", 0) > 0]
 
     summary = {
         "last_synced_at": sync_time,
         "token_expires_at": token_expiry,
         "auth_mode": "automated_login" if (UNSTOP_EMAIL and UNSTOP_PASSWORD) else "static_token",
-        "total_unstop_registrations": total_fest_applicants,
+        "total_unstop_registrations": total_count,
         "total_paid_registrations": total_paid_count,
+        "total_incomplete_registrations": total_incomplete_count,
         "total_amount_collected": round(total_revenue, 2),
         "total_colleges": len(colleges),
         "total_events_scanned": len(events_summary),
@@ -510,11 +528,11 @@ def main():
 
     combined_web_data = {
         "summary": summary,
-        "participants": all_paid_participants
+        "participants": all_participants
     }
     with open(ROOT_DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(combined_web_data, f, indent=2, ensure_ascii=False)
-    logging.info(f"Saved combined web data to {ROOT_DATA_FILE}")
+    logging.info(f"Saved {total_count} total records (complete + incomplete) to {ROOT_DATA_FILE}")
 
     # Also save data.js for instantaneous failproof browser loading
     data_js_file = os.path.join(BASE_DIR, "data.js")

@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Download, 
@@ -16,6 +15,8 @@ import {
   Crown,
   Activity
 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { DOMAINS_DIRECTORY } from '../utils/auth';
 
 export default function Header({ 
@@ -120,30 +121,36 @@ export default function Header({
           </div>
 
           {/* Refresh Button */}
-          <button
+          <Button
+            variant="ghost"
+            size="iconSm"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="w-8 h-8 rounded-lg bg-[#161A22] border border-white/[0.08] hover:border-white/20 flex items-center justify-center text-slate-400 hover:text-white transition-all disabled:opacity-50"
+            className="w-8 h-8 rounded-lg bg-[#161A22] border border-white/[0.08] hover:border-white/20 text-slate-400 hover:text-white"
             title="Refresh Live Registrations"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-sky-400' : ''}`} />
-          </button>
+          </Button>
 
           {/* CSV Export Button (Compact on phone) */}
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={onExportCSV}
-            className="h-8 px-2.5 sm:px-3 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-medium transition-all flex items-center gap-1.5"
+            className="h-8 px-2.5 sm:px-3 text-xs"
             title="Export CSV"
           >
             <Download className="w-3.5 h-3.5 text-sky-400" />
             <span className="hidden sm:inline">Export CSV</span>
-          </button>
+          </Button>
 
           {/* Super Admin Quick Verification Badge */}
           {isSuperAdmin && verificationCount > 0 && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onOpenVerificationQueue}
-              className="h-8 px-2.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 text-xs font-medium transition-all flex items-center gap-1.5"
+              className="h-8 px-2.5 bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 text-xs font-medium"
               title="Verification Queue"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -151,7 +158,7 @@ export default function Header({
               <span className="w-4 h-4 rounded-full bg-emerald-400 text-black text-[10px] font-bold flex items-center justify-center">
                 {verificationCount}
               </span>
-            </button>
+            </Button>
           )}
 
           {/* User Profile & Menu Dropdown (Replaces cluttered buttons) */}

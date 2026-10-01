@@ -1,11 +1,12 @@
 import React from 'react';
-import { Users, DollarSign, Trophy, School, TrendingUp } from 'lucide-react';
+import { Users, DollarSign, Trophy, School } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function KPIStrip({ summary, participants }) {
-  const verifiedCount = participants.length;
-  const totalApplicants = summary?.total_unstop_registrations || 3601;
-  const paidCount = participants.filter(p => Number(p.amount) > 0).length;
-  const freeCount = verifiedCount - paidCount;
+  const totalCount = participants.length;
+  const paidCount = participants.filter(p => p.is_paid === true || p.payment_status === 'PAID' || Number(p.amount) > 0).length;
+  const incompleteCount = participants.filter(p => p.is_paid === false || p.payment_status === 'INCOMPLETE' || p.payment_status === 'UNPAID' || (p.status_label && p.status_label.toLowerCase().includes('not paid'))).length;
   const totalRevenue = participants.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
   
   const totalEvents = summary?.total_events_scanned || 62;
@@ -16,13 +17,13 @@ export default function KPIStrip({ summary, participants }) {
 
   const cards = [
     {
-      label: "Verified Attendees",
-      value: verifiedCount.toLocaleString('en-IN'),
-      suffix: `/ ${totalApplicants.toLocaleString('en-IN')}`,
-      badge: "LIVE SYNC",
-      badgeClass: "text-sky-400 bg-sky-500/10 border-sky-500/20",
+      label: "Total Registrations",
+      value: totalCount.toLocaleString('en-IN'),
+      suffix: null,
+      badgeText: "LIVE SYNC",
+      badgeVariant: "info",
       valueColor: "text-white",
-      subtext: `${freeCount} Free • ${paidCount} Paid`,
+      subtext: `${paidCount.toLocaleString('en-IN')} Complete • ${incompleteCount.toLocaleString('en-IN')} Incomplete`,
       icon: Users,
       iconColor: "text-sky-400"
     },
@@ -30,10 +31,10 @@ export default function KPIStrip({ summary, participants }) {
       label: "Paid Revenue",
       value: `₹${totalRevenue.toLocaleString('en-IN')}`,
       suffix: null,
-      badge: "GATEWAY",
-      badgeClass: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      badgeText: "GATEWAY",
+      badgeVariant: "success",
       valueColor: "text-emerald-400",
-      subtext: "RC Boat + Ghost Code",
+      subtext: "Complete Registrations",
       icon: DollarSign,
       iconColor: "text-emerald-400"
     },
@@ -41,8 +42,8 @@ export default function KPIStrip({ summary, participants }) {
       label: "Total Competitions",
       value: totalEvents,
       suffix: null,
-      badge: "CATALOG",
-      badgeClass: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+      badgeText: "CATALOG",
+      badgeVariant: "purple",
       valueColor: "text-purple-300",
       subtext: `${eventsWithPaid} with entries • ${zeroPaidCount} awaiting`,
       icon: Trophy,
@@ -52,8 +53,8 @@ export default function KPIStrip({ summary, participants }) {
       label: "Institutions",
       value: collegeCount,
       suffix: null,
-      badge: "PAN-INDIA",
-      badgeClass: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+      badgeText: "PAN-INDIA",
+      badgeVariant: "warning",
       valueColor: "text-amber-300",
       subtext: `PAN-India (${collegeCount} Colleges)`,
       icon: School,
@@ -66,18 +67,18 @@ export default function KPIStrip({ summary, participants }) {
       {cards.map((card, i) => {
         const IconComponent = card.icon;
         return (
-          <div 
+          <Card 
             key={i}
-            className="surface-card rounded-xl p-4 relative overflow-hidden transition-all duration-200 hover:border-white/20 group"
+            className="p-4 relative overflow-hidden transition-all duration-200 hover:border-white/20 hover:shadow-lg group bg-[#11141A]/90 backdrop-blur-sm"
           >
-            {/* Top Row: Label + Micro Badge */}
+            {/* Top Row: Label + shadcn Badge */}
             <div className="flex items-center justify-between gap-2 mb-2">
               <span className="text-[11px] font-mono tracking-wider uppercase text-slate-400">
                 {card.label}
               </span>
-              <span className={`text-[9.5px] font-mono font-semibold px-1.5 py-0.5 rounded border ${card.badgeClass}`}>
-                {card.badge}
-              </span>
+              <Badge variant={card.badgeVariant} className="text-[9.5px] font-mono font-semibold px-1.5 py-0.5">
+                {card.badgeText}
+              </Badge>
             </div>
 
             {/* Value Row */}
@@ -97,7 +98,7 @@ export default function KPIStrip({ summary, participants }) {
               <span className="truncate">{card.subtext}</span>
               <IconComponent className={`w-3.5 h-3.5 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity ${card.iconColor}`} />
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>

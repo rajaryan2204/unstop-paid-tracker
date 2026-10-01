@@ -1,42 +1,38 @@
 import React from 'react';
-import { X, ShieldCheck, Clock, Key, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function TokenModal({ summary, isOpen, onClose }) {
-  if (!isOpen) return null;
-
   const isAuto = summary?.auth_mode === 'automated_login';
   const expiresAt = summary?.token_expires_at ? new Date(summary.token_expires_at) : null;
   const now = new Date();
   const hoursLeft = expiresAt ? Math.max(0, Math.round((expiresAt - now) / (1000 * 60 * 60))) : null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-md surface-card rounded-2xl p-5 border border-white/[0.1] shadow-2xl z-10 animate-in zoom-in-95 duration-200">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.08]">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md bg-[#11141A] border-white/[0.1] text-white">
+        <DialogHeader>
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h3 className="font-semibold text-white text-sm">24/7 Autonomous OAuth Status</h3>
+            <DialogTitle className="text-base font-semibold text-white">
+              24/7 Autonomous OAuth Status
+            </DialogTitle>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+          <DialogDescription className="text-xs text-slate-400">
+            Unstop token health & scheduled synchronization details
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="space-y-3.5 text-xs text-slate-300">
-          
+        <div className="space-y-3.5 text-xs text-slate-300 py-2">
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
@@ -47,16 +43,16 @@ export default function TokenModal({ summary, isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="surface-elevated rounded-xl p-3 border border-white/[0.06] space-y-2">
+          <div className="rounded-xl p-3 bg-[#161A22] border border-white/[0.06] space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-slate-400">Authentication Mode:</span>
-              <span className="font-mono text-emerald-400 font-semibold">
+              <Badge variant="success" className="font-mono text-[11px]">
                 {isAuto ? 'Email/Password Auto-Login' : 'Static Bearer Token'}
-              </span>
+              </Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-400">Token Status:</span>
-              <span className="font-mono text-white">Active & Valid</span>
+              <span className="font-mono text-emerald-400 font-semibold">Active & Valid</span>
             </div>
             {expiresAt && (
               <div className="flex items-center justify-between">
@@ -75,20 +71,19 @@ export default function TokenModal({ summary, isOpen, onClose }) {
           <p className="text-[11px] text-slate-400 leading-relaxed">
             Whenever the current session token expires, the autonomous sync script logs into Unstop automatically, acquires a fresh JWT access token, and syncs all 62 competitions without any manual intervention required.
           </p>
-
         </div>
 
-        {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-white/[0.08] flex justify-end">
-          <button
+        <DialogFooter className="border-t border-white/[0.08] pt-3">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-white/[0.08] hover:bg-white/[0.15] transition-colors"
+            className="border-white/[0.1] bg-white/[0.04] text-white hover:bg-white/[0.08]"
           >
             Got it
-          </button>
-        </div>
-
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

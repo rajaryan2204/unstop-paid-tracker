@@ -24,6 +24,9 @@ import {
 import { getAvatarStyle, getInitials } from '../utils/avatar';
 import { getCallRecords, CALL_STATUSES } from '../utils/callStore';
 import { getDomainForEvent, DOMAINS_DIRECTORY } from '../utils/auth';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function DataTable({ 
   participants = [], 
@@ -76,8 +79,9 @@ export default function DataTable({
 
   // Payment counts
   const paymentCounts = useMemo(() => {
-    const paid = participants.filter(p => Number(p.amount) > 0).length;
-    return { all: participants.length, paid, free: participants.length - paid };
+    const paid = participants.filter(p => p.is_paid === true || p.payment_status === 'PAID' || Number(p.amount) > 0).length;
+    const incomplete = participants.filter(p => p.is_paid === false || p.payment_status === 'INCOMPLETE' || p.payment_status === 'UNPAID' || (p.status_label && p.status_label.toLowerCase().includes('not paid'))).length;
+    return { all: participants.length, paid, incomplete, free: Math.max(0, participants.length - paid - incomplete) };
   }, [participants]);
 
   // Master events list for dropdown
@@ -110,8 +114,11 @@ export default function DataTable({
       }
 
       // 2. Payment
-      if (selectedPayment === 'paid' && Number(p.amount) <= 0) return false;
-      if (selectedPayment === 'free' && Number(p.amount) > 0) return false;
+      const isPaid = p.is_paid === true || p.payment_status === 'PAID' || Number(p.amount) > 0;
+      const isIncomplete = p.is_paid === false || p.payment_status === 'INCOMPLETE' || p.payment_status === 'UNPAID' || (p.status_label && p.status_label.toLowerCase().includes('not paid'));
+      if (selectedPayment === 'paid' && !isPaid) return false;
+      if (selectedPayment === 'incomplete' && !isIncomplete) return false;
+      if (selectedPayment === 'free' && (isPaid || isIncomplete)) return false;
 
       // 3. Calling Status Filter
       if (selectedCallStatus !== 'all') {
@@ -272,7 +279,8 @@ export default function DataTable({
         <div className="flex items-center gap-1 p-1 rounded-lg bg-[#161A22] border border-white/[0.08] shrink-0 mb-2 md:mb-0">
           {[
             { id: 'all', label: 'All', count: paymentCounts.all, countClass: 'text-slate-400' },
-            { id: 'paid', label: 'Paid', count: paymentCounts.paid, countClass: 'text-emerald-400' },
+            { id: 'paid', label: 'Complete', count: paymentCounts.paid, countClass: 'text-emerald-400 font-semibold' },
+            { id: 'incomplete', label: 'Incomplete', count: paymentCounts.incomplete, countClass: 'text-amber-400 font-semibold' },
             { id: 'free', label: 'Free', count: paymentCounts.free, countClass: 'text-slate-400' }
           ].map(p => {
             const isActive = selectedPayment === p.id;
@@ -300,18 +308,18 @@ export default function DataTable({
         
         {/* Instant Search Bar */}
         <div className="lg:col-span-4 relative">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
-          <input
+          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5 z-10" />
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             placeholder="Search candidate, team, college, email... (Press / to focus)"
-            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all"
+            className="pl-9 pr-8 text-xs bg-[#0B0D11] border-white/[0.08]"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-2.5 text-slate-500 hover:text-white"
+              className="absolute right-2.5 top-2.5 text-slate-500 hover:text-white z-10"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -629,10 +637,17 @@ export default function DataTable({
 
                     {/* Payment Status Pill */}
                     <td className="py-3 px-3 text-right">
-                      {amt > 0 ? (
+                      {amt > 0 || p.payment_status === 'PAID' ? (
                         <div>
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-                            <span>₹{amt.toLocaleString('en-IN')}</span>
+                            <span>{amt > 0 ? `₹${amt.toLocaleString('en-IN')}` : 'Paid'}</span>
+                          </span>
+                        </div>
+                      ) : p.payment_status === 'INCOMPLETE' || (p.status_label && p.status_label.toLowerCase().includes('not paid')) ? (
+                        <div>
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono font-medium text-amber-400 bg-amber-500/10 border border-amber-500/25" title="Registration Fee Pending">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                            <span>Incomplete</span>
                           </span>
                         </div>
                       ) : (
@@ -699,9 +714,13 @@ export default function DataTable({
                     </div>
                   </div>
 
-                  {amt > 0 ? (
+                  {amt > 0 || p.payment_status === 'PAID' ? (
                     <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-                      ₹{amt}
+                      {amt > 0 ? `₹${amt}` : 'Paid'}
+                    </span>
+                  ) : p.payment_status === 'INCOMPLETE' || (p.status_label && p.status_label.toLowerCase().includes('not paid')) ? (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-amber-400 bg-amber-500/10 border border-amber-500/25">
+                      Incomplete
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-white/[0.04]">
@@ -809,23 +828,27 @@ export default function DataTable({
           </div>
 
           <div className="flex items-center gap-1 font-mono text-xs">
-            <button
+            <Button
+              variant="outline"
+              size="iconSm"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage <= 1 || pageSize === 'all'}
-              className="p-1 rounded bg-[#161A22] border border-white/[0.08] hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="bg-[#161A22] border-white/[0.08] hover:border-white/20"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
+            </Button>
             <span className="px-2 text-slate-300">
               Page {effectivePage} of {totalPages}
             </span>
-            <button
+            <Button
+              variant="outline"
+              size="iconSm"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages || pageSize === 'all'}
-              className="p-1 rounded bg-[#161A22] border border-white/[0.08] hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="bg-[#161A22] border-white/[0.08] hover:border-white/20"
             >
               <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           </div>
         </div>
 

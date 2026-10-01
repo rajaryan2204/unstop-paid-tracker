@@ -1,9 +1,16 @@
 import React from 'react';
-import { X, Zap, ArrowDown, ExternalLink } from 'lucide-react';
+import { Zap, ArrowDown, ExternalLink } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function BookmarkletModal({ isOpen, onClose }) {
-  if (!isOpen) return null;
-
   const bookmarkletCode = `javascript:(function(){
     var token = localStorage.getItem('token') || (document.cookie.match(/access_token=([^;]+)/)||[])[1];
     if(!token){
@@ -16,36 +23,21 @@ export default function BookmarkletModal({ isOpen, onClose }) {
   })();`;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-md surface-card rounded-2xl p-5 border border-white/[0.1] shadow-2xl z-10 animate-in zoom-in-95 duration-200">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.08]">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md bg-[#11141A] border-white/[0.1] text-white">
+        <DialogHeader>
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
-            <h3 className="font-semibold text-white text-sm">1-Click Unstop Sync Tool</h3>
+            <DialogTitle className="text-base font-semibold text-white">
+              1-Click Unstop Sync Tool
+            </DialogTitle>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+          <DialogDescription className="text-xs text-slate-400">
+            Drag and drop this button to your browser's Bookmarks bar for 1-click token extraction and sync.
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="space-y-3.5 text-xs text-slate-300">
-          <p className="text-slate-400">
-            Drag and drop this button to your browser's Bookmarks bar for 1-click token extraction and sync:
-          </p>
-
+        <div className="space-y-3.5 text-xs text-slate-300 py-2">
           <div className="p-4 rounded-xl border border-dashed border-white/20 bg-black/40 text-center space-y-2">
             <div className="flex items-center justify-center gap-1 text-[11px] text-slate-400 font-mono">
               <ArrowDown className="w-3.5 h-3.5 text-amber-400" />
@@ -69,7 +61,7 @@ export default function BookmarkletModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="surface-elevated rounded-xl p-3 border border-white/[0.06] space-y-1.5 text-[11.5px]">
+          <div className="rounded-xl p-3 bg-[#161A22] border border-white/[0.06] space-y-1.5 text-[11.5px]">
             <div className="font-semibold text-white">How it works:</div>
             <ol className="list-decimal list-inside space-y-1 text-slate-400">
               <li>Open your Unstop Organiser Dashboard in your browser.</li>
@@ -77,20 +69,19 @@ export default function BookmarkletModal({ isOpen, onClose }) {
               <li>It automatically grabs your session token and triggers live sync.</li>
             </ol>
           </div>
-
         </div>
 
-        {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-white/[0.08] flex justify-end">
-          <button
+        <DialogFooter className="border-t border-white/[0.08] pt-3">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-white/[0.08] hover:bg-white/[0.15] transition-colors"
+            className="border-white/[0.1] bg-white/[0.04] text-white hover:bg-white/[0.08]"
           >
             Close
-          </button>
-        </div>
-
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

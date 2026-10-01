@@ -1,16 +1,23 @@
 // src/components/CallRemarkModal.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  X, 
   Phone, 
   PhoneCall, 
   Check, 
   AlertCircle, 
-  Clock, 
-  UserCheck, 
-  ShieldAlert, 
   Sparkles 
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { CALL_STATUSES, getParticipantCallRecord } from '../utils/callStore';
 
 export default function CallRemarkModal({ 
@@ -63,11 +70,8 @@ export default function CallRemarkModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div 
-        className="w-full max-w-lg bg-[#11141A] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-lg bg-[#11141A] border-white/[0.1] text-white p-0 overflow-hidden">
         {/* Header */}
         <div className="p-5 border-b border-white/[0.08] bg-[#161A22] flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -76,42 +80,37 @@ export default function CallRemarkModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-white">Log Call Details</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                <DialogTitle className="text-sm font-semibold text-white">Log Call Details</DialogTitle>
+                <Badge variant="warning" className="text-[10px] font-mono">
                   Call #{nextCallNum}
-                </span>
+                </Badge>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <DialogDescription className="text-xs text-slate-400 mt-0.5">
                 Calling as <span className="text-sky-300 font-medium">{currentUser?.name}</span> ({currentUser?.teamName || 'Staff'})
-              </p>
+              </DialogDescription>
             </div>
           </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Candidate Context Pill */}
         <div className="px-5 py-3 bg-[#151922] border-b border-white/[0.06] flex items-center justify-between text-xs">
-          <div>
+          <div className="truncate mr-2">
             <span className="text-slate-400">Candidate: </span>
             <span className="font-semibold text-white">{participant.name}</span>
             <span className="text-slate-500 mx-2">•</span>
             <span className="text-slate-300">{participant.event_name}</span>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleRedial}
-            className="flex items-center gap-1 text-[11px] font-mono text-sky-400 hover:text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 px-2 py-1 rounded border border-sky-500/20 transition-all"
+            className="h-7 px-2 text-[11px] font-mono text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 border border-sky-500/20"
             title="Redial via phone app"
           >
-            <Phone className="w-3 h-3" />
+            <Phone className="w-3 h-3 mr-1" />
             <span>Redial</span>
-          </button>
+          </Button>
         </div>
 
         {/* Form Body */}
@@ -119,7 +118,7 @@ export default function CallRemarkModal({
           
           {/* Field 1: Remark */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+            <label className="text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
               <span>Enter the remark of the call</span>
               <span className="text-[10px] font-mono text-slate-500">Summary notes</span>
             </label>
@@ -135,16 +134,16 @@ export default function CallRemarkModal({
 
           {/* Field 2: Lead Number */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+            <label className="text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
               <span>Lead Number</span>
               <span className="text-[10px] font-mono text-slate-500">Alternate phone / WhatsApp ID</span>
             </label>
-            <input
+            <Input
               type="text"
               value={leadNumber}
               onChange={(e) => setLeadNumber(e.target.value)}
               placeholder="e.g. 9876543210 (Direct candidate number)"
-              className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all font-mono"
+              className="font-mono text-xs"
             />
           </div>
 
@@ -171,7 +170,7 @@ export default function CallRemarkModal({
                       setSelectedStatus(st.id);
                       setHasError(false);
                     }}
-                    className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all ${
+                    className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       isSelected
                         ? `${st.badge} ring-1 ring-offset-1 ring-offset-[#11141A] shadow-md`
                         : 'bg-[#151922] border-white/[0.06] text-slate-300 hover:border-white/[0.15] hover:bg-white/[0.03]'
@@ -214,30 +213,28 @@ export default function CallRemarkModal({
           )}
 
           {/* Modal Footer */}
-          <div className="pt-2 flex items-center justify-end gap-2 border-t border-white/[0.08]">
-            <button
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2 border-t border-white/[0.08]">
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="text-slate-400 hover:text-white"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              size="sm"
               disabled={!selectedStatus}
-              className={`px-5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                selectedStatus
-                  ? 'bg-sky-500 hover:bg-sky-400 text-white shadow-lg shadow-sky-500/20 active:scale-95'
-                  : 'bg-white/[0.05] text-slate-500 cursor-not-allowed border border-white/[0.05]'
-              }`}
+              className={selectedStatus ? 'bg-sky-500 hover:bg-sky-400 text-white shadow-lg shadow-sky-500/20' : ''}
             >
               Save Call Record
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
 
         </form>
-
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

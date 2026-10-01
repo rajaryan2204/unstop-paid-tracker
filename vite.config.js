@@ -9,6 +9,11 @@ export default defineConfig({
     tailwindcss(),
   ],
   base: './',
+  resolve: {
+    alias: {
+      '@': resolve(import.meta.dirname, './src'),
+    },
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
