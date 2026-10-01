@@ -1,0 +1,304 @@
+// src/components/PasswordManagerModal.jsx
+import React, { useState } from 'react';
+import { 
+  X, 
+  KeyRound, 
+  Search, 
+  RotateCcw, 
+  Check, 
+  Eye, 
+  EyeOff, 
+  ShieldAlert, 
+  Lock, 
+  Sparkles,
+  ArrowRight
+} from 'lucide-react';
+import { 
+  OFFICIAL_ACCOUNTS, 
+  getPasswordForAccount, 
+  setAccountPassword, 
+  resetAccountPasswordToDefault 
+} from '../utils/auth';
+import { addAuditLog } from '../utils/callStore';
+
+export default function PasswordManagerModal({ 
+  isOpen, 
+  currentUser, 
+  onClose, 
+  onTriggerToast 
+}) {
+  const [search, setSearch] = useState('');
+  const [editingUser, setEditingUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [visiblePasswords, setVisiblePasswords] = useState({});
+  const [refreshVersion, setRefreshVersion] = useState(0);
+
+  if (!isOpen) return null;
+
+  // Filter accounts for password management (exclude super admins themselves from bulk view)
+  const targetAccounts = OFFICIAL_ACCOUNTS.filter(a => {
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      const matchName = a.name.toLowerCase().includes(q);
+      const matchUser = a.username.toLowerCase().includes(q);
+      const matchBay = (a.bay || '').toLowerCase().includes(q);
+      return matchName || matchUser || matchBay;
+    }
+    return true;
+  });
+
+  const togglePasswordVisibility = (username) => {
+    setVisiblePasswords(prev => ({
+      ...prev,
+      [username]: !prev[username]
+    }));
+  };
+
+  const handleStartEdit = (acc) => {
+    setEditingUser(acc);
+    setNewPassword(getPasswordForAccount(acc.username));
+  };
+
+  const handleSavePassword = (e) => {
+    e.preventDefault();
+    if (!editingUser || !newPassword.trim()) return;
+
+    try {
+      setAccountPassword(currentUser, editingUser.username, newPassword.trim());
+
+      addAuditLog({
+        actorName: currentUser.name,
+        actorRole: currentUser.role,
+        actorTeam: currentUser.teamName || 'Central Desk',
+        action: 'PASSWORD_RESET',
+        targetId: editingUser.username,
+        targetName: editingUser.name,
+        eventName: 'Security & Access Control',
+        prevStatus: 'CUSTOM',
+        nextStatus: 'UPDATED',
+        details: `Reset password for ${editingUser.name} (${editingUser.username})`
+      });
+
+      setRefreshVersion(v => v + 1);
+      setEditingUser(null);
+      setNewPassword('');
+
+      if (onTriggerToast) {
+        onTriggerToast({
+          type: 'success',
+          message: `Password updated for ${editingUser.name}`
+        });
+      }
+    } catch (err) {
+      if (onTriggerToast) {
+        onTriggerToast({
+          type: 'error',
+          message: err.message || 'Failed to update password'
+        });
+      }
+    }
+  };
+
+  const handleResetToDefault = (acc) => {
+    try {
+      resetAccountPasswordToDefault(currentUser, acc.username);
+
+      addAuditLog({
+        actorName: currentUser.name,
+        actorRole: currentUser.role,
+        actorTeam: currentUser.teamName || 'Central Desk',
+        action: 'PASSWORD_RESET',
+        targetId: acc.username,
+        targetName: acc.name,
+        eventName: 'Security & Access Control',
+        prevStatus: 'MODIFIED',
+        nextStatus: 'DEFAULT',
+        details: `Restored default password (${acc.defaultPassword}) for ${acc.name}`
+      });
+
+      setRefreshVersion(v => v + 1);
+
+      if (onTriggerToast) {
+        onTriggerToast({
+          type: 'success',
+          message: `Password reset to default for ${acc.name}`
+        });
+      }
+    } catch (err) {
+      if (onTriggerToast) {
+        onTriggerToast({
+          type: 'error',
+          message: err.message || 'Failed to reset password'
+        });
+      }
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
+      <div 
+        className="w-full max-w-3xl bg-[#11141A] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-5 border-b border-white/[0.08] bg-[#161A22] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+              <KeyRound className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-white">Central Desk Password Manager</h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                  Super Admin Exclusive
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Manage and reset access credentials for 13 Domain Heads and Operations Calling Desks
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="p-3 bg-[#151922] border-b border-white/[0.06]">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search domain name, username, or bay code..."
+              className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-purple-500/50 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Accounts List */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-2.5 custom-scrollbar">
+          {targetAccounts.map((acc) => {
+            const currentPass = getPasswordForAccount(acc.username);
+            const isRevealed = visiblePasswords[acc.username];
+            const isEditing = editingUser?.username === acc.username;
+
+            return (
+              <div
+                key={acc.username}
+                className="p-3.5 rounded-xl bg-[#0B0D11] border border-white/[0.06] hover:border-white/[0.12] transition-all"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  
+                  {/* Account Metadata */}
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center font-bold text-xs text-white shrink-0">
+                      {acc.avatar || 'TF'}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-xs text-white">{acc.name}</span>
+                        {acc.bay && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/[0.05] text-slate-400">
+                            {acc.bay}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                        Username: <span className="text-sky-400">{acc.username}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password & Actions */}
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    
+                    {/* Password Display Box */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#161A22] border border-white/[0.08] text-xs font-mono">
+                      <span className="text-slate-300">
+                        {isRevealed ? currentPass : '••••••••••••'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => togglePasswordVisibility(acc.username)}
+                        className="text-slate-500 hover:text-slate-300 ml-1"
+                        title={isRevealed ? 'Hide Password' : 'Show Password'}
+                      >
+                        {isRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+
+                    {/* Change Button */}
+                    <button
+                      onClick={() => handleStartEdit(acc)}
+                      className="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 text-xs font-medium transition-all"
+                    >
+                      Change
+                    </button>
+
+                    {/* Reset to Default Button */}
+                    <button
+                      onClick={() => handleResetToDefault(acc)}
+                      title={`Reset to default (${acc.defaultPassword})`}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+
+                  </div>
+
+                </div>
+
+                {/* Inline Editing Form */}
+                {isEditing && (
+                  <form onSubmit={handleSavePassword} className="mt-3 pt-3 border-t border-white/[0.06] flex items-center gap-2">
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      className="flex-1 bg-[#151922] border border-sky-500/40 focus:border-sky-500 rounded-lg px-3 py-1.5 text-xs text-white outline-none font-mono"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold transition-all shadow-sm"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingUser(null)}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/[0.04] text-slate-400 hover:text-white text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                )}
+
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="p-3 bg-[#161A22] border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
+          <span>All password resets are logged in the Central Operations Audit Trail</span>
+          <button
+            onClick={onClose}
+            className="px-3 py-1 rounded-md bg-white/[0.06] hover:bg-white/[0.1] text-white transition-colors"
+          >
+            Done
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}

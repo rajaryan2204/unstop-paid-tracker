@@ -1,5 +1,5 @@
 // src/utils/auth.js
-// TechFEST '26 Role-Based Access Control (RBAC), 13 Domains Directory & 17 Official Logins
+// TechFEST '26 Role-Based Access Control (RBAC), 13 Domains Directory & Official Logins
 
 export const DOMAINS_DIRECTORY = {
   robozar: {
@@ -218,12 +218,12 @@ export const DOMAINS_DIRECTORY = {
   }
 };
 
-// DIRECTORY OF ALL 17 OFFICIAL ACCOUNTS
+// OFFICIAL ACCOUNTS (2 Admins + 13 Domain Heads + 1 Combined Calling Desk)
 export const OFFICIAL_ACCOUNTS = [
   // 1 & 2: Central Super Admins
   {
     username: 'raj',
-    password: 'raj@sliet',
+    defaultPassword: 'raj@sliet',
     name: 'Raj Aryan',
     role: 'super_admin',
     accountType: 'admin',
@@ -236,7 +236,7 @@ export const OFFICIAL_ACCOUNTS = [
   },
   {
     username: 'sagar',
-    password: 'sagar@sliet',
+    defaultPassword: 'sagar@sliet',
     name: 'Sagar Anmol',
     role: 'super_admin',
     accountType: 'admin',
@@ -251,7 +251,7 @@ export const OFFICIAL_ACCOUNTS = [
   // 3-15: 13 Domain Heads
   {
     username: 'plexus',
-    password: 'plexus@sliet',
+    defaultPassword: 'plexus@sliet',
     name: 'Plexus Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -261,12 +261,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'plexus',
     teamName: 'Plexus Domain',
     title: 'Head of Computer Science & AI Domain',
-    avatar: 'PX',
-    description: 'Scoped strictly to Plexus events (Competitive Coding, Ghost Code, Pixel Wizard, ML).'
+    avatar: 'PX'
   },
   {
     username: 'mechanica',
-    password: 'mechanica@sliet',
+    defaultPassword: 'mechanica@sliet',
     name: 'Mechanica Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -276,12 +275,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'mechanica',
     teamName: 'Mechanica Domain',
     title: 'Head of Mechanical & Fabrication Domain',
-    avatar: 'MC',
-    description: 'Scoped strictly to Mechanica events (CAD, Hydraulics, Mechnovate, Fabrication).'
+    avatar: 'MC'
   },
   {
     username: 'robozar',
-    password: 'robozar@sliet',
+    defaultPassword: 'robozar@sliet',
     name: 'RoboZar Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -291,12 +289,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'robozar',
     teamName: 'RoboZar Domain',
     title: 'Head of Robotics & Combat Domain',
-    avatar: 'RZ',
-    description: 'Scoped strictly to RoboZar events (Robowar, Line Follower, Drone, Hovercraft).'
+    avatar: 'RZ'
   },
   {
     username: 'karyarachna',
-    password: 'karyarachna@sliet',
+    defaultPassword: 'karyarachna@sliet',
     name: 'Karyarachna Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -306,12 +303,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'karyarachna',
     teamName: 'Karyarachna Domain',
     title: 'Head of Innovation & Hackathon Domain',
-    avatar: 'KR',
-    description: 'Scoped strictly to Karyarachna events (Kritrim Hardware, Hackathons, Jugaad).'
+    avatar: 'KR'
   },
   {
     username: 'kermis',
-    password: 'kermis@sliet',
+    defaultPassword: 'kermis@sliet',
     name: 'Kermis Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -321,12 +317,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'kermis',
     teamName: 'Kermis Domain',
     title: 'Head of Esports & Gaming League',
-    avatar: 'KM',
-    description: 'Scoped strictly to Kermis events (BGMI, Free Fire, Competitive Chess).'
+    avatar: 'KM'
   },
   {
     username: 'genesis',
-    password: 'genesis@sliet',
+    defaultPassword: 'genesis@sliet',
     name: 'Genesis Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -336,12 +331,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'genesis',
     teamName: 'Genesis Domain',
     title: 'Head of Business & Startup Incubator',
-    avatar: 'GN',
-    description: 'Scoped strictly to Genesis events (Pitchverse, Case Crack, Brand Blitz).'
+    avatar: 'GN'
   },
   {
     username: 'electronica',
-    password: 'electronica@sliet',
+    defaultPassword: 'electronica@sliet',
     name: 'Electronica Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -351,12 +345,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'electronica',
     teamName: 'Electronica Domain',
     title: 'Head of Electronics & IoT Arena',
-    avatar: 'EC',
-    description: 'Scoped strictly to Electronica events (Circuit Craft, Digital Design, Arduino).'
+    avatar: 'EC'
   },
   {
     username: 'electrica',
-    password: 'electrica@sliet',
+    defaultPassword: 'electrica@sliet',
     name: 'Electrica Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -366,12 +359,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'electrica',
     teamName: 'Electrica Domain',
     title: 'Head of Electrical & Clean Energy Domain',
-    avatar: 'EL',
-    description: 'Scoped strictly to Electrica events (Soldering, Breadboard, Smart Grid, WPTC).'
+    avatar: 'EL'
   },
   {
     username: 'chemica',
-    password: 'chemica@sliet',
+    defaultPassword: 'chemica@sliet',
     name: 'Chemica Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -381,12 +373,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'chemica',
     teamName: 'Chemica Domain',
     title: 'Head of Chemical & Bio-Polymer Domain',
-    avatar: 'CH',
-    description: 'Scoped strictly to Chemica events (Chemi-Thon, Soap Making, Jam Session, Mystery).'
+    avatar: 'CH'
   },
   {
     username: 'civicon',
-    password: 'civicon@sliet',
+    defaultPassword: 'civicon@sliet',
     name: 'Civicon Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -396,12 +387,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'civicon',
     teamName: 'Civicon Domain',
     title: 'Head of Civil & Smart Architecture Domain',
-    avatar: 'CV',
-    description: 'Scoped strictly to Civicon events (Truss Load, City Model, Seismic, CAD).'
+    avatar: 'CV'
   },
   {
     username: 'inventia',
-    password: 'inventia@sliet',
+    defaultPassword: 'inventia@sliet',
     name: 'Inventia Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -411,12 +401,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'inventia',
     teamName: 'Inventia Domain',
     title: 'Head of Interdisciplinary Solutions Domain',
-    avatar: 'IN',
-    description: 'Scoped strictly to Inventia events (Techno-Vation, Smart Agriculture, Cognitive).'
+    avatar: 'IN'
   },
   {
     username: 'foodocrats',
-    password: 'foodocrats@sliet',
+    defaultPassword: 'foodocrats@sliet',
     aliasUsername: 'food-o-crats',
     name: 'Food-O-Crats Domain Head',
     role: 'domain_head',
@@ -427,12 +416,11 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'foodocrats',
     teamName: 'Food-O-Crats Domain',
     title: 'Head of Food Engineering & Agri Domain',
-    avatar: 'FC',
-    description: 'Scoped strictly to Food-O-Crats events (Food Forge, Forensics, Foodprint, Clue Craze).'
+    avatar: 'FC'
   },
   {
     username: 'atomheimer',
-    password: 'atomheimer@sliet',
+    defaultPassword: 'atomheimer@sliet',
     name: 'Atomheimer Domain Head',
     role: 'domain_head',
     accountType: 'domain',
@@ -442,40 +430,90 @@ export const OFFICIAL_ACCOUNTS = [
     team: 'atomheimer',
     teamName: 'Atomheimer Domain',
     title: 'Head of Applied Sciences & Physics Domain',
-    avatar: 'AT',
-    description: 'Scoped strictly to Atomheimer events (The Big Bull, Aqua Clean, Aerostrike, Quiz Nova).'
+    avatar: 'AT'
   },
 
-  // 16 & 17: Operations Calling & Reception Teams
-  {
-    username: 'reception',
-    password: 'reception@sliet',
-    name: 'Reception & Helpdesk',
-    role: 'operations_calling',
-    accountType: 'operations',
-    team: 'reception',
-    teamName: 'Reception Team',
-    title: 'Registration Desk & Participant Support',
-    domainId: null,
-    avatar: 'RC',
-    description: 'Front-desk operations, spot registrations, and participant call support.'
-  },
+  // 16: Combined Reception & Outreach Desk (As requested by user)
   {
     username: 'outreach',
-    password: 'outreach@sliet',
-    name: 'Outreach Calling Team',
+    aliasUsername: 'reception',
+    defaultPassword: 'outreach@sliet',
+    name: 'Reception & Outreach Calling Desk',
     role: 'operations_calling',
     accountType: 'operations',
     team: 'outreach',
-    teamName: 'Outreach Team',
-    title: 'Calling Campaign & Payment Follow-up Lead',
+    teamName: 'Reception & Outreach Team',
+    title: 'Participant Calling & Spot Registration Desk',
     domainId: null,
-    avatar: 'OT',
-    description: 'Dedicated calling desk for payment reminders, fee collection, and conversion.'
+    avatar: 'RO',
+    description: 'Unified front-desk reception and outbound calling operations across all events.'
   }
 ];
 
-const SESSION_STORAGE_KEY = 'tf_auth_session_v3';
+const SESSION_STORAGE_KEY = 'tf_auth_session_v4';
+const CUSTOM_PASSWORDS_KEY = 'tf_custom_passwords_v2';
+
+export function getCustomPasswords() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_PASSWORDS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.error('Error loading custom passwords:', e);
+  }
+  return {};
+}
+
+export function saveCustomPasswords(passwords) {
+  try {
+    localStorage.setItem(CUSTOM_PASSWORDS_KEY, JSON.stringify(passwords));
+  } catch (e) {
+    console.error('Error saving custom passwords:', e);
+  }
+}
+
+export function getPasswordForAccount(username) {
+  const custom = getCustomPasswords();
+  const clean = username.toLowerCase().trim();
+  if (custom[clean]) return custom[clean];
+
+  const acc = OFFICIAL_ACCOUNTS.find(a => 
+    a.username.toLowerCase() === clean || 
+    (a.aliasUsername && a.aliasUsername.toLowerCase() === clean)
+  );
+
+  return acc?.defaultPassword || `${clean}@sliet`;
+}
+
+/**
+ * Super Admin Password Reset Tool
+ * Allows Raj and Sagar to change/reset passwords for any account
+ */
+export function setAccountPassword(adminUser, targetUsername, newPassword) {
+  if (!adminUser || adminUser.role !== 'super_admin') {
+    throw new Error('Unauthorized: Only Super Admins (Raj & Sagar) can reset passwords.');
+  }
+  if (!targetUsername || !newPassword || newPassword.trim().length < 4) {
+    throw new Error('Password must be at least 4 characters long.');
+  }
+
+  const clean = targetUsername.toLowerCase().trim();
+  const custom = getCustomPasswords();
+  custom[clean] = newPassword.trim();
+  saveCustomPasswords(custom);
+
+  return true;
+}
+
+export function resetAccountPasswordToDefault(adminUser, targetUsername) {
+  if (!adminUser || adminUser.role !== 'super_admin') {
+    throw new Error('Unauthorized: Only Super Admins can reset passwords.');
+  }
+  const clean = targetUsername.toLowerCase().trim();
+  const custom = getCustomPasswords();
+  delete custom[clean];
+  saveCustomPasswords(custom);
+  return true;
+}
 
 export function getActiveUser() {
   try {
@@ -487,8 +525,8 @@ export function getActiveUser() {
   } catch (e) {
     console.error('Error reading auth session:', e);
   }
-  // Default to Super Admin (Sagar Anmol)
-  return OFFICIAL_ACCOUNTS[1];
+  // Return null when not logged in (so Login Screen appears on visit!)
+  return null;
 }
 
 export function setActiveUser(user) {
@@ -508,8 +546,7 @@ export function clearActiveUser() {
 }
 
 /**
- * Authenticates user credentials against the 17 verified accounts.
- * Returns { success: true, user } or { success: false, error }
+ * Authenticates user credentials against the official accounts and custom passwords.
  */
 export function authenticateUser(usernameInput, passwordInput) {
   if (!usernameInput || !passwordInput) {
@@ -527,14 +564,20 @@ export function authenticateUser(usernameInput, passwordInput) {
   if (!account) {
     return { 
       success: false, 
-      error: `Invalid username "${cleanUser}". Use domain name (e.g. plexus, mechanica), admin (raj, sagar), or operations (reception, outreach).` 
+      error: `Account "${cleanUser}" not found. Enter your assigned domain ID (e.g. plexus, mechanica), admin ID, or outreach.` 
     };
   }
 
-  if (account.password !== cleanPass) {
+  const expectedPassword = getPasswordForAccount(account.username);
+
+  // For outreach, also accept reception@sliet
+  const isMatch = (cleanPass === expectedPassword) || 
+                  (account.username === 'outreach' && cleanPass === 'reception@sliet');
+
+  if (!isMatch) {
     return { 
       success: false, 
-      error: `Incorrect password for ${account.name}. Hint: use ${account.username}@sliet` 
+      error: `Incorrect password for ${account.name}. Contact Central Desk (Raj / Sagar) if forgotten.` 
     };
   }
 
@@ -575,13 +618,10 @@ export function getDomainForEvent(eventName) {
 
 /**
  * Filters participants for the active user session.
- * - If user is domain_head: STRICTLY filtered to that domain's events.
- * - If user is super_admin and domainOverride is set: filtered to that domain.
- * - Otherwise: returns all participants.
  */
 export function getParticipantsForUser(user, participants = [], domainOverride = null) {
   if (!Array.isArray(participants)) return [];
-  if (!user) return participants;
+  if (!user) return [];
 
   const targetDomainId = user.role === 'domain_head' ? user.domainId : domainOverride;
 

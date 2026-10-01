@@ -12,12 +12,15 @@ import AuthModal from './components/AuthModal';
 import AuditLogsModal from './components/AuditLogsModal';
 import VerificationQueueModal from './components/VerificationQueueModal';
 import DomainBanner from './components/DomainBanner';
+import LoginScreen from './components/LoginScreen';
+import PasswordManagerModal from './components/PasswordManagerModal';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
 import { 
   getActiveUser, 
   setActiveUser, 
+  clearActiveUser,
   getParticipantsForUser, 
   DOMAINS_DIRECTORY 
 } from './utils/auth';
@@ -59,6 +62,7 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
   const [isVerificationQueueOpen, setIsVerificationQueueOpen] = useState(false);
+  const [isPasswordManagerOpen, setIsPasswordManagerOpen] = useState(false);
   
   // Active call logging modal state
   const [callingCandidate, setCallingCandidate] = useState(null);
@@ -178,16 +182,33 @@ export default function App() {
     }
   };
 
-  // Switch Active User / RBAC Persona
-  const handleSelectUser = (user) => {
+  // Handle Login & Session Initialization
+  const handleLoginSuccess = useCallback((user) => {
     setActiveUser(user);
     setCurrentUser(user);
     setSelectedDomainOverride('ALL');
     setSelectedEventFilter('');
     triggerToast({
       type: 'success',
-      message: `Signed in as ${user.name} (${user.title || user.username})`
+      message: `Welcome, ${user.name}! Operations dashboard unlocked.`
     });
+  }, [triggerToast]);
+
+  // Handle Explicit Logout
+  const handleLogout = useCallback(() => {
+    clearActiveUser();
+    setCurrentUser(null);
+    setSelectedDomainOverride('ALL');
+    setSelectedEventFilter('');
+    triggerToast({
+      type: 'info',
+      message: 'Logged out successfully.'
+    });
+  }, [triggerToast]);
+
+  // Switch Active User / RBAC Persona
+  const handleSelectUser = (user) => {
+    handleLoginSuccess(user);
   };
 
   // Initiate Direct Phone Call & Open Post-Call Remark Modal
@@ -256,6 +277,16 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Gate dashboard behind dedicated Login Screen on load
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+        <Toast toast={toast} onClose={() => setToast(null)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
       
@@ -263,6 +294,8 @@ export default function App() {
       <Header
         onRefresh={() => fetchData(true)}
         isRefreshing={isRefreshing}
+        onLogout={handleLogout}
+        onOpenPasswordManager={() => setIsPasswordManagerOpen(true)}
         onOpenBookmarklet={() => setIsBookmarkletOpen(true)}
         onOpenTokenHealth={() => setIsTokenHealthOpen(true)}
         onOpenAuth={() => setIsAuthModalOpen(true)}
@@ -382,6 +415,14 @@ export default function App() {
       <BookmarkletModal
         isOpen={isBookmarkletOpen}
         onClose={() => setIsBookmarkletOpen(false)}
+      />
+
+      {/* Super Admin Password Manager & Reset Tool */}
+      <PasswordManagerModal
+        isOpen={isPasswordManagerOpen}
+        currentUser={currentUser}
+        onClose={() => setIsPasswordManagerOpen(false)}
+        onTriggerToast={triggerToast}
       />
 
       {/* Floating Toast Notification */}
