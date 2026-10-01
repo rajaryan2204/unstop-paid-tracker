@@ -12,6 +12,8 @@ import {
   ShieldAlert,
   CheckCircle2
 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { getAuditLogs } from '../utils/callStore';
 
 export default function AuditLogsModal({ isOpen, onClose }) {
@@ -67,53 +69,57 @@ export default function AuditLogsModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
       <div 
-        className="w-full max-w-4xl bg-[#11141A] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-4xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-white/[0.08] bg-[#161A22] flex items-center justify-between">
+        <div className="p-5 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-xs">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white">Central Operations Audit & Calling Trail</h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h3 className="text-sm font-semibold text-slate-900">Central Operations Audit & Calling Trail</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
                 Complete tamper-evident log of caller activities, status updates, and payment claims
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-xs font-medium text-slate-300 border border-white/[0.08] transition-all"
+              className="text-slate-700 bg-white hover:bg-slate-50 border-slate-200 shadow-xs text-xs"
               title="Download audit trail as CSV"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 mr-1" />
               <span>Export CSV</span>
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="iconSm"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60"
             >
-              <X className="w-5 h-5" />
-            </button>
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="p-4 bg-[#151922] border-b border-white/[0.06] grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="p-4 bg-slate-50/50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search actor, candidate, or remarks..."
-              className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-purple-500/50 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 outline-none shadow-xs"
             />
           </div>
 
@@ -121,7 +127,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
             <select
               value={teamFilter}
               onChange={(e) => setTeamFilter(e.target.value)}
-              className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-purple-500/50 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-xl px-3 py-1.5 text-xs text-slate-900 outline-none shadow-xs"
             >
               <option value="ALL">All Teams & Departments</option>
               <option value="Central Desk">Central Desk</option>
@@ -135,7 +141,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-purple-500/50 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-xl px-3 py-1.5 text-xs text-slate-900 outline-none shadow-xs"
             >
               <option value="ALL">All Logged Actions</option>
               <option value="LOG_CALL">Call Logs (LOG_CALL)</option>
@@ -145,7 +151,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
         </div>
 
         {/* Logs Feed */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2.5 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2.5 custom-scrollbar bg-slate-50/30">
           {filteredLogs.length === 0 ? (
             <div className="py-16 text-center text-slate-500 text-xs">
               No audit records match your search filters.
@@ -162,18 +168,18 @@ export default function AuditLogsModal({ isOpen, onClose }) {
               return (
                 <div
                   key={log.id}
-                  className="p-3 rounded-xl bg-[#0B0D11] border border-white/[0.06] hover:border-white/[0.12] transition-colors"
+                  className="p-3 rounded-xl bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs text-white">
+                      <span className="font-semibold text-xs text-slate-900">
                         {log.actorName}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-200">
                         {log.actorTeam || 'Desk'}
                       </span>
-                      <span className="text-slate-500 text-xs">→</span>
-                      <span className="font-medium text-xs text-sky-300">
+                      <span className="text-slate-400 text-xs">→</span>
+                      <span className="font-semibold text-xs text-sky-700">
                         {log.targetName}
                       </span>
                       <span className="text-[11px] text-slate-500 truncate hidden md:inline">
@@ -181,20 +187,20 @@ export default function AuditLogsModal({ isOpen, onClose }) {
                       </span>
                     </div>
 
-                    <span className="text-[11px] font-mono text-slate-400 shrink-0">
+                    <span className="text-[11px] font-mono text-slate-500 shrink-0">
                       {dateStr}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-300 mt-1.5">
+                  <p className="text-xs text-slate-700 mt-1.5 leading-relaxed">
                     {log.details}
                   </p>
 
                   {log.nextStatus && log.nextStatus !== 'NONE' && (
                     <div className="flex items-center gap-1.5 mt-2 text-[10px] font-mono">
                       <span className="text-slate-500">{log.prevStatus || 'None'}</span>
-                      <ArrowRight className="w-2.5 h-2.5 text-slate-600" />
-                      <span className="px-1.5 py-0.5 rounded bg-white/[0.05] text-slate-200 border border-white/[0.08]">
+                      <ArrowRight className="w-2.5 h-2.5 text-slate-400" />
+                      <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
                         {log.nextStatus}
                       </span>
                     </div>
@@ -206,7 +212,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-[#161A22] border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
+        <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
           <span>Showing {filteredLogs.length} verified operations audit events</span>
           <span className="font-mono text-[11px] text-slate-500">Immutable Audit Trail • SLIET TechFEST '26</span>
         </div>

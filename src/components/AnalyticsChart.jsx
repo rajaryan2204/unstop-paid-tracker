@@ -38,9 +38,9 @@ export default function AnalyticsChart({ participants, summary }) {
       const counts = sortedDates.map(d => dateCounts[d]);
 
       const gradient = ctx.createLinearGradient(0, 0, 0, 180);
-      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
-      gradient.addColorStop(0.6, 'rgba(56, 189, 248, 0.08)');
-      gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+      gradient.addColorStop(0, 'rgba(2, 132, 199, 0.16)');
+      gradient.addColorStop(0.6, 'rgba(2, 132, 199, 0.04)');
+      gradient.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
 
       chartInstance.current = new Chart(ctx, {
         type: 'line',
@@ -49,10 +49,10 @@ export default function AnalyticsChart({ participants, summary }) {
           datasets: [{
             label: 'Verified Registrations',
             data: counts,
-            borderColor: '#38bdf8',
+            borderColor: '#0284c7',
             borderWidth: 2,
-            pointBackgroundColor: '#38bdf8',
-            pointBorderColor: '#0B0D11',
+            pointBackgroundColor: '#0284c7',
+            pointBorderColor: '#ffffff',
             pointBorderWidth: 1.5,
             pointRadius: 2.5,
             pointHoverRadius: 5.5,
@@ -67,10 +67,10 @@ export default function AnalyticsChart({ participants, summary }) {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#161A22',
-              titleColor: '#F5F7FA',
+              backgroundColor: '#0f172a',
+              titleColor: '#ffffff',
               bodyColor: '#38bdf8',
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: '#e2e8f0',
               borderWidth: 1,
               padding: 10,
               displayColors: false,
@@ -82,11 +82,11 @@ export default function AnalyticsChart({ participants, summary }) {
           scales: {
             x: {
               grid: { display: false },
-              ticks: { color: '#626A78', font: { family: 'Geist, sans-serif', size: 10 } }
+              ticks: { color: '#64748b', font: { family: 'Geist, sans-serif', size: 10 } }
             },
             y: {
-              grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
-              ticks: { color: '#626A78', font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
+              grid: { color: '#f1f5f9', drawBorder: false },
+              ticks: { color: '#64748b', font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
             }
           }
         }
@@ -114,10 +114,10 @@ export default function AnalyticsChart({ participants, summary }) {
           datasets: [{
             label: 'Participants',
             data: counts,
-            backgroundColor: 'rgba(56, 189, 248, 0.45)',
-            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(2, 132, 199, 0.7)',
+            borderColor: '#0284c7',
             borderWidth: 1,
-            borderRadius: 4
+            borderRadius: 5
           }]
         },
         options: {
@@ -126,10 +126,10 @@ export default function AnalyticsChart({ participants, summary }) {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#161A22',
-              titleColor: '#F5F7FA',
+              backgroundColor: '#0f172a',
+              titleColor: '#ffffff',
               bodyColor: '#38bdf8',
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: '#e2e8f0',
               borderWidth: 1,
               padding: 10,
               displayColors: false
@@ -138,11 +138,11 @@ export default function AnalyticsChart({ participants, summary }) {
           scales: {
             x: {
               grid: { display: false },
-              ticks: { color: '#626A78', font: { family: 'Geist, sans-serif', size: 9.5 } }
+              ticks: { color: '#64748b', font: { family: 'Geist, sans-serif', size: 9.5 } }
             },
             y: {
-              grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
-              ticks: { color: '#626A78', font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
+              grid: { color: '#f1f5f9', drawBorder: false },
+              ticks: { color: '#64748b', font: { family: 'Geist, sans-serif', size: 10 }, precision: 0 }
             }
           }
         }
@@ -158,37 +158,37 @@ export default function AnalyticsChart({ participants, summary }) {
   }, [participants, mode]);
 
   return (
-    <div className="surface-card rounded-xl p-4 mb-6 transition-all">
+    <div className="bg-white rounded-xl p-4 mb-6 border border-slate-200 shadow-xs transition-all">
       {/* Header with Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3 pb-2.5 border-b border-white/[0.06]">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-white tracking-tight">Event Activity & Volume</span>
-          <span className="text-[10px] font-mono text-slate-400 px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">
+          <span className="text-xs font-semibold text-slate-900 tracking-tight">Event Activity & Volume</span>
+          <span className="text-[10px] font-mono text-slate-500 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200">
             Real Unstop Data
           </span>
         </div>
 
-        <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[#161A22] border border-white/[0.08]">
+        <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 border border-slate-200">
           <button
             onClick={() => setMode('timeline')}
             className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
               mode === 'timeline' 
-                ? 'bg-[#11141A] text-white shadow-sm' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs' 
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <TrendingUp className="w-3 h-3 text-sky-400" />
+            <TrendingUp className="w-3 h-3 text-sky-600" />
             <span>Timeline</span>
           </button>
           <button
             onClick={() => setMode('events')}
             className={`px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
               mode === 'events' 
-                ? 'bg-[#11141A] text-white shadow-sm' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs' 
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <BarChart3 className="w-3 h-3 text-purple-400" />
+            <BarChart3 className="w-3 h-3 text-purple-600" />
             <span>Top Events</span>
           </button>
         </div>

@@ -16,8 +16,8 @@ export const CALL_STATUSES = {
     label: 'Payment Completed',
     shortLabel: 'Paid Claimed',
     color: 'emerald',
-    badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    indicator: 'bg-emerald-400',
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    indicator: 'bg-emerald-500',
     description: 'Participant claims to have completed registration payment. Moved to Verification Queue.'
   },
   INTERESTED: {
@@ -25,8 +25,8 @@ export const CALL_STATUSES = {
     label: 'Interested / Follow Up',
     shortLabel: 'Interested',
     color: 'amber',
-    badge: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    indicator: 'bg-amber-400',
+    badge: 'bg-amber-50 text-amber-800 border-amber-200',
+    indicator: 'bg-amber-500',
     description: 'Hot/warm lead. Promised to register or pay soon.'
   },
   CALL_LATER: {
@@ -34,8 +34,8 @@ export const CALL_STATUSES = {
     label: 'Call Later / Callback',
     shortLabel: 'Callback',
     color: 'sky',
-    badge: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-    indicator: 'bg-sky-400',
+    badge: 'bg-sky-50 text-sky-700 border-sky-200',
+    indicator: 'bg-sky-500',
     description: 'Requested call back at a later specific time or evening.'
   },
   NOT_PICKED: {
@@ -43,8 +43,8 @@ export const CALL_STATUSES = {
     label: 'Not Picked / Busy',
     shortLabel: 'Not Picked',
     color: 'rose',
-    badge: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-    indicator: 'bg-rose-400',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200',
+    indicator: 'bg-rose-500',
     description: 'Ringing, busy, call rejected, or phone switched off.'
   },
   DECLINED: {
@@ -52,18 +52,18 @@ export const CALL_STATUSES = {
     label: 'Declined / Not Interested',
     shortLabel: 'Declined',
     color: 'slate',
-    badge: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200',
     indicator: 'bg-slate-400',
     description: 'Cannot attend TechFEST or declined participation.'
   },
   WRONG_NUMBER: {
     id: 'WRONG_NUMBER',
-    label: 'Wrong Number / Invalid',
-    shortLabel: 'Wrong No.',
-    color: 'purple',
-    badge: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-    indicator: 'bg-purple-400',
-    description: 'Invalid phone number, not reachable or wrong person.'
+    label: 'Wrong / Invalid Number',
+    shortLabel: 'Invalid No',
+    color: 'slate',
+    badge: 'bg-slate-100 text-slate-600 border-slate-200',
+    indicator: 'bg-slate-400',
+    description: 'Number does not exist, out of service, or wrong contact.'
   }
 };
 

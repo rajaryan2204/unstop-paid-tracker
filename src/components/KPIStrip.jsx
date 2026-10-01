@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, DollarSign, Trophy, School } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function KPIStrip({ summary, participants }) {
@@ -19,84 +19,77 @@ export default function KPIStrip({ summary, participants }) {
     {
       label: "Total Registrations",
       value: totalCount.toLocaleString('en-IN'),
-      suffix: null,
       badgeText: "LIVE SYNC",
-      badgeVariant: "info",
-      valueColor: "text-white",
+      badgeClass: "bg-sky-50 text-sky-700 border-sky-200",
+      valueColor: "text-slate-900",
       subtext: `${paidCount.toLocaleString('en-IN')} Complete • ${incompleteCount.toLocaleString('en-IN')} Incomplete`,
       icon: Users,
-      iconColor: "text-sky-400"
+      iconBg: "bg-sky-50 text-sky-600"
     },
     {
       label: "Paid Revenue",
       value: `₹${totalRevenue.toLocaleString('en-IN')}`,
-      suffix: null,
       badgeText: "GATEWAY",
-      badgeVariant: "success",
-      valueColor: "text-emerald-400",
-      subtext: "Complete Registrations",
+      badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      valueColor: "text-emerald-700",
+      subtext: `${paidCount.toLocaleString('en-IN')} verified paid candidates`,
       icon: DollarSign,
-      iconColor: "text-emerald-400"
+      iconBg: "bg-emerald-50 text-emerald-600"
     },
     {
       label: "Total Competitions",
       value: totalEvents,
-      suffix: null,
       badgeText: "CATALOG",
-      badgeVariant: "purple",
-      valueColor: "text-purple-300",
+      badgeClass: "bg-purple-50 text-purple-700 border-purple-200",
+      valueColor: "text-slate-900",
       subtext: `${eventsWithPaid} with entries • ${zeroPaidCount} awaiting`,
       icon: Trophy,
-      iconColor: "text-purple-400"
+      iconBg: "bg-purple-50 text-purple-600"
     },
     {
       label: "Institutions",
       value: collegeCount,
-      suffix: null,
       badgeText: "PAN-INDIA",
-      badgeVariant: "warning",
-      valueColor: "text-amber-300",
-      subtext: `PAN-India (${collegeCount} Colleges)`,
+      badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
+      valueColor: "text-slate-900",
+      subtext: `Across ${collegeCount} colleges & universities`,
       icon: School,
-      iconColor: "text-amber-400"
+      iconBg: "bg-amber-50 text-amber-600"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
       {cards.map((card, i) => {
         const IconComponent = card.icon;
         return (
           <Card 
             key={i}
-            className="p-4 relative overflow-hidden transition-all duration-200 hover:border-white/20 hover:shadow-lg group bg-[#11141A]/90 backdrop-blur-sm"
+            className="p-4 relative overflow-hidden transition-all duration-200 hover:shadow-md bg-white border border-slate-200 rounded-xl"
           >
             {/* Top Row: Label + shadcn Badge */}
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-[11px] font-mono tracking-wider uppercase text-slate-400">
+              <span className="text-[11px] font-mono tracking-wider uppercase text-slate-500 font-semibold">
                 {card.label}
               </span>
-              <Badge variant={card.badgeVariant} className="text-[9.5px] font-mono font-semibold px-1.5 py-0.5">
+              <span className={`text-[9.5px] font-mono font-semibold px-2 py-0.5 rounded-full border ${card.badgeClass}`}>
                 {card.badgeText}
-              </Badge>
+              </span>
             </div>
 
             {/* Value Row */}
-            <div className="flex items-baseline gap-1.5 my-1">
-              <span className={`text-2xl sm:text-[26px] font-semibold tracking-tight tabular-nums ${card.valueColor}`}>
+            <div className="flex items-baseline justify-between my-1">
+              <span className={`text-2xl sm:text-[28px] font-bold tracking-tight tabular-nums ${card.valueColor}`}>
                 {card.value}
               </span>
-              {card.suffix && (
-                <span className="text-xs font-mono text-slate-500 font-normal">
-                  {card.suffix}
-                </span>
-              )}
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.iconBg}`}>
+                <IconComponent className="w-4 h-4" />
+              </div>
             </div>
 
             {/* Subtitle Row */}
-            <div className="text-[11.5px] text-slate-400 flex items-center justify-between gap-2 mt-1 truncate">
-              <span className="truncate">{card.subtext}</span>
-              <IconComponent className={`w-3.5 h-3.5 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity ${card.iconColor}`} />
+            <div className="text-[12px] text-slate-500 mt-1 truncate">
+              {card.subtext}
             </div>
           </Card>
         );

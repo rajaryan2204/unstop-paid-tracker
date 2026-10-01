@@ -210,48 +210,48 @@ export default function DataTable({
     const t = String(type || 'Competitions').toLowerCase();
     if (t.includes('quiz')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]"></span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-amber-800 bg-amber-50 border border-amber-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
           Quizzes
         </span>
       );
     } else if (t.includes('hack')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-purple-300 bg-purple-500/10 border border-purple-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(192,132,252,0.8)]"></span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-purple-800 bg-purple-50 border border-purple-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
           Hackathons
         </span>
       );
     } else if (t.includes('cultur')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-rose-300 bg-rose-500/10 border border-rose-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shadow-[0_0_6px_rgba(251,113,133,0.8)]"></span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-rose-800 bg-rose-50 border border-rose-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
           Cultural
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-sky-300 bg-sky-500/10 border border-sky-500/20">
-        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.8)]"></span>
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium text-sky-800 bg-sky-50 border border-sky-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
         Competition
       </span>
     );
   };
 
   return (
-    <div className="surface-card rounded-xl overflow-hidden border border-white/[0.08] transition-all mb-10">
+    <div className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-all mb-10">
       
       {/* 1. Header Bar: Category Tabs + Payment Segments */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-white/[0.06] bg-[#11141A]">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 px-4 pt-2 border-b border-slate-200 bg-white">
         
         {/* Category Segment Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
           {[
-            { id: 'all', label: 'All Events', count: categoryCounts.all, countClass: 'text-slate-400 bg-white/[0.06]', icon: Sparkles },
-            { id: 'competitions', label: 'Competitions', count: categoryCounts.competitions, countClass: 'text-sky-400 bg-sky-500/15', icon: Trophy },
-            { id: 'quizzes', label: 'Quizzes', count: categoryCounts.quizzes, countClass: 'text-amber-400 bg-amber-500/15', icon: HelpCircle },
-            { id: 'hackathons', label: 'Hackathons', count: categoryCounts.hackathons, countClass: 'text-purple-400 bg-purple-500/15', icon: Terminal },
-            { id: 'cultural', label: 'Cultural & Jam', count: categoryCounts.cultural, countClass: 'text-rose-400 bg-rose-500/15', icon: Music },
+            { id: 'all', label: 'All Events', count: categoryCounts.all, countClass: 'text-slate-600 bg-slate-100', icon: Sparkles },
+            { id: 'competitions', label: 'Competitions', count: categoryCounts.competitions, countClass: 'text-sky-700 bg-sky-50', icon: Trophy },
+            { id: 'quizzes', label: 'Quizzes', count: categoryCounts.quizzes, countClass: 'text-amber-700 bg-amber-50', icon: HelpCircle },
+            { id: 'hackathons', label: 'Hackathons', count: categoryCounts.hackathons, countClass: 'text-purple-700 bg-purple-50', icon: Terminal },
+            { id: 'cultural', label: 'Cultural & Jam', count: categoryCounts.cultural, countClass: 'text-rose-700 bg-rose-50', icon: Music },
           ].map(tab => {
             const IconComponent = tab.icon;
             const isActive = selectedCategory === tab.id;
@@ -259,13 +259,13 @@ export default function DataTable({
               <button
                 key={tab.id}
                 onClick={() => { setSelectedCategory(tab.id); setCurrentPage(1); }}
-                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all cursor-pointer ${
                   isActive 
-                    ? 'border-sky-400 text-sky-400 font-semibold' 
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                    ? 'border-slate-900 text-slate-900 font-semibold' 
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <IconComponent className={`w-3.5 h-3.5 ${isActive ? 'text-sky-400' : 'text-slate-400'}`} />
+                <IconComponent className={`w-3.5 h-3.5 ${isActive ? 'text-slate-900' : 'text-slate-400'}`} />
                 <span>{tab.label}</span>
                 <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${tab.countClass}`}>
                   {tab.count}
@@ -276,22 +276,22 @@ export default function DataTable({
         </div>
 
         {/* Payment Filter Segmented Tray */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-[#161A22] border border-white/[0.08] shrink-0 mb-2 md:mb-0">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200/80 shrink-0 mb-2 md:mb-0">
           {[
-            { id: 'all', label: 'All', count: paymentCounts.all, countClass: 'text-slate-400' },
-            { id: 'paid', label: 'Complete', count: paymentCounts.paid, countClass: 'text-emerald-400 font-semibold' },
-            { id: 'incomplete', label: 'Incomplete', count: paymentCounts.incomplete, countClass: 'text-amber-400 font-semibold' },
-            { id: 'free', label: 'Free', count: paymentCounts.free, countClass: 'text-slate-400' }
+            { id: 'all', label: 'All', count: paymentCounts.all, countClass: 'text-slate-500' },
+            { id: 'paid', label: 'Complete', count: paymentCounts.paid, countClass: 'text-emerald-700 font-semibold' },
+            { id: 'incomplete', label: 'Incomplete', count: paymentCounts.incomplete, countClass: 'text-amber-800 font-semibold' },
+            { id: 'free', label: 'Free', count: paymentCounts.free, countClass: 'text-slate-500' }
           ].map(p => {
             const isActive = selectedPayment === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => { setSelectedPayment(p.id); setCurrentPage(1); }}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
                   isActive 
-                    ? 'bg-[#1F2430] text-white shadow-sm' 
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span>{p.label}</span>
@@ -304,22 +304,22 @@ export default function DataTable({
       </div>
 
       {/* 2. Operations Filter Toolbar */}
-      <div className="p-4 bg-[#11141A] border-b border-white/[0.06] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+      <div className="p-4 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
         
         {/* Instant Search Bar */}
         <div className="lg:col-span-4 relative">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5 z-10" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 z-10" />
           <Input
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             placeholder="Search candidate, team, college, email... (Press / to focus)"
-            className="pl-9 pr-8 text-xs bg-[#0B0D11] border-white/[0.08]"
+            className="pl-9 pr-8 text-xs bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-900 shadow-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-2.5 text-slate-500 hover:text-white z-10"
+              className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 z-10 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -336,7 +336,7 @@ export default function DataTable({
               if (onSelectEventFilter) onSelectEventFilter(val);
               setCurrentPage(1); 
             }}
-            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
+            className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-lg px-3 py-2 text-xs text-slate-800 outline-none transition-all truncate shadow-xs cursor-pointer"
           >
             <option value="">
               {activeDomain ? `All ${activeDomain.name} Events (${participants.length})` : `All Events (${participants.length})`}
@@ -349,12 +349,12 @@ export default function DataTable({
           </select>
         </div>
 
-        {/* Calling Status Filter (As requested by Sagar) */}
+        {/* Calling Status Filter */}
         <div className="lg:col-span-2">
           <select
             value={selectedCallStatus}
             onChange={(e) => { setSelectedCallStatus(e.target.value); setCurrentPage(1); }}
-            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
+            className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-lg px-3 py-2 text-xs text-slate-800 outline-none transition-all truncate shadow-xs cursor-pointer"
           >
             <option value="all">All Calling Status</option>
             <option value="never_called">Never Called (0 calls)</option>
@@ -371,7 +371,7 @@ export default function DataTable({
           <select
             value={selectedCollege}
             onChange={(e) => { setSelectedCollege(e.target.value); setCurrentPage(1); }}
-            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white outline-none transition-all truncate"
+            className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-lg px-3 py-2 text-xs text-slate-800 outline-none transition-all truncate shadow-xs cursor-pointer"
           >
             <option value="">All Colleges & Institutions ({collegesList.length})</option>
             {collegesList.map((c, i) => (
@@ -385,7 +385,7 @@ export default function DataTable({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="w-full bg-[#0B0D11] border border-white/[0.08] focus:border-sky-500/50 rounded-xl px-2 py-2 text-xs text-slate-300 outline-none transition-all"
+            className="w-full bg-white border border-slate-200 focus:border-slate-900 rounded-lg px-2 py-2 text-xs text-slate-800 outline-none transition-all shadow-xs cursor-pointer"
             title="Sort Attendees"
           >
             <option value="date-desc">Latest</option>
@@ -400,19 +400,19 @@ export default function DataTable({
 
       {/* Active Filter Bar Summary */}
       {isFiltering && (
-        <div className="px-4 py-2 bg-[#151922] border-b border-white/[0.06] flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2 text-slate-300">
-            <span className="font-mono text-sky-400 font-semibold">{filteredParticipants.length}</span>
+        <div className="px-4 py-2 bg-slate-100/80 border-b border-slate-200 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="font-mono text-sky-700 font-semibold">{filteredParticipants.length}</span>
             <span>attendees matched active filters</span>
             {selectedEvent && (
-              <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20 font-mono text-[10px]">
+              <span className="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 font-mono text-[10px]">
                 Event: {selectedEvent}
               </span>
             )}
           </div>
           <button
             onClick={handleResetFilters}
-            className="flex items-center gap-1 text-[11px] font-mono text-sky-400 hover:text-sky-300 transition-colors"
+            className="flex items-center gap-1 text-[11px] font-mono text-sky-700 hover:text-sky-900 transition-colors cursor-pointer font-medium"
           >
             <RotateCcw className="w-3 h-3" />
             <span>Reset filters</span>
@@ -424,7 +424,7 @@ export default function DataTable({
       <div className="overflow-x-auto hidden md:block">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-[#161A22] text-slate-400 font-medium">
+            <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
               <th className="py-2.5 px-3 w-10 text-center font-mono text-[11px]">#</th>
               <th className="py-2.5 px-3 min-w-[200px]">Candidate Details</th>
               <th className="py-2.5 px-3 min-w-[190px]">Phone & Direct Calling</th>
@@ -435,17 +435,17 @@ export default function DataTable({
               <th className="py-2.5 px-3 w-12 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04]">
+          <tbody className="divide-y divide-slate-100 bg-white">
             {pageItems.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-16 text-center text-slate-400">
+                <td colSpan={8} className="py-16 text-center text-slate-500">
                   <div className="max-w-xs mx-auto">
-                    <Filter className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                    <p className="font-semibold text-sm text-slate-300">No participants found</p>
+                    <Filter className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="font-semibold text-sm text-slate-800">No participants found</p>
                     <p className="text-xs text-slate-500 mt-1">Try resetting search terms or switching categories.</p>
                     <button
                       onClick={handleResetFilters}
-                      className="mt-3 px-3 py-1.5 text-xs text-sky-400 bg-sky-500/10 border border-sky-500/20 rounded-lg hover:bg-sky-500/20 transition-all"
+                      className="mt-3 px-3 py-1.5 text-xs text-sky-700 bg-sky-50 border border-sky-200 rounded-lg hover:bg-sky-100 transition-all font-medium cursor-pointer"
                     >
                       Reset all filters
                     </button>
@@ -474,10 +474,10 @@ export default function DataTable({
                   <tr 
                     key={p.id || idx}
                     onClick={() => onSelectParticipant(p)}
-                    className="hover:bg-white/[0.02] cursor-pointer transition-colors group"
+                    className="hover:bg-slate-50/80 cursor-pointer transition-colors group"
                   >
                     {/* Index */}
-                    <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-500">
+                    <td className="py-3 px-3 text-center font-mono text-[11px] text-slate-400">
                       {absoluteIndex}
                     </td>
 
@@ -486,16 +486,16 @@ export default function DataTable({
                       <div className="flex items-center gap-2.5">
                         <span 
                           style={avatarStyle}
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[10.5px] font-bold shrink-0 tracking-tight"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[10.5px] font-bold shrink-0 tracking-tight shadow-xs"
                         >
                           {initials}
                         </span>
                         <div className="min-w-0">
-                          <div className="font-medium text-white truncate max-w-[190px] text-xs group-hover:text-sky-300 transition-colors">
+                          <div className="font-semibold text-slate-900 truncate max-w-[190px] text-xs group-hover:text-sky-600 transition-colors">
                             {p.name || 'Participant'}
                           </div>
                           <div 
-                            className="flex items-center gap-1 font-mono text-[11px] text-slate-400 mt-0.5"
+                            className="flex items-center gap-1 font-mono text-[11px] text-slate-500 mt-0.5"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <span className="truncate max-w-[145px]">{p.email || 'N/A'}</span>
@@ -503,10 +503,10 @@ export default function DataTable({
                               <button
                                 onClick={(e) => handleCopyEmail(e, p.email)}
                                 title="Copy Email"
-                                className="text-slate-500 hover:text-white transition-colors"
+                                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                               >
                                 {copiedEmail === p.email ? (
-                                  <Check className="w-3 h-3 text-emerald-400" />
+                                  <Check className="w-3 h-3 text-emerald-600" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
                                 )}
@@ -517,20 +517,20 @@ export default function DataTable({
                       </div>
                     </td>
 
-                    {/* Phone & Direct Calling (As requested by Sagar) */}
+                    {/* Phone & Direct Calling */}
                     <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
                       {p.phone && p.phone !== 'N/A' ? (
                         <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 font-mono text-[11.5px] text-slate-300">
+                          <div className="flex items-center gap-1.5 font-mono text-[11.5px] text-slate-700">
                             <span>{p.phone}</span>
 
-                            {/* Prominent Direct Phone Call Button */}
+                            {/* Direct Phone Call Button */}
                             <button
                               onClick={() => onTriggerCall && onTriggerCall(p)}
                               title="Direct Phone Call & Log Remarks"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all shadow-[0_0_8px_rgba(56,189,248,0.2)]"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-all shadow-xs cursor-pointer"
                             >
-                              <PhoneCall className="w-3 h-3 text-sky-400" />
+                              <PhoneCall className="w-3 h-3 text-sky-600" />
                               <span className="font-mono text-[10px]">{callCount > 0 ? callCount : 'Call'}</span>
                             </button>
 
@@ -541,7 +541,7 @@ export default function DataTable({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title="Chat on WhatsApp"
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all"
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-all shadow-xs"
                               >
                                 WA
                               </a>
@@ -563,39 +563,39 @@ export default function DataTable({
                                 )}
                               </div>
                               {rec.lastRemark && rec.lastRemark !== 'No remarks entered.' && (
-                                <div className="text-[10px] text-slate-400 truncate max-w-[190px] italic" title={rec.lastRemark}>
+                                <div className="text-[10px] text-slate-500 truncate max-w-[190px] italic" title={rec.lastRemark}>
                                   "{rec.lastRemark}"
                                 </div>
                               )}
                             </div>
                           ) : (
-                            <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                            <div className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                               <span>Never Called</span>
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="font-mono text-slate-600">--</span>
+                        <span className="font-mono text-slate-400">--</span>
                       )}
                     </td>
 
                     {/* College & Specialization */}
                     <td className="py-3 px-3">
-                      <div className="font-medium text-slate-200 truncate max-w-[200px]" title={p.college}>
+                      <div className="font-medium text-slate-800 truncate max-w-[200px]" title={p.college}>
                         {p.college || 'N/A'}
                       </div>
                       {p.specialization && (
-                        <div className="text-[11px] text-slate-400 truncate max-w-[200px] mt-0.5">
+                        <div className="text-[11px] text-slate-500 truncate max-w-[200px] mt-0.5">
                           <span>{p.specialization}</span>
-                          {p.passing_year && <span className="text-slate-500"> • {p.passing_year}</span>}
+                          {p.passing_year && <span className="text-slate-400"> • {p.passing_year}</span>}
                         </div>
                       )}
                     </td>
 
                     {/* Event, Track & Domain Badge */}
                     <td className="py-3 px-3">
-                      <div className="font-medium text-white truncate max-w-[170px]" title={p.event_name}>
+                      <div className="font-semibold text-slate-900 truncate max-w-[170px]" title={p.event_name}>
                         {p.event_name || 'Event'}
                       </div>
                       <div className="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -604,7 +604,7 @@ export default function DataTable({
                           <span 
                             className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-medium border"
                             style={{ 
-                              borderColor: `${domainInfo.accentColor}35`, 
+                              borderColor: `${domainInfo.accentColor}40`, 
                               color: domainInfo.accentColor, 
                               backgroundColor: `${domainInfo.accentColor}12` 
                             }}
@@ -617,14 +617,14 @@ export default function DataTable({
 
                     {/* Team Roster */}
                     <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="text-slate-300 truncate max-w-[110px]" title={p.team_name}>
+                      <div className="text-slate-700 truncate max-w-[110px]" title={p.team_name}>
                         {p.team_name || 'Individual'}
                       </div>
                       <div className="mt-0.5">
                         {hasMembers ? (
                           <button
                             onClick={() => onSelectParticipant(p)}
-                            className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-400 hover:text-purple-300"
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-700 hover:text-purple-900 font-medium cursor-pointer"
                           >
                             <Users className="w-3 h-3" />
                             <span>{p.team_members.length} members</span>
@@ -639,19 +639,19 @@ export default function DataTable({
                     <td className="py-3 px-3 text-right">
                       {amt > 0 || p.payment_status === 'PAID' ? (
                         <div>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200">
                             <span>{amt > 0 ? `₹${amt.toLocaleString('en-IN')}` : 'Paid'}</span>
                           </span>
                         </div>
                       ) : p.payment_status === 'INCOMPLETE' || (p.status_label && p.status_label.toLowerCase().includes('not paid')) ? (
                         <div>
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono font-medium text-amber-400 bg-amber-500/10 border border-amber-500/25" title="Registration Fee Pending">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold text-amber-800 bg-amber-50 border border-amber-200" title="Registration Fee Pending">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                             <span>Incomplete</span>
                           </span>
                         </div>
                       ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-white/[0.04] border border-white/[0.06]">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono text-slate-600 bg-slate-100 border border-slate-200">
                           Free Entry
                         </span>
                       )}
@@ -661,7 +661,7 @@ export default function DataTable({
                     <td className="py-3 px-3 text-center">
                       <button
                         onClick={() => onSelectParticipant(p)}
-                        className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        className="p-1 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
                         title="View Full Candidate Profile"
                       >
                         <ArrowRight className="w-4 h-4" />
@@ -677,7 +677,7 @@ export default function DataTable({
       </div>
 
       {/* 4. Responsive Mobile Cards Feed */}
-      <div className="md:hidden divide-y divide-white/[0.06]">
+      <div className="md:hidden divide-y divide-slate-100 bg-white">
         {pageItems.length === 0 ? (
           <div className="py-12 text-center text-slate-500 text-xs">
             No participants found matching active filters.
@@ -698,39 +698,39 @@ export default function DataTable({
               <div 
                 key={p.id || idx}
                 onClick={() => onSelectParticipant(p)}
-                className="p-4 space-y-2.5 active:bg-white/[0.02] cursor-pointer"
+                className="p-4 space-y-2.5 active:bg-slate-50 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
                     <span 
                       style={avatarStyle}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 shadow-xs"
                     >
                       {initials}
                     </span>
                     <div>
-                      <div className="font-semibold text-white text-xs">{p.name}</div>
-                      <div className="text-[11px] font-mono text-slate-400">{p.email || 'N/A'}</div>
+                      <div className="font-semibold text-slate-900 text-xs">{p.name}</div>
+                      <div className="text-[11px] font-mono text-slate-500">{p.email || 'N/A'}</div>
                     </div>
                   </div>
 
                   {amt > 0 || p.payment_status === 'PAID' ? (
-                    <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200">
                       {amt > 0 ? `₹${amt}` : 'Paid'}
                     </span>
                   ) : p.payment_status === 'INCOMPLETE' || (p.status_label && p.status_label.toLowerCase().includes('not paid')) ? (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-amber-400 bg-amber-500/10 border border-amber-500/25">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold text-amber-800 bg-amber-50 border border-amber-200">
                       Incomplete
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-white/[0.04]">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-200">
                       Free
                     </span>
                   )}
                 </div>
 
-                <div className="text-xs text-slate-300">
-                  <div className="font-medium text-white flex items-center gap-1.5">
+                <div className="text-xs text-slate-600">
+                  <div className="font-medium text-slate-900 flex items-center gap-1.5">
                     <span>{p.event_name}</span>
                     {domainInfo && (
                       <span 
@@ -741,7 +741,7 @@ export default function DataTable({
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-400 truncate mt-0.5">{p.college}</div>
+                  <div className="text-[11px] text-slate-500 truncate mt-0.5">{p.college}</div>
                 </div>
 
                 {/* Call Status & Direct Action Buttons */}
@@ -754,14 +754,14 @@ export default function DataTable({
                           <span>{statusDef.label || statusDef.shortLabel}</span>
                         </span>
                         {rec.lastRemark && rec.lastRemark !== 'No remarks entered.' && (
-                          <div className="text-[10px] text-slate-400 truncate max-w-[170px] italic mt-0.5" title={rec.lastRemark}>
+                          <div className="text-[10px] text-slate-500 truncate max-w-[170px] italic mt-0.5" title={rec.lastRemark}>
                             "{rec.lastRemark}"
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                      <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                         <span>Never Called</span>
                       </span>
                     )}
@@ -771,9 +771,9 @@ export default function DataTable({
                     {p.phone && p.phone !== 'N/A' && (
                       <button
                         onClick={() => onTriggerCall && onTriggerCall(p)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition-all"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-all shadow-xs cursor-pointer"
                       >
-                        <PhoneCall className="w-3 h-3 text-sky-400" />
+                        <PhoneCall className="w-3 h-3 text-sky-600" />
                         <span>Call ({callCount})</span>
                       </button>
                     )}
@@ -782,7 +782,7 @@ export default function DataTable({
                         href={waLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2 py-1 rounded text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25"
+                        className="px-2 py-1 rounded text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 shadow-xs"
                       >
                         WA
                       </a>
@@ -796,15 +796,15 @@ export default function DataTable({
       </div>
 
       {/* 5. Pagination Bar */}
-      <div className="p-3 bg-[#11141A] border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+      <div className="p-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
         
         <div className="flex items-center gap-2">
           <span>Showing</span>
-          <span className="font-mono text-slate-200">{filteredParticipants.length > 0 ? startIndex + 1 : 0}</span>
+          <span className="font-mono text-slate-900 font-semibold">{filteredParticipants.length > 0 ? startIndex + 1 : 0}</span>
           <span>to</span>
-          <span className="font-mono text-slate-200">{endIndex}</span>
+          <span className="font-mono text-slate-900 font-semibold">{endIndex}</span>
           <span>of</span>
-          <span className="font-mono text-slate-200">{filteredParticipants.length}</span>
+          <span className="font-mono text-slate-900 font-semibold">{filteredParticipants.length}</span>
           <span>verified records</span>
         </div>
 
@@ -818,7 +818,7 @@ export default function DataTable({
                 setPageSize(val);
                 setCurrentPage(1);
               }}
-              className="bg-[#0B0D11] border border-white/[0.08] rounded-md px-2 py-1 text-xs text-slate-300 outline-none"
+              className="bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 outline-none shadow-xs cursor-pointer"
             >
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -833,11 +833,11 @@ export default function DataTable({
               size="iconSm"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage <= 1 || pageSize === 'all'}
-              className="bg-[#161A22] border-white/[0.08] hover:border-white/20"
+              className="bg-white border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </Button>
-            <span className="px-2 text-slate-300">
+            <span className="px-2 text-slate-700 font-medium">
               Page {effectivePage} of {totalPages}
             </span>
             <Button
@@ -845,7 +845,7 @@ export default function DataTable({
               size="iconSm"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages || pageSize === 'all'}
-              className="bg-[#161A22] border-white/[0.08] hover:border-white/20"
+              className="bg-white border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </Button>

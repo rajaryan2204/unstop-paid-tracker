@@ -9,18 +9,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-slate-900 text-white shadow-xs hover:bg-slate-800",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-rose-600 text-white shadow-xs hover:bg-rose-500",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-slate-200 bg-white shadow-xs hover:bg-slate-50 hover:text-slate-900 text-slate-700",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        subtle: "bg-white/[0.04] hover:bg-white/[0.08] text-white border border-white/[0.08]",
-        emerald: "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30",
-        sky: "bg-sky-500/15 text-sky-400 hover:bg-sky-500/25 border border-sky-500/30",
+          "bg-slate-100 text-slate-900 shadow-xs hover:bg-slate-200",
+        ghost: "hover:bg-slate-100 hover:text-slate-900 text-slate-600",
+        link: "text-slate-900 underline-offset-4 hover:underline",
+        subtle: "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200",
+        emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-semibold",
+        sky: "bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 font-semibold",
       },
       size: {
         default: "h-9 px-4 py-2",

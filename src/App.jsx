@@ -72,8 +72,25 @@ export default function App() {
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
 
   const [toast, setToast] = useState(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem('tf_theme') || 'dark');
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('tf_theme_v2');
+    if (saved) return saved;
+    return 'light';
+  });
   const [neonStatus, setNeonStatus] = useState({ isConnected: false, isSyncing: false });
+
+  // Sync theme with document root
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.body.style.backgroundColor = '#F8FAFC';
+      document.body.style.color = '#0F172A';
+    } else {
+      document.documentElement.classList.add('dark');
+      document.body.style.backgroundColor = '#0B0D11';
+      document.body.style.color = '#F5F7FA';
+    }
+  }, [theme]);
 
   // Trigger toast with auto-hide
   const triggerToast = useCallback((toastData) => {
@@ -87,16 +104,7 @@ export default function App() {
   const toggleTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
-    localStorage.setItem('tf_theme', next);
-    if (next === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#F8FAFC';
-      document.body.style.color = '#0F172A';
-    } else {
-      document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#0B0D11';
-      document.body.style.color = '#F5F7FA';
-    }
+    localStorage.setItem('tf_theme_v2', next);
   }, [theme]);
 
   // Load live data
@@ -321,7 +329,7 @@ export default function App() {
   // Gate dashboard behind dedicated Login Screen on load
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500/20 selection:text-sky-800">
         <LoginScreen onLoginSuccess={handleLoginSuccess} />
         <Toast toast={toast} onClose={() => setToast(null)} />
       </div>
@@ -329,7 +337,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0D11] text-[#F5F7FA] font-sans selection:bg-sky-500/20 selection:text-sky-300">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500/20 selection:text-sky-800">
       
       {/* 1. Header with RBAC Profile, 13 Domain Switcher & Verification Badges */}
       <Header

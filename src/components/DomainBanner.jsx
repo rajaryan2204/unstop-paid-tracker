@@ -1,17 +1,4 @@
-// src/components/DomainBanner.jsx
 import React from 'react';
-import { 
-  Terminal, 
-  Sparkles, 
-  Layers, 
-  Users, 
-  Trophy, 
-  PhoneCall, 
-  CheckCircle2, 
-  ShieldCheck, 
-  ExternalLink,
-  ArrowRight
-} from 'lucide-react';
 import { DOMAINS_DIRECTORY, getDomainStats } from '../utils/auth';
 
 export default function DomainBanner({ 
@@ -28,43 +15,37 @@ export default function DomainBanner({
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
   return (
-    <div className="surface-card rounded-2xl p-5 mb-6 border border-white/[0.08] relative overflow-hidden bg-gradient-to-br from-[#11141A] via-[#141822] to-[#11141A] shadow-2xl">
-      
-      {/* Subtle Ambient Radial Glow */}
-      <div 
-        className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none"
-        style={{ backgroundColor: domain.accentColor || '#38BDF8' }}
-      />
-
+    <div className="bg-white rounded-xl p-5 mb-6 border border-slate-200 shadow-sm relative overflow-hidden">
       <div className="relative z-10 space-y-4">
         
         {/* Top Header Row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-lg border border-white/[0.15]"
+              className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs border"
               style={{ 
-                backgroundColor: `${domain.accentColor}25`,
-                color: domain.accentColor || '#38BDF8'
+                backgroundColor: `${domain.accentColor}15`,
+                color: domain.accentColor || '#0284C7',
+                borderColor: `${domain.accentColor}30`
               }}
             >
               {domain.bay?.split('-')[1] || domain.name.substring(0, 2).toUpperCase()}
             </div>
 
             <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h2 className="text-xl font-bold tracking-tight text-white">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-lg font-bold tracking-tight text-slate-900">
                   {domain.name.toUpperCase()}
                 </h2>
-                <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-white/[0.06] text-slate-300 border border-white/[0.1]">
+                <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">
                   {domain.bay}
                 </span>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono tracking-wider uppercase text-sky-400 bg-sky-500/10 border border-sky-500/20">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase text-sky-700 bg-sky-50 border border-sky-200">
                   {domain.category}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                {domain.department} • <span className="text-slate-300 font-medium">{domain.tagline}</span>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {domain.department} • <span className="text-slate-700 font-medium">{domain.tagline}</span>
               </p>
             </div>
           </div>
@@ -72,12 +53,12 @@ export default function DomainBanner({
           {/* Session Status Pill */}
           <div className="flex items-center gap-2 self-start md:self-auto">
             {isSuperAdmin ? (
-              <span className="px-3 py-1 rounded-lg text-xs font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-lg text-xs font-mono bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1.5 shadow-xs">
                 <span>👑 Super Admin Filter View</span>
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-lg text-xs font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="px-3 py-1 rounded-lg text-xs font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Logged In as {currentUser?.name}</span>
               </span>
             )}
@@ -87,30 +68,30 @@ export default function DomainBanner({
         {/* Domain Metrics Row */}
         {stats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-            <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Domain Attendees</div>
-              <div className="text-xl font-bold text-white mt-0.5">{stats.totalParticipants}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold">Domain Attendees</div>
+              <div className="text-xl font-bold text-slate-900 mt-0.5">{stats.totalParticipants}</div>
               <div className="text-[10px] font-mono text-slate-500 mt-0.5">Across {stats.uniqueColleges} colleges</div>
             </div>
 
-            <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-400">Paid Revenue</div>
-              <div className="text-xl font-bold text-emerald-400 mt-0.5">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
-              <div className="text-[10px] font-mono text-slate-500 mt-0.5">{stats.paidCount} Paid • {stats.freeCount} Free</div>
+            <div className="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200/80">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-800 font-semibold">Paid Revenue</div>
+              <div className="text-xl font-bold text-emerald-700 mt-0.5">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
+              <div className="text-[10px] font-mono text-emerald-800/80 mt-0.5">{stats.paidCount} Paid • {stats.freeCount} Free</div>
             </div>
 
-            <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-sky-400">Domain Competitions</div>
-              <div className="text-xl font-bold text-sky-400 mt-0.5">{stats.eventsCount}</div>
-              <div className="text-[10px] font-mono text-slate-500 mt-0.5">Active TechFEST Events</div>
+            <div className="p-3 rounded-lg bg-sky-50/60 border border-sky-200/80">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-sky-800 font-semibold">Competitions</div>
+              <div className="text-xl font-bold text-sky-800 mt-0.5">{stats.eventsCount}</div>
+              <div className="text-[10px] font-mono text-sky-700/80 mt-0.5">Active TechFEST Events</div>
             </div>
 
-            <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400">Calling Outreach</div>
-              <div className="text-xl font-bold text-amber-400 mt-0.5">
+            <div className="p-3 rounded-lg bg-amber-50/60 border border-amber-200/80">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-amber-800 font-semibold">Outreach Conversion</div>
+              <div className="text-xl font-bold text-amber-800 mt-0.5">
                 {stats.totalParticipants > 0 ? Math.round((stats.paidCount / stats.totalParticipants) * 100) : 0}%
               </div>
-              <div className="text-[10px] font-mono text-slate-500 mt-0.5">Paid Conversion Ratio</div>
+              <div className="text-[10px] font-mono text-amber-700 mt-0.5">Paid Conversion Ratio</div>
             </div>
           </div>
         )}
@@ -118,13 +99,13 @@ export default function DomainBanner({
         {/* Domain Events Chips */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold">
               Assigned Competitions & Tracks ({domain.events.length})
             </span>
             {selectedEvent && (
               <button
                 onClick={() => onSelectEventFilter && onSelectEventFilter('')}
-                className="text-[10px] font-mono text-sky-400 hover:text-sky-300"
+                className="text-[10px] font-mono text-sky-600 hover:text-sky-800 cursor-pointer font-medium"
               >
                 Clear Event Filter
               </button>
@@ -138,10 +119,10 @@ export default function DomainBanner({
                 <button
                   key={i}
                   onClick={() => onSelectEventFilter && onSelectEventFilter(isSelected ? '' : ev)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-sky-500 text-white shadow-md'
-                      : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80'
                   }`}
                 >
                   <span>{ev}</span>
@@ -152,7 +133,6 @@ export default function DomainBanner({
         </div>
 
       </div>
-
     </div>
   );
 }
