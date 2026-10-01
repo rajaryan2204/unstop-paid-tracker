@@ -17,6 +17,7 @@ import LoginScreen from './components/LoginScreen';
 import PasswordManagerModal from './components/PasswordManagerModal';
 import DeviceActivityModal from './components/DeviceActivityModal';
 import NeonConfigModal from './components/NeonConfigModal';
+import AntiGravityReportModal from './components/AntiGravityReportModal';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
@@ -71,6 +72,7 @@ export default function App() {
   const [isPasswordManagerOpen, setIsPasswordManagerOpen] = useState(false);
   const [isDeviceActivityOpen, setIsDeviceActivityOpen] = useState(false);
   const [isNeonConfigOpen, setIsNeonConfigOpen] = useState(false);
+  const [isAntiGravityReportOpen, setIsAntiGravityReportOpen] = useState(false);
   
   // Active call logging modal state
   const [callingCandidate, setCallingCandidate] = useState(null);
@@ -357,6 +359,7 @@ export default function App() {
         onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
         onOpenDeviceActivity={() => setIsDeviceActivityOpen(true)}
         onOpenNeonConfig={() => setIsNeonConfigOpen(true)}
+        onOpenAntiGravityReport={() => setIsAntiGravityReportOpen(true)}
         onExportCSV={handleExportCSV}
         currentUser={currentUser}
         selectedDomainOverride={selectedDomainOverride}
@@ -500,6 +503,15 @@ export default function App() {
         isOpen={isNeonConfigOpen}
         onClose={() => setIsNeonConfigOpen(false)}
         onTriggerToast={triggerToast}
+      />
+
+      {/* Anti-Gravity Operations & Financial Intelligence Report (Sliet Hub Meeting) */}
+      <AntiGravityReportModal
+        isOpen={isAntiGravityReportOpen}
+        onClose={() => setIsAntiGravityReportOpen(false)}
+        participants={participants}
+        summary={summary}
+        currentUser={currentUser}
       />
 
       {/* Floating Toast Notification */}

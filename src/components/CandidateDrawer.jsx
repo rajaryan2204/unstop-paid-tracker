@@ -179,8 +179,18 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                 </div>
                 <div className="flex items-center gap-2 font-semibold text-sm text-indigo-800">
                   <Clock className="w-4 h-4 text-indigo-600" />
-                  <span>Payment Claimed by Caller • Pending Gateway Sync</span>
+                  <span>Payment Claimed • Saturday Batch Verification Desk</span>
                 </div>
+                {callRecord.utrNumber && (
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span className="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-indigo-200 text-indigo-950 font-bold select-all">
+                      UTR: {callRecord.utrNumber}
+                    </span>
+                    <span className="text-[10px] font-mono text-indigo-700 bg-indigo-100/70 px-1.5 py-0.5 rounded">
+                      {callRecord.paymentMode || 'UPI'}
+                    </span>
+                  </div>
+                )}
                 <div className="text-[11px] font-mono text-indigo-700 mt-1">
                   Claimed: {new Date(callRecord.lastCalledAt).toLocaleString('en-IN')}
                 </div>

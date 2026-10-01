@@ -224,6 +224,29 @@ export default function VerificationQueueModal({
                         <p className="text-xs text-slate-500 mt-0.5">
                           {p.event_name} • Phone: <span className="font-mono text-slate-700">{p.phone || 'N/A'}</span>
                         </p>
+                        
+                        {/* UTR & Payment Mode Display (Sliet Hub Meeting requirement) */}
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          {item.utrNumber ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold">
+                              <span>UTR:</span>
+                              <span className="select-all">{item.utrNumber}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                              UTR: Pending Caller Entry
+                            </span>
+                          )}
+
+                          <span className="text-[10px] font-mono text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                            {item.paymentMode || 'UPI / QR'}
+                          </span>
+
+                          <span className="text-[10px] font-medium text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                            🗓️ Saturday Verification
+                          </span>
+                        </div>
+
                         <p className="text-[11px] text-slate-500 font-mono mt-1">
                           Claimed by caller {item.elapsedHours} hrs ago ({rec.history?.[0]?.callerName || 'Staff'})
                         </p>

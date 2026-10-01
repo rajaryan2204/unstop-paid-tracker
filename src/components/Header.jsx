@@ -40,6 +40,7 @@ export default function Header({
   onOpenTokenHealth,
   onOpenDeviceActivity,
   onOpenNeonConfig,
+  onOpenAntiGravityReport,
   onExportCSV,
   selectedDomainOverride,
   onSelectDomainOverride,
@@ -69,11 +70,11 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200/80 transition-colors">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
         
         {/* Left: Brand + Navigation Links */}
-        <div className="flex items-center gap-6 min-w-0">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-xs">
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -91,8 +92,8 @@ export default function Header({
             </div>
           </div>
 
-          {/* Clean Horizontal Links (like Home, Docs, Components in screenshot) */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-zinc-600">
+          {/* Clean Horizontal Links */}
+          <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-zinc-600">
             <span className="px-2.5 py-1 rounded-md text-zinc-900 font-semibold bg-zinc-100/80">
               Overview
             </span>
@@ -113,10 +114,18 @@ export default function Header({
                 </span>
               )}
             </button>
+            <button
+              onClick={onOpenAntiGravityReport}
+              className="px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors flex items-center gap-1 cursor-pointer text-emerald-800 bg-emerald-50/70 border border-emerald-200/60 font-semibold"
+              title="Anti-Gravity Operations Intelligence Report (Sliet Hub)"
+            >
+              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Anti-Gravity Report</span>
+            </button>
             {isSuperAdmin && (
               <button
                 onClick={onOpenAuditLogs}
-                className="px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
+                className="hidden xl:inline-flex px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
               >
                 Audit Trail
               </button>
@@ -124,7 +133,7 @@ export default function Header({
           </nav>
         </div>
 
-        {/* Right: Search, Domain Scope, Cloud Sync, and Profile */}
+        {/* Right: Domain Scope, Cloud Sync, and Profile */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           
           {/* Domain Scope Dropdown Pill */}
@@ -133,7 +142,7 @@ export default function Header({
               <select
                 value={selectedDomainOverride || 'ALL'}
                 onChange={(e) => onSelectDomainOverride(e.target.value)}
-                className="h-8 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-800 rounded-lg px-2.5 py-1 outline-none font-medium focus:border-zinc-900 cursor-pointer max-w-[160px] sm:max-w-[200px] truncate shadow-xs transition-colors"
+                className="h-8 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-800 rounded-lg px-2 py-1 outline-none font-medium focus:border-zinc-900 cursor-pointer w-[125px] sm:w-[155px] truncate shadow-xs transition-colors"
               >
                 <option value="ALL">All 13 Domains</option>
                 {Object.values(DOMAINS_DIRECTORY).map(d => (
@@ -144,7 +153,7 @@ export default function Header({
               </select>
             </div>
           ) : (
-            <span className="h-8 px-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs font-medium text-zinc-700 flex items-center">
+            <span className="h-8 px-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs font-medium text-zinc-700 flex items-center max-w-[140px] truncate">
               {currentUser?.domainName || currentUser?.teamName}
             </span>
           )}
@@ -161,10 +170,10 @@ export default function Header({
             </span>
           </button>
 
-          {/* Instagram-style Active Device & Location Pill */}
+          {/* Device Pill (Shown on very wide screens to prevent navbar clutter on laptops) */}
           <button
             onClick={onOpenDeviceActivity}
-            className="hidden lg:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-700 transition-colors cursor-pointer"
+            className="hidden 2xl:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-700 transition-colors cursor-pointer"
             title="Where You're Logged In: View active device hardware, IP & location"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -175,12 +184,8 @@ export default function Header({
             ) : (
               <Laptop className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
             )}
-            <span className="font-mono text-[11px] font-medium text-zinc-800 truncate max-w-[110px] xl:max-w-[150px]">
+            <span className="font-mono text-[11px] font-medium text-zinc-800 truncate max-w-[100px]">
               {currentDev.deviceModel}
-            </span>
-            <span className="text-zinc-300">•</span>
-            <span className="text-[11px] text-zinc-500 font-sans truncate max-w-[110px]">
-              📍 {currentDev.location.split(',')[0]}
             </span>
           </button>
 
@@ -194,7 +199,7 @@ export default function Header({
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-zinc-900' : ''}`} />
           </button>
 
-          {/* Export CSV Button (Like 'Get Code' in screenshot) */}
+          {/* Export CSV Button */}
           <button
             onClick={onExportCSV}
             className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
@@ -285,6 +290,17 @@ export default function Header({
                     >
                       <FileText className="w-4 h-4 text-zinc-600 shrink-0" />
                       <span>Audit Trail & Activity Logs</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenAntiGravityReport();
+                      }}
+                      className="w-full px-3.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
+                    >
+                      <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Anti-Gravity Report (Sliet Hub)</span>
                     </button>
 
                     <button

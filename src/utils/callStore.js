@@ -414,6 +414,9 @@ export function logCallForParticipant({
     status,
     remark: remark?.trim() || 'No remarks entered.',
     leadNumber: leadNumber?.trim() || existing.leadNumber || '',
+    utrNumber: (participant.utrNumber || existing.utrNumber || '').trim(),
+    paymentMode: participant.paymentMode || existing.paymentMode || 'UPI / QR',
+    amountPaid: participant.amountPaid || existing.amountPaid || 199,
     device: currentDev.deviceName,
     deviceType: currentDev.deviceType,
     location: currentDev.location,
@@ -429,6 +432,9 @@ export function logCallForParticipant({
     lastStatus: status,
     lastRemark: callEntry.remark,
     leadNumber: callEntry.leadNumber,
+    utrNumber: callEntry.utrNumber,
+    paymentMode: callEntry.paymentMode,
+    amountPaid: callEntry.amountPaid,
     claimedAt: status === 'PAYMENT_CLAIMED' ? nowIso : existing.claimedAt,
     history: [callEntry, ...(existing.history || [])]
   };
@@ -522,7 +528,11 @@ export function getPaymentVerificationQueue(participants = []) {
         stateBadge,
         stateLabel,
         isGatewayPaid,
-        manualStatus
+        manualStatus,
+        utrNumber: record.utrNumber || record.history?.[0]?.utrNumber || '',
+        paymentMode: record.paymentMode || 'UPI / QR',
+        amountPaid: record.amountPaid || 199,
+        scheduledBatch: 'Saturday Verification Desk'
       });
     }
   });
