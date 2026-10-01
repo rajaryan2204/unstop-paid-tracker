@@ -10,7 +10,10 @@ import {
   ChevronRight,
   Users,
   AlertTriangle,
-  ArrowUpRight
+  ArrowUpRight,
+  Smartphone,
+  Laptop,
+  Tablet
 } from 'lucide-react';
 import { DOMAINS_DIRECTORY } from '../utils/auth';
 import { getAuditLogs, getCallRecords } from '../utils/callStore';
@@ -90,7 +93,9 @@ export default function BentoGrid({
         title: `${l.actorName || 'Staff'} → ${l.targetName || 'Participant'}`,
         subtitle: l.details || l.eventName || 'Call logged',
         time: l.timestamp ? new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today',
-        icon: l.action === 'VERIFY_PAYMENT' ? ShieldCheck : PhoneCall
+        icon: l.action === 'VERIFY_PAYMENT' ? ShieldCheck : PhoneCall,
+        device: l.device,
+        deviceType: l.deviceType
       }));
     }
 
@@ -100,35 +105,45 @@ export default function BentoGrid({
         title: 'Harsh Vardhan (Central Desk)',
         subtitle: 'Call Logged: Candidate interested in Robowars, will pay online',
         time: 'Today, 10:24 AM',
-        icon: PhoneCall
+        icon: PhoneCall,
+        device: 'MacBook / Mac • Chrome',
+        deviceType: 'desktop'
       },
       {
         id: 2,
         title: 'Priya Sharma (Mechanica Bay)',
         subtitle: 'Payment Claimed: Candidate claimed UPI payment, queued for verify',
         time: 'Today, 09:45 AM',
-        icon: ShieldCheck
+        icon: ShieldCheck,
+        device: 'Apple iPhone • Safari',
+        deviceType: 'mobile'
       },
       {
         id: 3,
         title: 'Aman Deep (Plexus Bay)',
         subtitle: 'Callback scheduled: Asked to call back at 6:00 PM',
         time: 'Yesterday',
-        icon: Clock
+        icon: Clock,
+        device: 'Samsung Galaxy S24 • Chrome',
+        deviceType: 'mobile'
       },
       {
         id: 4,
         title: 'Unstop Sync Engine',
         subtitle: 'Synced 3,673 total records from Unstop Portal',
         time: 'Oct 01',
-        icon: Zap
+        icon: Zap,
+        device: 'Server Daemon',
+        deviceType: 'desktop'
       },
       {
         id: 5,
         title: 'Rohit Kumar (Electrolution)',
         subtitle: 'Call Logged: Candidate requested event rules on WhatsApp',
         time: 'Oct 01',
-        icon: CheckCircle2
+        icon: CheckCircle2,
+        device: 'Windows 11 PC • Edge',
+        deviceType: 'desktop'
       }
     ];
   }, []);
@@ -422,19 +437,35 @@ export default function BentoGrid({
                   <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0 group-hover:bg-zinc-200 transition-colors">
                     <IconComp className="w-4 h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <div className="font-medium text-xs text-zinc-900 truncate">
-                      {act.title}
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-xs text-zinc-900 truncate flex items-center justify-between gap-2">
+                      <span className="truncate">{act.title}</span>
+                      <span className="text-[11px] font-medium text-zinc-400 shrink-0">
+                        {act.time}
+                      </span>
                     </div>
-                    <div className="text-[11px] text-zinc-500 truncate mt-0.5">
-                      {act.subtitle}
+                    <div className="flex items-center justify-between gap-2 mt-0.5">
+                      <div className="text-[11px] text-zinc-500 truncate">
+                        {act.subtitle}
+                      </div>
+                      {act.device && (
+                        <span 
+                          className="inline-flex items-center gap-1 text-[10px] font-mono text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60 shrink-0"
+                          title={`Logged via: ${act.device}`}
+                        >
+                          {act.deviceType === 'mobile' ? (
+                            <Smartphone className="w-2.5 h-2.5 text-zinc-400" />
+                          ) : act.deviceType === 'tablet' ? (
+                            <Tablet className="w-2.5 h-2.5 text-zinc-400" />
+                          ) : (
+                            <Laptop className="w-2.5 h-2.5 text-zinc-400" />
+                          )}
+                          <span className="truncate max-w-[120px]">{act.device}</span>
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                <span className="text-[11px] font-medium text-zinc-400 shrink-0">
-                  {act.time}
-                </span>
               </div>
             );
           })}

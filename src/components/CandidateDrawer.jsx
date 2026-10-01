@@ -14,7 +14,10 @@ import {
   Clock,
   MessageSquare,
   AlertTriangle,
-  History
+  History,
+  Smartphone,
+  Laptop,
+  Tablet
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -248,9 +251,26 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                                 ({call.callerTeam || 'Team'})
                               </span>
                             </div>
-                            <span className="text-[10px] font-mono text-slate-500">
-                              {dateFormatted}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              {call.device && (
+                                <span 
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-zinc-600 bg-zinc-100 border border-zinc-200"
+                                  title={`Logged via device: ${call.device}`}
+                                >
+                                  {call.deviceType === 'mobile' ? (
+                                    <Smartphone className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                                  ) : call.deviceType === 'tablet' ? (
+                                    <Tablet className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                                  ) : (
+                                    <Laptop className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                                  )}
+                                  <span className="truncate max-w-[130px] sm:max-w-[180px]">{call.device}</span>
+                                </span>
+                              )}
+                              <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                                {dateFormatted}
+                              </span>
+                            </div>
                           </div>
 
                           <div className="flex items-center gap-2 my-1.5">

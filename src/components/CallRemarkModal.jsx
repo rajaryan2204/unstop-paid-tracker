@@ -5,7 +5,11 @@ import {
   PhoneCall, 
   Check, 
   AlertCircle, 
-  Sparkles 
+  Sparkles,
+  Smartphone,
+  Laptop,
+  Tablet,
+  Settings2
 } from 'lucide-react';
 import {
   Dialog,
@@ -19,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CALL_STATUSES, getParticipantCallRecord } from '../utils/callStore';
+import { getDeviceInfo, setCustomDeviceName, getCustomDeviceName } from '../utils/device';
 
 export default function CallRemarkModal({ 
   isOpen, 
@@ -31,6 +36,9 @@ export default function CallRemarkModal({
   const [leadNumber, setLeadNumber] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [hasError, setHasError] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState(() => getDeviceInfo());
+  const [isEditingStation, setIsEditingStation] = useState(false);
+  const [stationName, setStationName] = useState(() => getCustomDeviceName());
 
   const existingRecord = participant ? getParticipantCallRecord(participant.id) : null;
   const nextCallNum = (existingRecord?.callCount || 0) + 1;
@@ -41,8 +49,18 @@ export default function CallRemarkModal({
       setSelectedStatus('');
       setHasError(false);
       setLeadNumber(existingRecord?.leadNumber || participant.phone || '');
+      setDeviceInfo(getDeviceInfo());
+      setStationName(getCustomDeviceName());
+      setIsEditingStation(false);
     }
   }, [participant]);
+
+  const handleSaveStation = (e) => {
+    e.preventDefault();
+    setCustomDeviceName(stationName);
+    setDeviceInfo(getDeviceInfo());
+    setIsEditingStation(false);
+  };
 
   if (!isOpen || !participant) return null;
 
@@ -112,6 +130,55 @@ export default function CallRemarkModal({
             <span>Redial</span>
           </Button>
         </div>
+
+        {/* Active Caller Device Recognition Bar */}
+        <div className="px-5 py-2.5 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <div className="flex items-center gap-1.5 text-zinc-600 truncate">
+              <span className="text-[11px] text-zinc-500">Device:</span>
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-zinc-800 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">
+                {deviceInfo.deviceType === 'mobile' ? (
+                  <Smartphone className="w-3 h-3 text-zinc-600 shrink-0" />
+                ) : deviceInfo.deviceType === 'tablet' ? (
+                  <Tablet className="w-3 h-3 text-zinc-600 shrink-0" />
+                ) : (
+                  <Laptop className="w-3 h-3 text-zinc-600 shrink-0" />
+                )}
+                <span className="truncate max-w-[180px] sm:max-w-[260px]">
+                  {deviceInfo.deviceName}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsEditingStation(!isEditingStation)}
+            className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900 flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
+            title="Customize device nickname or station"
+          >
+            <Settings2 className="w-3 h-3" />
+            <span>{isEditingStation ? 'Close' : 'Nickname'}</span>
+          </button>
+        </div>
+
+        {/* Optional Custom Device Station Editor */}
+        {isEditingStation && (
+          <form onSubmit={handleSaveStation} className="px-5 py-2.5 bg-zinc-100/90 border-b border-zinc-200 flex items-center gap-2 animate-in fade-in duration-150">
+            <input
+              type="text"
+              value={stationName}
+              onChange={(e) => setStationName(e.target.value)}
+              placeholder="e.g. Plexus Desk #1 or Sagar's iPhone"
+              className="flex-1 bg-white border border-zinc-300 rounded-lg px-2.5 py-1 text-xs text-zinc-900 outline-none focus:border-zinc-900"
+              autoFocus
+            />
+            <Button type="submit" size="sm" className="h-7 text-xs px-2.5 bg-zinc-900 text-white hover:bg-zinc-800">
+              Save
+            </Button>
+          </form>
+        )}
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4">

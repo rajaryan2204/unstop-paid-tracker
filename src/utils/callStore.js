@@ -9,6 +9,7 @@ import {
   writePaymentVerificationToNeon,
   dbStatus
 } from './neonDb';
+import { getDeviceInfo } from './device';
 
 export const CALL_STATUSES = {
   PAYMENT_CLAIMED: {
@@ -92,7 +93,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         callerTeam: 'Invitation Team',
         status: 'NOT_PICKED',
         remark: 'Ringing, no response. Will retry in evening.',
-        leadNumber: ''
+        leadNumber: '',
+        device: 'Apple iPhone • Safari',
+        deviceType: 'mobile'
       },
       {
         id: 'call_2',
@@ -103,7 +106,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         callerTeam: 'Outreach Team',
         status: 'CALL_LATER',
         remark: 'Candidate was in college lectures. Asked to call back after 6 PM.',
-        leadNumber: '9876543210'
+        leadNumber: '9876543210',
+        device: 'Samsung Galaxy S24 • Chrome',
+        deviceType: 'mobile'
       },
       {
         id: 'call_3',
@@ -114,7 +119,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         callerTeam: 'Invitation Team',
         status: 'INTERESTED',
         remark: 'Convinced for Robowars track. Explaining prize pool. Promised to pay tonight.',
-        leadNumber: '9876543210'
+        leadNumber: '9876543210',
+        device: 'Apple iPhone • Safari',
+        deviceType: 'mobile'
       },
       {
         id: 'call_4',
@@ -125,7 +132,9 @@ const INITIAL_CALL_RECORDS_SEED = {
         callerTeam: 'Central Desk',
         status: 'PAYMENT_CLAIMED',
         remark: 'Participant said paid ₹199 via UPI to TechFEST QR. Sent screenshot to WhatsApp.',
-        leadNumber: '9876543210'
+        leadNumber: '9876543210',
+        device: 'MacBook / Mac • Chrome',
+        deviceType: 'desktop'
       }
     ]
   }
@@ -144,7 +153,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     eventName: 'Robowars Championship',
     prevStatus: 'INTERESTED',
     nextStatus: 'PAYMENT_CLAIMED',
-    details: 'Logged Call #4. Status changed to Payment Completed (Sent to Verification Desk).'
+    device: 'MacBook / Mac • Chrome',
+    deviceType: 'desktop',
+    details: 'Logged Call #4 via MacBook / Mac • Chrome. Status changed to Payment Completed (Sent to Verification Desk).'
   },
   {
     id: 'log_seed_3',
@@ -158,7 +169,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     eventName: 'Robowars Championship',
     prevStatus: 'CALL_LATER',
     nextStatus: 'INTERESTED',
-    details: 'Logged Call #3. Marked Interested / Follow Up.'
+    device: 'Apple iPhone • Safari',
+    deviceType: 'mobile',
+    details: 'Logged Call #3 via Apple iPhone • Safari. Marked Interested / Follow Up.'
   },
   {
     id: 'log_seed_2',
@@ -172,7 +185,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     eventName: 'Robowars Championship',
     prevStatus: 'NOT_PICKED',
     nextStatus: 'CALL_LATER',
-    details: 'Logged Call #2. Callback scheduled.'
+    device: 'Samsung Galaxy S24 • Chrome',
+    deviceType: 'mobile',
+    details: 'Logged Call #2 via Samsung Galaxy S24 • Chrome. Callback scheduled.'
   },
   {
     id: 'log_seed_1',
@@ -186,7 +201,9 @@ const INITIAL_AUDIT_LOGS_SEED = [
     eventName: 'Robowars Championship',
     prevStatus: 'NONE',
     nextStatus: 'NOT_PICKED',
-    details: 'Logged Call #1. Participant did not pick up.'
+    device: 'Apple iPhone • Safari',
+    deviceType: 'mobile',
+    details: 'Logged Call #1 via Apple iPhone • Safari. Participant did not pick up.'
   }
 ];
 
@@ -233,11 +250,20 @@ export function saveAuditLogs(logs) {
 
 export function addAuditLog(entry) {
   const logs = getAuditLogs();
+  const currentDev = getDeviceInfo();
+  const device = entry.device || currentDev.deviceName;
+  const deviceType = entry.deviceType || currentDev.deviceType;
+
   const newEntry = {
     id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
     timestamp: new Date().toISOString(),
+    device,
+    deviceType,
     ...entry
   };
+  if (!newEntry.device) newEntry.device = device;
+  if (!newEntry.deviceType) newEntry.deviceType = deviceType;
+
   logs.unshift(newEntry);
   saveAuditLogs(logs.slice(0, 500)); // retain latest 500 logs
   return newEntry;
@@ -354,6 +380,7 @@ export function logCallForParticipant({
 
   const newCallNumber = (existing.callCount || 0) + 1;
   const nowIso = new Date().toISOString();
+  const currentDev = getDeviceInfo();
 
   const callEntry = {
     id: 'call_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -364,7 +391,9 @@ export function logCallForParticipant({
     callerTeam: callerUser.teamName || callerUser.team,
     status,
     remark: remark?.trim() || 'No remarks entered.',
-    leadNumber: leadNumber?.trim() || existing.leadNumber || ''
+    leadNumber: leadNumber?.trim() || existing.leadNumber || '',
+    device: currentDev.deviceName,
+    deviceType: currentDev.deviceType
   };
 
   const prevStatus = existing.lastStatus || 'NONE';
@@ -394,7 +423,9 @@ export function logCallForParticipant({
     eventName: participant.event_name || 'Event',
     prevStatus,
     nextStatus: status,
-    details: `Logged Call #${newCallNumber}. Status: ${CALL_STATUSES[status]?.label || status}. Remark: ${callEntry.remark}`
+    device: currentDev.deviceName,
+    deviceType: currentDev.deviceType,
+    details: `Logged Call #${newCallNumber} via ${currentDev.deviceName}. Status: ${CALL_STATUSES[status]?.label || status}. Remark: ${callEntry.remark}`
   });
 
   // Background Cloud Sync to Neon PostgreSQL

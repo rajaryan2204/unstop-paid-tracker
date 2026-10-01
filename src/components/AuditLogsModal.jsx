@@ -10,7 +10,10 @@ import {
   User, 
   ArrowRight,
   ShieldAlert,
-  CheckCircle2
+  CheckCircle2,
+  Smartphone,
+  Laptop,
+  Tablet
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,12 +46,13 @@ export default function AuditLogsModal({ isOpen, onClose }) {
 
   const handleExportCSV = () => {
     if (filteredLogs.length === 0) return;
-    const headers = ['Timestamp', 'Actor Name', 'Actor Role', 'Actor Team', 'Action', 'Target ID', 'Target Name', 'Event', 'Previous Status', 'Next Status', 'Details'];
+    const headers = ['Timestamp', 'Actor Name', 'Actor Role', 'Actor Team', 'Device', 'Action', 'Target ID', 'Target Name', 'Event', 'Previous Status', 'Next Status', 'Details'];
     const rows = filteredLogs.map(l => [
       `"${l.timestamp || ''}"`,
       `"${l.actorName || ''}"`,
       `"${l.actorRole || ''}"`,
       `"${l.actorTeam || ''}"`,
+      `"${l.device || 'Web Client'}"`,
       `"${l.action || ''}"`,
       `"${l.targetId || ''}"`,
       `"${l.targetName || ''}"`,
@@ -171,7 +175,7 @@ export default function AuditLogsModal({ isOpen, onClose }) {
                   className="p-3 rounded-xl bg-white border border-slate-200 hover:border-slate-300 shadow-xs transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-xs text-slate-900">
                         {log.actorName}
                       </span>
@@ -187,9 +191,26 @@ export default function AuditLogsModal({ isOpen, onClose }) {
                       </span>
                     </div>
 
-                    <span className="text-[11px] font-mono text-slate-500 shrink-0">
-                      {dateStr}
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {log.device && (
+                        <span 
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-zinc-600 bg-zinc-100 border border-zinc-200"
+                          title={`Logged via: ${log.device}`}
+                        >
+                          {log.deviceType === 'mobile' ? (
+                            <Smartphone className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                          ) : log.deviceType === 'tablet' ? (
+                            <Tablet className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                          ) : (
+                            <Laptop className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
+                          )}
+                          <span className="truncate max-w-[120px] sm:max-w-[170px]">{log.device}</span>
+                        </span>
+                      )}
+                      <span className="text-[11px] font-mono text-slate-500">
+                        {dateStr}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-xs text-slate-700 mt-1.5 leading-relaxed">
