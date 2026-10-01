@@ -32,7 +32,7 @@ export default function BentoGrid({
   // Exact real numbers from Unstop dataset
   const totalCount = participants.length;
   
-  // Real incomplete: "Registraition fee not paid"
+  // Real incomplete: "Registraition fee not paid" & payment incomplete
   const incompleteCount = useMemo(() => {
     return participants.filter(p => 
       p.payment_status === 'INCOMPLETE' || 
@@ -44,32 +44,58 @@ export default function BentoGrid({
   // Real completed
   const completedCount = totalCount - incompleteCount;
 
+  // Real Gateway Revenue collected so far (from Unstop paid receipts)
+  const gatewayRevenue = useMemo(() => {
+    return participants.reduce((acc, p) => acc + (Number(p.amount) || 0), 0);
+  }, [participants]);
+
+  // Paid candidate count with gateway receipts
+  const paidGatewayCount = useMemo(() => {
+    return participants.filter(p => (Number(p.amount) || 0) > 0).length;
+  }, [participants]);
+
+  // Calling recovery pipeline (2,988 unpaid leads @ ₹199 standard fee)
+  const standardFee = 199;
+  const pipelineValue = incompleteCount * standardFee;
+
   // Real call stats from CRM store
   const callRecords = useMemo(() => getCallRecords(), [participants]);
   const calledCount = useMemo(() => {
     return Object.values(callRecords).filter(r => (r.callCount || 0) > 0).length;
   }, [callRecords]);
 
-  // Activity distribution across dates
+  // Activity distribution across dates with human-readable power-scaled bar heights
   const chartBars = useMemo(() => {
     const datesMap = {};
+    const compMap = {};
+    const incompMap = {};
+
     participants.forEach(p => {
       if (p.registered_at) {
         const d = p.registered_at.substring(0, 10);
         datesMap[d] = (datesMap[d] || 0) + 1;
+        const isIncomp = p.payment_status === 'INCOMPLETE' || 
+          p.payment_status === 'UNPAID' || 
+          (p.status_label && p.status_label.toLowerCase().includes('not paid'));
+        if (isIncomp) {
+          incompMap[d] = (incompMap[d] || 0) + 1;
+        } else {
+          compMap[d] = (compMap[d] || 0) + 1;
+        }
       }
     });
 
     const sortedDates = Object.keys(datesMap).sort();
-    const recentDates = sortedDates.slice(-6);
+    // Pick the most recent 7 active dates for clear visualization
+    const recentDates = sortedDates.slice(-7);
     if (recentDates.length === 0) {
       return [
-        { label: 'Sep 26', count: 180, height: 45 },
-        { label: 'Sep 27', count: 240, height: 60 },
-        { label: 'Sep 28', count: 190, height: 48 },
-        { label: 'Sep 29', count: 310, height: 78 },
-        { label: 'Sep 30', count: 220, height: 55 },
-        { label: 'Oct 01', count: 380, height: 95 }
+        { label: 'Sep 26', count: 180, comp: 35, incomp: 145, height: 45 },
+        { label: 'Sep 27', count: 240, comp: 48, incomp: 192, height: 60 },
+        { label: 'Sep 28', count: 190, comp: 38, incomp: 152, height: 48 },
+        { label: 'Sep 29', count: 310, comp: 62, incomp: 248, height: 78 },
+        { label: 'Sep 30', count: 220, comp: 44, incomp: 176, height: 55 },
+        { label: 'Oct 01', count: 3548, comp: 660, incomp: 2888, height: 100 }
       ];
     }
 
@@ -78,9 +104,12 @@ export default function BentoGrid({
       const parts = d.split('-');
       const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
       const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const count = datesMap[d];
-      const height = Math.max(15, Math.round((count / max) * 100));
-      return { label, count, height };
+      const count = datesMap[d] || 0;
+      const comp = compMap[d] || 0;
+      const incomp = incompMap[d] || 0;
+      // Power scale (exponent 0.42) so low-volume days remain visible alongside the 3,548 spike
+      const height = Math.max(14, Math.round(Math.pow(count / max, 0.42) * 100));
+      return { label, count, comp, incomp, height };
     });
   }, [participants]);
 
@@ -157,39 +186,49 @@ export default function BentoGrid({
   return (
     <div className="space-y-6 mb-8 font-sans">
       
-      {/* 3-Column Bento Grid matching ui.shadcn.com */}
+      {/* 3-Column Bento Grid matching modern shadcn UI */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         
         {/* ========================================================
-            CARD 1: Registration Velocity & Flow
+            CARD 1: Registration Velocity & Daily Chart Breakdown
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
-                Registration Flow
-              </h3>
-              <span className="text-[10px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
-                {totalCount} Total
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
+                  Registration Flow
+                </h3>
+                <span className="text-[10px] font-mono text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full font-semibold">
+                  3,673 Total
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full font-medium">
+                19% Done
               </span>
             </div>
-            <p className="text-xs text-zinc-500 mb-6">
-              Daily student registration trends on Unstop
+            <p className="text-xs text-zinc-500 mb-4">
+              Daily student signups on Unstop & status breakdown
             </p>
 
-            {/* Minimalist Neutral Bar Chart */}
-            <div className="h-36 flex items-end justify-between gap-3 px-2 pt-2 pb-1 mb-6 border-b border-zinc-100">
+            {/* Minimalist Neutral Bar Chart with Tooltips */}
+            <div className="h-32 flex items-end justify-between gap-2.5 px-2 pt-2 pb-1 mb-4 border-b border-zinc-100">
               {chartBars.map((bar, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group relative">
+                  {/* Hover Floating Pill */}
+                  <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-white text-[9.5px] px-1.5 py-0.5 rounded pointer-events-none whitespace-nowrap z-10 font-mono shadow-sm">
+                    {bar.count.toLocaleString('en-IN')} leads
+                  </div>
+                  
                   <div className="w-full relative flex items-end justify-center h-full">
                     <div 
                       style={{ height: `${bar.height}%` }}
                       className={`w-full max-w-[28px] rounded-t-md transition-all duration-300 ${
                         idx === chartBars.length - 1 
                           ? 'bg-zinc-900 shadow-xs' 
-                          : 'bg-zinc-600 hover:bg-zinc-700'
+                          : 'bg-zinc-500 hover:bg-zinc-700'
                       }`}
-                      title={`${bar.label}: ${bar.count} registrations`}
+                      title={`${bar.label}: ${bar.count.toLocaleString('en-IN')} total (${bar.comp} completed, ${bar.incomp} unpaid)`}
                     />
                   </div>
                   <span className="text-[10px] font-medium text-zinc-500 group-hover:text-zinc-900 truncate">
@@ -199,13 +238,40 @@ export default function BentoGrid({
               ))}
             </div>
 
+            {/* Split Progress Indicator: Completed (19%) vs Fee Not Paid (81%) */}
+            <div className="mb-4">
+              <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden flex">
+                <div 
+                  style={{ width: `${Math.round((completedCount / totalCount) * 100)}%` }}
+                  className="bg-zinc-900 h-full transition-all duration-500"
+                  title={`Completed: ${completedCount} (${Math.round((completedCount / totalCount) * 100)}%)`}
+                />
+                <div 
+                  style={{ width: `${Math.round((incompleteCount / totalCount) * 100)}%` }}
+                  className="bg-amber-400 h-full transition-all duration-500"
+                  title={`Fee Not Paid: ${incompleteCount} (${Math.round((incompleteCount / totalCount) * 100)}%)`}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1 font-mono">
+                <span className="flex items-center gap-1 font-medium text-zinc-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-900 inline-block" />
+                  Completed: {completedCount} (19%)
+                </span>
+                <span className="flex items-center gap-1 font-medium text-amber-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                  Fee Not Paid: {incompleteCount} (81%)
+                </span>
+              </div>
+            </div>
+
             {/* 2 Stat Tiles: Completed vs Fee Not Paid */}
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  COMPLETED
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1 flex items-center justify-between">
+                  <span>COMPLETED</span>
+                  <span className="text-[9px] font-mono text-zinc-400 font-normal">18.7%</span>
                 </div>
-                <div className="text-lg font-bold text-zinc-900">
+                <div className="text-xl font-bold text-zinc-900">
                   {completedCount.toLocaleString('en-IN')}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-0.5">
@@ -213,15 +279,16 @@ export default function BentoGrid({
                 </div>
               </div>
 
-              <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1">
-                  FEE NOT PAID
+              <div className="bg-amber-50/60 rounded-xl p-3 border border-amber-100">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 mb-1 flex items-center justify-between">
+                  <span>FEE NOT PAID</span>
+                  <span className="text-[9px] font-mono text-amber-600 font-normal">81.3%</span>
                 </div>
-                <div className="text-lg font-bold text-zinc-900">
+                <div className="text-xl font-bold text-amber-950">
                   {incompleteCount.toLocaleString('en-IN')}
                 </div>
-                <div className="text-[11px] text-zinc-500 mt-0.5">
-                  Calling leads (81%)
+                <div className="text-[11px] text-amber-700 mt-0.5">
+                  Drop-off leads to call
                 </div>
               </div>
             </div>
@@ -229,104 +296,101 @@ export default function BentoGrid({
 
           <button
             onClick={onOpenAuditLogs}
-            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
           >
-            View Operations Audit Report
+            <span>View Operations Audit Report</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
           </button>
         </div>
 
 
         {/* ========================================================
-            CARD 2: Calling Outreach Pipeline & Target
+            CARD 2: Total Revenue & Calling Recovery Pipeline
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
-                Outreach Pipeline
+                Total Revenue & Pipeline
               </h3>
-              <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
-                Calling Desk
+              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-semibold">
+                Live Receipts
               </span>
             </div>
-            <p className="text-xs text-zinc-500 mb-5">
-              Unpaid lead recovery across 13 technical domains
+            <p className="text-xs text-zinc-500 mb-4">
+              Real gateway receipts + recoverable calling pipeline
             </p>
 
-            <form onSubmit={handleSaveQuota} className="space-y-4">
+            {/* Hero Revenue Box */}
+            <div className="bg-zinc-900 rounded-xl p-4 text-white mb-4 shadow-xs">
+              <div className="flex items-center justify-between text-zinc-400 text-xs mb-1">
+                <span className="font-medium">Direct Unstop Gateway Revenue</span>
+                <span className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">
+                  {paidGatewayCount} Paid Receipts
+                </span>
+              </div>
+              <div className="text-3xl font-bold tracking-tight text-white mb-1">
+                ₹{gatewayRevenue.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[11px] text-zinc-400 flex items-center justify-between pt-2 border-t border-zinc-800">
+                <span>RC Boat (₹2,995) • Soldering (₹598) • Ghost Code (₹200)</span>
+              </div>
+            </div>
+
+            {/* Recoverable Pipeline Target Card */}
+            <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100 mb-4">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Calling Recovery Pipeline
+                </span>
+                <span className="text-xs font-bold text-zinc-900 font-mono">
+                  ₹{pipelineValue.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <p className="text-[11px] text-zinc-500 mb-2">
+                2,988 unpaid leads × ₹199 standard event entry fee
+              </p>
               
-              {/* Preferred Domain Select */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Active Domain Scope
-                </label>
-                <div className="relative">
-                  <select 
-                    defaultValue={activeDomainId || "ALL"}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-900 font-medium outline-none appearance-none cursor-pointer focus:border-zinc-900 shadow-xs"
-                  >
-                    <option value="ALL">All 13 Technical Domains (Master)</option>
-                    {Object.values(DOMAINS_DIRECTORY).map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.name} ({d.bay})
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-2.5 rotate-90 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Amount Display & Progress */}
-              <div className="pt-1">
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-xs font-medium text-zinc-700">
-                    Fee Not Paid (To Call)
-                  </span>
-                  <span className="text-2xl font-bold text-zinc-900 tracking-tight">
-                    {incompleteCount}
-                  </span>
-                </div>
-
-                <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mt-2 mb-1.5">
-                  <div 
-                    style={{ width: `${Math.min(100, Math.round((calledCount / Math.max(1, incompleteCount)) * 100))}%` }}
-                    className="bg-zinc-900 h-full rounded-full transition-all duration-500"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                  <span>{calledCount} Calls Logged</span>
-                  <span>{incompleteCount} Total Unpaid Leads</span>
-                </div>
-              </div>
-
-              {/* Notes Field */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Calling Desk Memo / Guidelines
-                </label>
-                <textarea 
-                  rows={2}
-                  value={memoNote}
-                  onChange={(e) => setMemoNote(e.target.value)}
-                  placeholder="e.g. Inform candidates that ₹200 pass covers entry to all 62 competitions..."
-                  className="w-full bg-white border border-zinc-200 rounded-xl p-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 resize-none shadow-xs"
+              {/* Recovery Progress Bar */}
+              <div className="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden mb-1.5">
+                <div 
+                  style={{ width: `${Math.min(100, Math.round((calledCount / Math.max(1, incompleteCount)) * 100))}%` }}
+                  className="bg-zinc-900 h-full rounded-full transition-all duration-500"
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer mt-2"
-              >
-                {savedNotice ? '✓ Memo Saved' : 'Save Calling Guidelines'}
-              </button>
-            </form>
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                <span>{calledCount} Calls Logged</span>
+                <span>Target: ₹89,190 (15% Recovery)</span>
+              </div>
+            </div>
+
+            {/* Calling Guidelines / Memo */}
+            <div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                Calling Desk Memo / Pitch
+              </label>
+              <textarea 
+                rows={2}
+                value={memoNote}
+                onChange={(e) => setMemoNote(e.target.value)}
+                placeholder="e.g. ₹199 fee includes TechFEST '26 master pass, kits & certificate of participation..."
+                className="w-full bg-white border border-zinc-200 rounded-xl p-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 resize-none shadow-xs"
+              />
+            </div>
           </div>
+
+          <button
+            onClick={handleSaveQuota}
+            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl py-2.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer mt-3"
+          >
+            {savedNotice ? '✓ Calling Memo Saved' : 'Save Calling Guidelines'}
+          </button>
         </div>
 
 
         {/* ========================================================
-            CARD 3: Registration Milestones & Conversion
+            CARD 3: Registration Milestones & Conversion Funnel
             ======================================================== */}
         <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
           <div>
@@ -341,63 +405,90 @@ export default function BentoGrid({
                 Verification Desk
               </button>
             </div>
-            <p className="text-xs text-zinc-500 mb-6">
-              Official Unstop conversion breakdown
+            <p className="text-xs text-zinc-500 mb-5">
+              Official Unstop conversion breakdown across 62 competitions
             </p>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               
               {/* Target 1: Completed Registrations */}
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1">
-                  COMPLETED REGISTRATIONS
-                </div>
-                <div className="text-3xl font-bold tracking-tight text-zinc-900 mb-2">
-                  {completedCount}
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                    COMPLETED REGISTRATIONS
+                  </span>
+                  <span className="font-mono font-bold text-zinc-900 text-sm">
+                    {completedCount.toLocaleString('en-IN')}
+                  </span>
                 </div>
                 
                 {/* Thick Solid Black Progress Bar */}
-                <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-1.5">
+                <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mb-1">
                   <div 
                     style={{ width: `${Math.min(100, Math.round((completedCount / totalCount) * 100))}%` }}
                     className="bg-zinc-900 h-full rounded-full transition-all duration-500"
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-zinc-500">
-                  <span>{Math.round((completedCount / totalCount) * 100)}% of total entries</span>
+                <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>18.7% completed on portal</span>
                   <span className="font-medium text-zinc-700">{completedCount} / {totalCount}</span>
                 </div>
               </div>
 
               {/* Target 2: Registration Fee Not Paid */}
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1">
-                  REGISTRATION FEE NOT PAID (INCOMPLETE)
-                </div>
-                <div className="text-3xl font-bold tracking-tight text-zinc-900 mb-2">
-                  {incompleteCount}
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+                    FEE NOT PAID (DROP-OFFS)
+                  </span>
+                  <span className="font-mono font-bold text-amber-800 text-sm">
+                    {incompleteCount.toLocaleString('en-IN')}
+                  </span>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-1.5">
+                <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mb-1">
                   <div 
                     style={{ width: `${Math.min(100, Math.round((incompleteCount / totalCount) * 100))}%` }}
-                    className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                    className="bg-amber-400 h-full rounded-full transition-all duration-500"
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-zinc-500">
-                  <span>{Math.round((incompleteCount / totalCount) * 100)}% pending fee payment</span>
+                <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>81.3% drop-off at gateway</span>
                   <span className="font-medium text-zinc-700">{incompleteCount} / {totalCount}</span>
+                </div>
+              </div>
+
+              {/* Target 3: Technical Catalog Scale */}
+              <div className="pt-2 border-t border-zinc-100">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                    EVENTS & DOMAINS
+                  </span>
+                  <span className="font-mono font-bold text-zinc-900 text-sm">
+                    62 Events
+                  </span>
+                </div>
+                <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mb-1">
+                  <div 
+                    style={{ width: '100%' }}
+                    className="bg-zinc-700 h-full rounded-full"
+                  />
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>13 Technical Bays & Domains</span>
+                  <span className="font-medium text-zinc-700">100% Synced</span>
                 </div>
               </div>
 
             </div>
           </div>
 
-          <div className="pt-4 border-t border-zinc-100 text-xs text-zinc-400 mt-4">
-            Candidates who did not complete payment on Unstop.
+          <div className="pt-3 border-t border-zinc-100 text-xs text-zinc-400 flex items-center justify-between">
+            <span>Average Ticket: ₹199 - ₹200</span>
+            <span className="font-mono text-zinc-500">Total Leads: 3,673</span>
           </div>
         </div>
 

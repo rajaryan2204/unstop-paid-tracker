@@ -20,7 +20,8 @@ import {
   Smartphone,
   Laptop,
   Tablet,
-  MapPin
+  MapPin,
+  Database
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ export default function Header({
   onOpenBookmarklet,
   onOpenTokenHealth,
   onOpenDeviceActivity,
+  onOpenNeonConfig,
   onExportCSV,
   selectedDomainOverride,
   onSelectDomainOverride,
@@ -147,16 +149,17 @@ export default function Header({
             </span>
           )}
 
-          {/* Neon Database Live Pill */}
-          <div 
-            className="hidden sm:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-zinc-700"
-            title={neonStatus?.isConnected ? `Neon PostgreSQL Live (${neonStatus.lastSyncTime ? new Date(neonStatus.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Live'})` : 'Connecting to Cloud Database...'}
+          {/* Neon Database Live Pill / Credentials Config */}
+          <button 
+            onClick={onOpenNeonConfig}
+            className="hidden sm:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-700 transition-colors cursor-pointer"
+            title={neonStatus?.isConnected ? `Neon PostgreSQL Connected (${neonStatus.lastSyncTime ? new Date(neonStatus.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Live'}). Click to manage credentials & rotation.` : 'Neon Database: Click to configure connection string or manage credentials'}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${neonStatus?.isSyncing ? 'bg-amber-500 animate-pulse' : (neonStatus?.isConnected ? 'bg-emerald-500' : 'bg-zinc-400')}`} />
-            <span className="text-[11px] font-medium text-zinc-600">
-              {neonStatus?.isSyncing ? 'Syncing...' : (neonStatus?.isConnected ? 'Neon Live' : 'Connecting')}
+            <span className="text-[11px] font-medium text-zinc-700">
+              {neonStatus?.isSyncing ? 'Syncing...' : (neonStatus?.isConnected ? 'Neon Live' : 'Neon Setup')}
             </span>
-          </div>
+          </button>
 
           {/* Instagram-style Active Device & Location Pill */}
           <button
@@ -322,6 +325,17 @@ export default function Header({
                     >
                       <ShieldCheck className="w-4 h-4 text-zinc-600 shrink-0" />
                       <span>Autonomous OAuth Health</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenNeonConfig();
+                      }}
+                      className="w-full px-3.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <Database className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Neon Cloud DB Settings</span>
                     </button>
                   </div>
                 )}

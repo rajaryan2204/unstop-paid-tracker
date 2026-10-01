@@ -16,6 +16,7 @@ import DomainBanner from './components/DomainBanner';
 import LoginScreen from './components/LoginScreen';
 import PasswordManagerModal from './components/PasswordManagerModal';
 import DeviceActivityModal from './components/DeviceActivityModal';
+import NeonConfigModal from './components/NeonConfigModal';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
@@ -69,6 +70,7 @@ export default function App() {
   const [isVerificationQueueOpen, setIsVerificationQueueOpen] = useState(false);
   const [isPasswordManagerOpen, setIsPasswordManagerOpen] = useState(false);
   const [isDeviceActivityOpen, setIsDeviceActivityOpen] = useState(false);
+  const [isNeonConfigOpen, setIsNeonConfigOpen] = useState(false);
   
   // Active call logging modal state
   const [callingCandidate, setCallingCandidate] = useState(null);
@@ -354,6 +356,7 @@ export default function App() {
         onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
         onOpenVerificationQueue={() => setIsVerificationQueueOpen(true)}
         onOpenDeviceActivity={() => setIsDeviceActivityOpen(true)}
+        onOpenNeonConfig={() => setIsNeonConfigOpen(true)}
         onExportCSV={handleExportCSV}
         currentUser={currentUser}
         selectedDomainOverride={selectedDomainOverride}
@@ -490,6 +493,13 @@ export default function App() {
         isOpen={isDeviceActivityOpen}
         currentUser={currentUser}
         onClose={() => setIsDeviceActivityOpen(false)}
+      />
+
+      {/* Zero-Leak Neon Cloud Database Configuration & Password Rotation Modal */}
+      <NeonConfigModal
+        isOpen={isNeonConfigOpen}
+        onClose={() => setIsNeonConfigOpen(false)}
+        onTriggerToast={triggerToast}
       />
 
       {/* Floating Toast Notification */}
