@@ -121,7 +121,7 @@ export default function ForgotPasswordModal({
   const waRajUrl = `https://wa.me/919288522520?text=${encodeURIComponent(waRajMsg)}`;
 
   const waSagarMsg = `Hi Sagar bhaiya, I am ${coordName} (${coordDomain}). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
-  const waSagarUrl = `https://wa.me/919771174465?text=${encodeURIComponent(waSagarMsg)}`;
+  const waSagarUrl = `https://wa.me/917366879486?text=${encodeURIComponent(waSagarMsg)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/50 backdrop-blur-xs animate-in fade-in duration-150">
@@ -290,13 +290,13 @@ export default function ForgotPasswordModal({
                     </span>
                   </div>
                   <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                    📞 +91 97711 74465
+                    📞 7366879486
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   <a
-                    href="tel:+919771174465"
+                    href="tel:7366879486"
                     className="p-2 rounded-lg bg-white hover:bg-zinc-100 text-zinc-700 border border-zinc-200 text-xs transition-colors shadow-2xs"
                     title="Call Sagar Anmol"
                   >

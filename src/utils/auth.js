@@ -235,6 +235,7 @@ export const OFFICIAL_ACCOUNTS = [
     defaultPassword: DEFAULT_INITIAL_PASSWORD,
     name: 'Sagar Anmol',
     email: 'sagaranmol@gmail.com',
+    phone: '7366879486',
     role: 'super_admin',
     accountType: 'admin',
     team: 'central',
