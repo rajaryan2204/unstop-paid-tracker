@@ -47,12 +47,12 @@ export default function AuthModal({
     setUsername(acc.username);
     setPassword(acc.password);
     setError('');
-    // Auto-login on click
     onSelectUser(acc);
     onClose();
   };
 
   const admins = OFFICIAL_ACCOUNTS.filter(a => a.accountType === 'admin');
+  const webdevs = OFFICIAL_ACCOUNTS.filter(a => a.accountType === 'webdev');
   const domains = OFFICIAL_ACCOUNTS.filter(a => a.accountType === 'domain');
   const ops = OFFICIAL_ACCOUNTS.filter(a => a.accountType === 'operations');
 
@@ -157,11 +157,11 @@ export default function AuthModal({
 
             <div className="flex items-center justify-between pt-1">
               <span className="text-[11px] text-slate-500">
-                Rule: password is <code className="text-slate-700 font-mono bg-slate-100 px-1 py-0.5 rounded">&lt;username&gt;@sliet</code>
+                Initial password for all accounts: <code className="text-slate-800 font-mono bg-slate-100 px-1 py-0.5 rounded font-semibold">Techfest@2026</code>
               </span>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-95"
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
               >
                 Sign In
               </button>
@@ -252,11 +252,55 @@ export default function AuthModal({
               </div>
             </div>
 
-            {/* 3. Operations & Calling Teams */}
+            {/* 3. WebDev Operations Editor */}
+            {webdevs.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-amber-700 font-semibold flex items-center gap-1.5">
+                    <KeyRound className="w-3.5 h-3.5" /> Operations Record Editor (WebDev)
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">Participant Edit Access</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {webdevs.map(acc => {
+                    const isActive = currentUser?.username === acc.username;
+                    return (
+                      <button
+                        key={acc.username}
+                        type="button"
+                        onClick={() => handleQuickSelect(acc)}
+                        className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between group shadow-xs ${
+                          isActive 
+                            ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-100' 
+                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 font-bold text-xs flex items-center justify-center">
+                            {acc.avatar}
+                          </span>
+                          <div>
+                            <div className="font-semibold text-xs text-slate-900 group-hover:text-amber-700 transition-colors">
+                              {acc.name}
+                            </div>
+                            <div className="text-[10px] font-mono text-slate-500">
+                              {acc.username}
+                            </div>
+                          </div>
+                        </div>
+                        {isActive && <Check className="w-3.5 h-3.5 text-amber-600" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 4. Operations & Calling Teams */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-700 font-semibold flex items-center gap-1.5">
-                  <PhoneCall className="w-3.5 h-3.5" /> Calling & Operations Desks (2)
+                  <PhoneCall className="w-3.5 h-3.5" /> Calling & Operations Desks (1)
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono">Participant Calling Focused</span>
               </div>
@@ -283,7 +327,7 @@ export default function AuthModal({
                             {acc.name}
                           </div>
                           <div className="text-[10px] font-mono text-slate-500">
-                            {acc.username} • {acc.password}
+                            {acc.username}
                           </div>
                         </div>
                       </div>

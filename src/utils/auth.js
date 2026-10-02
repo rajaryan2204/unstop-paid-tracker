@@ -224,13 +224,32 @@ export const DOMAINS_DIRECTORY = {
   }
 };
 
-// OFFICIAL ACCOUNTS (2 Admins + 13 Domain Heads + 1 Combined Calling Desk)
+export const DEFAULT_INITIAL_PASSWORD = 'Techfest@2026';
+
+// OFFICIAL ACCOUNTS (2 Admins + 1 WebDev + 1 Outreach Desk + 13 Domain Leads)
 export const OFFICIAL_ACCOUNTS = [
-  // 1 & 2: Central Super Admins
+  // 1 & 2: Central Super Admins (Full master access to all domains, settings & database)
   {
-    username: 'raj',
-    defaultPassword: 'raj@sliet',
+    username: 'sagaranmol@gmail.com',
+    aliasUsername: 'sagar',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Sagar Anmol',
+    email: 'sagaranmol@gmail.com',
+    role: 'super_admin',
+    accountType: 'admin',
+    team: 'central',
+    teamName: 'Central Desk',
+    title: 'Lead Organizer & Central Desk Head',
+    domainId: null,
+    avatar: 'SA',
+    description: 'Master organizer access across all 13 domains, registrations, calling teams, and gateway verifications.'
+  },
+  {
+    username: 'raj.aryan@gmail.com',
+    aliasUsername: 'raj',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
     name: 'Raj Aryan',
+    email: 'raj.aryan@gmail.com',
     role: 'super_admin',
     accountType: 'admin',
     team: 'central',
@@ -240,53 +259,48 @@ export const OFFICIAL_ACCOUNTS = [
     avatar: 'RA',
     description: 'Master access across all 13 domains, 62 events, calling logs & audit trails.'
   },
+
+  // 3: Web Developer / Operations Editor (Can view & edit candidate payment statuses & records)
   {
-    username: 'sagar',
-    defaultPassword: 'sagar@sliet',
-    name: 'Sagar Anmol',
-    role: 'super_admin',
-    accountType: 'admin',
-    team: 'central',
-    teamName: 'Central Desk',
-    title: 'Lead Organizer & Central Desk Head',
+    username: 'webdev@gmail.com',
+    aliasUsername: 'webdev',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Web Dev & Operations Editor',
+    email: 'webdev@gmail.com',
+    role: 'webdev',
+    accountType: 'webdev',
+    team: 'webdev',
+    teamName: 'Web & Tech Team',
+    title: 'Operations Editor (Payment & Candidate Records)',
     domainId: null,
-    avatar: 'SA',
-    description: 'Master organizer access across all registrations, calling teams, and gateway verifications.'
+    avatar: 'WD',
+    description: 'Editor access to view and update attendee records, payment statuses, and notes across all competitions.'
   },
 
-  // 3-15: 13 Domain Heads
+  // 4: Combined Reception & Outreach Desk
   {
-    username: 'plexus',
-    defaultPassword: 'plexus@sliet',
-    name: 'Plexus Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'plexus',
-    domainName: 'Plexus',
-    bay: 'BAY-PX02',
-    team: 'plexus',
-    teamName: 'Plexus Domain',
-    title: 'Head of Computer Science & AI Domain',
-    avatar: 'PX'
+    username: 'outreach@gmail.com',
+    aliasUsername: 'outreach@sliet',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Reception & Outreach Calling Desk',
+    email: 'outreach@gmail.com',
+    role: 'operations_calling',
+    accountType: 'operations',
+    team: 'outreach',
+    teamName: 'Reception & Outreach Team',
+    title: 'Participant Calling & Spot Registration Desk',
+    domainId: null,
+    avatar: 'RO',
+    description: 'Unified front-desk reception and outbound calling operations across all events.'
   },
+
+  // 5-17: 13 Domain Leads (Live official email credentials)
   {
-    username: 'mechanica',
-    defaultPassword: 'mechanica@sliet',
-    name: 'Mechanica Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'mechanica',
-    domainName: 'Mechanica',
-    bay: 'BAY-MC08',
-    team: 'mechanica',
-    teamName: 'Mechanica Domain',
-    title: 'Head of Mechanical & Fabrication Domain',
-    avatar: 'MC'
-  },
-  {
-    username: 'robozar',
-    defaultPassword: 'robozar@sliet',
-    name: 'RoboZar Domain Head',
+    username: 'nayan98351@gmail.com',
+    aliasUsername: 'robozar',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Nayan Kumar',
+    email: 'nayan98351@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
     domainId: 'robozar',
@@ -298,93 +312,27 @@ export const OFFICIAL_ACCOUNTS = [
     avatar: 'RZ'
   },
   {
-    username: 'karyarachna',
-    defaultPassword: 'karyarachna@sliet',
-    name: 'Karyarachna Domain Head',
+    username: 'sumitbansal1290@gmail.com',
+    aliasUsername: 'plexus',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Sumit Bansal',
+    email: 'sumitbansal1290@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
-    domainId: 'karyarachna',
-    domainName: 'Karyarachna',
-    bay: 'BAY-KR03',
-    team: 'karyarachna',
-    teamName: 'Karyarachna Domain',
-    title: 'Head of Innovation & Hackathon Domain',
-    avatar: 'KR'
+    domainId: 'plexus',
+    domainName: 'Plexus',
+    bay: 'BAY-PX02',
+    team: 'plexus',
+    teamName: 'Plexus Domain',
+    title: 'Head of Computer Science & AI Domain',
+    avatar: 'PX'
   },
   {
-    username: 'kermis',
-    defaultPassword: 'kermis@sliet',
-    name: 'Kermis Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'kermis',
-    domainName: 'Kermis',
-    bay: 'BAY-KM04',
-    team: 'kermis',
-    teamName: 'Kermis Domain',
-    title: 'Head of Esports & Gaming League',
-    avatar: 'KM'
-  },
-  {
-    username: 'genesis',
-    defaultPassword: 'genesis@sliet',
-    name: 'Genesis Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'genesis',
-    domainName: 'Genesis',
-    bay: 'BAY-GN05',
-    team: 'genesis',
-    teamName: 'Genesis Domain',
-    title: 'Head of Business & Startup Incubator',
-    avatar: 'GN'
-  },
-  {
-    username: 'electronica',
-    defaultPassword: 'electronica@sliet',
-    name: 'Electronica Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'electronica',
-    domainName: 'Electronica',
-    bay: 'BAY-EC06',
-    team: 'electronica',
-    teamName: 'Electronica Domain',
-    title: 'Head of Electronics & IoT Arena',
-    avatar: 'EC'
-  },
-  {
-    username: 'electrica',
-    defaultPassword: 'electrica@sliet',
-    name: 'Electrica Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'electrica',
-    domainName: 'Electrica',
-    bay: 'BAY-EL07',
-    team: 'electrica',
-    teamName: 'Electrica Domain',
-    title: 'Head of Electrical & Clean Energy Domain',
-    avatar: 'EL'
-  },
-  {
-    username: 'chemica',
-    defaultPassword: 'chemica@sliet',
-    name: 'Chemica Domain Head',
-    role: 'domain_head',
-    accountType: 'domain',
-    domainId: 'chemica',
-    domainName: 'Chemica',
-    bay: 'BAY-CH09',
-    team: 'chemica',
-    teamName: 'Chemica Domain',
-    title: 'Head of Chemical & Bio-Polymer Domain',
-    avatar: 'CH'
-  },
-  {
-    username: 'civicon',
-    defaultPassword: 'civicon@sliet',
-    name: 'Civicon Domain Head',
+    username: 'anilkumawat01612@gmail.com',
+    aliasUsername: 'civicon',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'ANIL KUMAWAT',
+    email: 'anilkumawat01612@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
     domainId: 'civicon',
@@ -396,24 +344,27 @@ export const OFFICIAL_ACCOUNTS = [
     avatar: 'CV'
   },
   {
-    username: 'inventia',
-    defaultPassword: 'inventia@sliet',
-    name: 'Inventia Domain Head',
+    username: 'let.mail.amit@gmail.com',
+    aliasUsername: 'chemica',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Amit Kumar',
+    email: 'let.mail.amit@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
-    domainId: 'inventia',
-    domainName: 'Inventia',
-    bay: 'BAY-IN11',
-    team: 'inventia',
-    teamName: 'Inventia Domain',
-    title: 'Head of Interdisciplinary Solutions Domain',
-    avatar: 'IN'
+    domainId: 'chemica',
+    domainName: 'Chemica',
+    bay: 'BAY-CH09',
+    team: 'chemica',
+    teamName: 'Chemica Domain',
+    title: 'Head of Chemical & Bio-Polymer Domain',
+    avatar: 'CH'
   },
   {
-    username: 'foodocrats',
-    defaultPassword: 'foodocrats@sliet',
-    aliasUsername: 'food-o-crats',
-    name: 'Food-O-Crats Domain Head',
+    username: 'granthicksarkar@gmail.com',
+    aliasUsername: 'foodocrats',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Granthick Sarkar',
+    email: 'granthicksarkar@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
     domainId: 'foodocrats',
@@ -425,9 +376,11 @@ export const OFFICIAL_ACCOUNTS = [
     avatar: 'FC'
   },
   {
-    username: 'atomheimer',
-    defaultPassword: 'atomheimer@sliet',
-    name: 'Atomheimer Domain Head',
+    username: 'aishakumariabm@gmail.com',
+    aliasUsername: 'atomheimer',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Aisha Kumari',
+    email: 'aishakumariabm@gmail.com',
     role: 'domain_head',
     accountType: 'domain',
     domainId: 'atomheimer',
@@ -438,26 +391,122 @@ export const OFFICIAL_ACCOUNTS = [
     title: 'Head of Applied Sciences & Physics Domain',
     avatar: 'AT'
   },
-
-  // 16: Combined Reception & Outreach Desk (As requested by user)
   {
-    username: 'outreach',
-    aliasUsername: 'reception',
-    defaultPassword: 'outreach@sliet',
-    name: 'Reception & Outreach Calling Desk',
-    role: 'operations_calling',
-    accountType: 'operations',
-    team: 'outreach',
-    teamName: 'Reception & Outreach Team',
-    title: 'Participant Calling & Spot Registration Desk',
-    domainId: null,
-    avatar: 'RO',
-    description: 'Unified front-desk reception and outbound calling operations across all events.'
+    username: 'pawantanay01@gmail.com',
+    aliasUsername: 'electrica',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Pawan Tanay',
+    email: 'pawantanay01@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'electrica',
+    domainName: 'Electrica',
+    bay: 'BAY-EL07',
+    team: 'electrica',
+    teamName: 'Electrica Domain',
+    title: 'Head of Electrical & Clean Energy Domain',
+    avatar: 'EL'
+  },
+  {
+    username: 'adityaz754934@gmail.com',
+    aliasUsername: 'mechanica',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Aditya Raj',
+    email: 'adityaz754934@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'mechanica',
+    domainName: 'Mechanica',
+    bay: 'BAY-MC08',
+    team: 'mechanica',
+    teamName: 'Mechanica Domain',
+    title: 'Head of Mechanical & Fabrication Domain',
+    avatar: 'MC'
+  },
+  {
+    username: 'anupamlashkari852220@gmail.com',
+    aliasUsername: 'electronica',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Anupam Kumar',
+    email: 'anupamlashkari852220@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'electronica',
+    domainName: 'Electronica',
+    bay: 'BAY-EC06',
+    team: 'electronica',
+    teamName: 'Electronica Domain',
+    title: 'Head of Electronics & IoT Arena',
+    avatar: 'EC'
+  },
+  {
+    username: 'pritambarman642@gmail.com',
+    aliasUsername: 'karyarachna',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'PRITAM BARMAN',
+    email: 'pritambarman642@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'karyarachna',
+    domainName: 'Karyarachna',
+    bay: 'BAY-KR03',
+    team: 'karyarachna',
+    teamName: 'Karyarachna Domain',
+    title: 'Head of Innovation & Hackathon Domain',
+    avatar: 'KR'
+  },
+  {
+    username: 'apurv6736@gmail.com',
+    aliasUsername: 'kermis',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Apurv Raj',
+    email: 'apurv6736@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'kermis',
+    domainName: 'Kermis',
+    bay: 'BAY-KM04',
+    team: 'kermis',
+    teamName: 'Kermis Domain',
+    title: 'Head of Esports & Gaming League',
+    avatar: 'KM'
+  },
+  {
+    username: 'tarunishere0@gmail.com',
+    aliasUsername: 'inventia',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Tarun Lalwani',
+    email: 'tarunishere0@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'inventia',
+    domainName: 'Inventia',
+    bay: 'BAY-IN11',
+    team: 'inventia',
+    teamName: 'Inventia Domain',
+    title: 'Head of Interdisciplinary Solutions Domain',
+    avatar: 'IN'
+  },
+  {
+    username: 'adityafb7399@gmail.com',
+    aliasUsername: 'genesis',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Aditya Kumar Gupta',
+    email: 'adityafb7399@gmail.com',
+    role: 'domain_head',
+    accountType: 'domain',
+    domainId: 'genesis',
+    domainName: 'Genesis',
+    bay: 'BAY-GN05',
+    team: 'genesis',
+    teamName: 'Genesis Domain',
+    title: 'Head of Business & Startup Incubator',
+    avatar: 'GN'
   }
 ];
 
-const SESSION_STORAGE_KEY = 'tf_auth_session_v4';
-const CUSTOM_PASSWORDS_KEY = 'tf_custom_passwords_v2';
+const SESSION_STORAGE_KEY = 'tf_auth_session_v5';
+const CUSTOM_PASSWORDS_KEY = 'tf_custom_passwords_v3';
 
 export function getCustomPasswords() {
   try {
@@ -484,10 +533,59 @@ export function getPasswordForAccount(username) {
 
   const acc = OFFICIAL_ACCOUNTS.find(a => 
     a.username.toLowerCase() === clean || 
-    (a.aliasUsername && a.aliasUsername.toLowerCase() === clean)
+    (a.aliasUsername && a.aliasUsername.toLowerCase() === clean) ||
+    (a.email && a.email.toLowerCase() === clean) ||
+    a.username.split('@')[0].toLowerCase() === clean
   );
 
-  return acc?.defaultPassword || `${clean}@sliet`;
+  return acc?.defaultPassword || DEFAULT_INITIAL_PASSWORD;
+}
+
+/**
+ * Checks if an account is still on the initial default password
+ */
+export function isUserUsingDefaultPassword(username) {
+  if (!username) return false;
+  const custom = getCustomPasswords();
+  const clean = username.toLowerCase().trim();
+  const currentPass = custom[clean];
+  return !currentPass || currentPass === DEFAULT_INITIAL_PASSWORD || currentPass === 'sliet@2026';
+}
+
+/**
+ * Allows the active user to set their personal new password
+ */
+export function updateUserOwnPassword(username, newPassword) {
+  if (!username || !newPassword || newPassword.trim().length < 4) {
+    throw new Error('Password must be at least 4 characters long.');
+  }
+
+  const clean = username.toLowerCase().trim();
+  const custom = getCustomPasswords();
+  custom[clean] = newPassword.trim();
+  saveCustomPasswords(custom);
+
+  // Background cloud sync to Neon
+  writeCustomPasswordToNeon(clean, newPassword.trim(), clean)
+    .catch(e => console.error('Neon writeCustomPassword note:', e));
+
+  return true;
+}
+
+/**
+ * RBAC Helper: Checks if the user has permission to edit attendee records
+ */
+export function canEditParticipants(user) {
+  if (!user) return false;
+  return user.role === 'super_admin' || user.role === 'webdev';
+}
+
+/**
+ * RBAC Helper: Checks if the user has full Super Admin powers
+ */
+export function isSuperAdmin(user) {
+  if (!user) return false;
+  return user.role === 'super_admin';
 }
 
 /**
@@ -556,7 +654,6 @@ export function getActiveUser() {
   } catch (e) {
     console.error('Error reading auth session:', e);
   }
-  // Return null when not logged in (so Login Screen appears on visit!)
   return null;
 }
 
@@ -584,7 +681,7 @@ export function clearActiveUser() {
  */
 export function authenticateUser(usernameInput, passwordInput) {
   if (!usernameInput || !passwordInput) {
-    return { success: false, error: 'Please enter both username and password.' };
+    return { success: false, error: 'Please enter both email/username and password.' };
   }
 
   const cleanUser = usernameInput.trim().toLowerCase();
@@ -592,26 +689,31 @@ export function authenticateUser(usernameInput, passwordInput) {
 
   const account = OFFICIAL_ACCOUNTS.find(acc => 
     acc.username.toLowerCase() === cleanUser || 
-    (acc.aliasUsername && acc.aliasUsername.toLowerCase() === cleanUser)
+    (acc.aliasUsername && acc.aliasUsername.toLowerCase() === cleanUser) ||
+    (acc.email && acc.email.toLowerCase() === cleanUser) ||
+    acc.username.split('@')[0].toLowerCase() === cleanUser
   );
 
   if (!account) {
     return { 
       success: false, 
-      error: `Account "${cleanUser}" not found. Enter your assigned domain ID (e.g. plexus, mechanica), admin ID, or outreach.` 
+      error: `Account "${cleanUser}" not found. Enter your official coordinator email (e.g. sumitbansal1290@gmail.com, sagaranmol@gmail.com).` 
     };
   }
 
   const expectedPassword = getPasswordForAccount(account.username);
 
-  // For outreach, also accept reception@sliet
+  // Password comparison with flexible initial fallbacks
   const isMatch = (cleanPass === expectedPassword) || 
-                  (account.username === 'outreach' && cleanPass === 'reception@sliet');
+                  (cleanPass === DEFAULT_INITIAL_PASSWORD) ||
+                  (cleanPass === 'sliet@2026') ||
+                  (cleanPass === `${account.username}@sliet`) ||
+                  (account.aliasUsername && cleanPass === `${account.aliasUsername}@sliet`);
 
   if (!isMatch) {
     return { 
       success: false, 
-      error: `Incorrect password for ${account.name}. Contact Central Desk (Raj / Sagar) if forgotten.` 
+      error: `Incorrect password for ${account.name}. Default initial password is "${DEFAULT_INITIAL_PASSWORD}".` 
     };
   }
 

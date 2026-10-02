@@ -47,11 +47,12 @@ export default function LoginScreen({ onLoginSuccess }) {
   };
 
   const quickLogins = [
-    { label: "Sagar Anmol", user: "sagar", pass: "sagar@sliet", role: "Super Admin", variant: "default" },
-    { label: "Raj Aryan", user: "raj", pass: "raj@sliet", role: "Super Admin", variant: "default" },
-    { label: "Plexus", user: "plexus", pass: "plexus@sliet", role: "Robowars", variant: "outline" },
-    { label: "Mechanica", user: "mechanica", pass: "mechanica@sliet", role: "CAD Bay", variant: "outline" },
-    { label: "Calling Desk 1", user: "caller1", pass: "caller1@sliet", role: "Calling Desk", variant: "outline" },
+    { label: "Sagar Anmol", user: "sagaranmol@gmail.com", pass: "Techfest@2026", role: "Super Admin", variant: "default" },
+    { label: "Raj Aryan", user: "raj.aryan@gmail.com", pass: "Techfest@2026", role: "Super Admin", variant: "default" },
+    { label: "WebDev Editor", user: "webdev@gmail.com", pass: "Techfest@2026", role: "Operations Editor", variant: "outline" },
+    { label: "Outreach Desk", user: "outreach@gmail.com", pass: "Techfest@2026", role: "Calling Desk", variant: "outline" },
+    { label: "Plexus (Sumit)", user: "sumitbansal1290@gmail.com", pass: "Techfest@2026", role: "Plexus Lead", variant: "outline" },
+    { label: "RoboZar (Nayan)", user: "nayan98351@gmail.com", pass: "Techfest@2026", role: "RoboZar Lead", variant: "outline" },
   ];
 
   return (
@@ -79,10 +80,10 @@ export default function LoginScreen({ onLoginSuccess }) {
         <div className="bg-white border border-zinc-200/80 shadow-xs rounded-2xl p-6 sm:p-7">
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Field 1: Username */}
+            {/* Field 1: Official Email */}
             <div>
               <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                Username / Domain ID
+                Official Email / Username
               </label>
               <div className="relative">
                 <input
@@ -96,7 +97,7 @@ export default function LoginScreen({ onLoginSuccess }) {
                     setUsername(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="e.g. plexus, mechanica, raj, sagar"
+                  placeholder="e.g. sumitbansal1290@gmail.com, sagaranmol@gmail.com"
                   className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 outline-none shadow-xs h-10 font-mono"
                 />
                 <User className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
@@ -110,7 +111,7 @@ export default function LoginScreen({ onLoginSuccess }) {
                   Password
                 </label>
                 <span className="text-[11px] font-mono text-zinc-400">
-                  &lt;username&gt;@sliet
+                  Initial: Techfest@2026
                 </span>
               </div>
               <div className="relative">

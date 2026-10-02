@@ -17,7 +17,8 @@ import {
   History,
   Smartphone,
   Laptop,
-  Tablet
+  Tablet,
+  Edit3
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,14 @@ import { Card } from "@/components/ui/card";
 import { getAvatarStyle, getInitials } from '../utils/avatar';
 import { getParticipantCallRecord, CALL_STATUSES } from '../utils/callStore';
 
-export default function CandidateDrawer({ participant, onClose, onTriggerCall, callDbVersion = 0 }) {
+export default function CandidateDrawer({ 
+  participant, 
+  currentUser, 
+  onClose, 
+  onTriggerCall, 
+  callDbVersion = 0,
+  onUpdateParticipant 
+}) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -55,6 +63,40 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
   const callCount = callRecord?.callCount || 0;
   const history = callRecord?.history || [];
   const latestStatusDef = callRecord?.lastStatus ? CALL_STATUSES[callRecord.lastStatus] : null;
+
+  // Edit state for WebDev and Super Admins
+  const canEdit = currentUser?.role === 'super_admin' || currentUser?.role === 'webdev';
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editStatus, setEditStatus] = React.useState(participant.payment_status || (amt > 0 ? 'PAID' : 'INCOMPLETE'));
+  const [editAmount, setEditAmount] = React.useState(participant.amount !== undefined ? String(participant.amount) : '0');
+  const [editPaymentId, setEditPaymentId] = React.useState(participant.payment_id || '');
+  const [editUtr, setEditUtr] = React.useState(participant.utr_number || '');
+  const [editRemark, setEditRemark] = React.useState(participant.admin_note || '');
+
+  React.useEffect(() => {
+    if (participant) {
+      setEditStatus(participant.payment_status || (Number(participant.amount) > 0 ? 'PAID' : 'INCOMPLETE'));
+      setEditAmount(participant.amount !== undefined ? String(participant.amount) : '0');
+      setEditPaymentId(participant.payment_id || '');
+      setEditUtr(participant.utr_number || '');
+      setEditRemark(participant.admin_note || '');
+      setIsEditing(false);
+    }
+  }, [participant]);
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (onUpdateParticipant) {
+      onUpdateParticipant(participant.id, {
+        payment_status: editStatus,
+        amount: editStatus === 'PAID' ? (Number(editAmount) || 200) : (editStatus === 'FREE' ? 0 : Number(editAmount) || 0),
+        payment_id: editPaymentId.trim(),
+        utr_number: editUtr.trim(),
+        admin_note: editRemark.trim()
+      });
+    }
+    setIsEditing(false);
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -92,15 +134,32 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
               </div>
             </div>
 
-            <Button
-              variant="ghost"
-              size="iconSm"
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60"
-              title="Close (Esc)"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1.5">
+              {canEdit && (
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={`px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    isEditing 
+                      ? 'bg-zinc-900 text-white border-zinc-900' 
+                      : 'bg-white hover:bg-zinc-100 text-zinc-700 border-zinc-200 shadow-2xs'
+                  }`}
+                  title="Edit participant payment status & operations details"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit Record'}</span>
+                </button>
+              )}
+
+              <Button
+                variant="ghost"
+                size="iconSm"
+                onClick={onClose}
+                className="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60"
+                title="Close (Esc)"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Body Content */}
@@ -142,6 +201,132 @@ export default function CandidateDrawer({ participant, onClose, onTriggerCall, c
                 </a>
               )}
             </div>
+
+            {/* Interactive Record Editor for WebDev & Super Admins */}
+            {isEditing && (
+              <form onSubmit={handleSaveEdit} className="p-4 rounded-xl bg-white border border-zinc-300 shadow-sm space-y-3 animate-in fade-in zoom-in-95 duration-100">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+                  <div className="flex items-center gap-2">
+                    <Edit3 className="w-4 h-4 text-zinc-900" />
+                    <span className="text-xs font-bold text-zinc-900">
+                      Operations Record Editor
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
+                    {currentUser?.role === 'webdev' ? 'WebDev Access' : 'Super Admin'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Payment Status
+                    </label>
+                    <select
+                      value={editStatus}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditStatus(val);
+                        if (val === 'PAID' && (!editAmount || editAmount === '0')) {
+                          setEditAmount('200');
+                        } else if (val === 'FREE') {
+                          setEditAmount('0');
+                        }
+                      }}
+                      className="w-full text-xs bg-white border border-zinc-300 rounded-lg p-2 font-semibold text-zinc-900 focus:border-zinc-900 outline-none"
+                    >
+                      <option value="PAID">PAID (Confirmed)</option>
+                      <option value="INCOMPLETE">INCOMPLETE (Fee Pending)</option>
+                      <option value="FREE">FREE (Entry Pass)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Amount Collected (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(e.target.value)}
+                      placeholder="e.g. 200"
+                      className="w-full text-xs bg-white border border-zinc-300 rounded-lg p-2 font-mono text-zinc-900 focus:border-zinc-900 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Payment / Txn Ref ID
+                    </label>
+                    <input
+                      type="text"
+                      value={editPaymentId}
+                      onChange={(e) => setEditPaymentId(e.target.value)}
+                      placeholder="e.g. ORD_1744..."
+                      className="w-full text-xs bg-white border border-zinc-300 rounded-lg p-2 font-mono text-zinc-900 focus:border-zinc-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      UTR / Direct UPI Ref
+                    </label>
+                    <input
+                      type="text"
+                      value={editUtr}
+                      onChange={(e) => setEditUtr(e.target.value)}
+                      placeholder="e.g. 427819..."
+                      className="w-full text-xs bg-white border border-zinc-300 rounded-lg p-2 font-mono text-zinc-900 focus:border-zinc-900 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                    Editor Remark / Verification Note
+                  </label>
+                  <input
+                    type="text"
+                    value={editRemark}
+                    onChange={(e) => setEditRemark(e.target.value)}
+                    placeholder="e.g. Verified by WebDev / Paid offline via UPI"
+                    className="w-full text-xs bg-white border border-zinc-300 rounded-lg p-2 text-zinc-900 focus:border-zinc-900 outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Custom Override Notice Banner if modified */}
+            {participant._hasCustomOverride && !isEditing && (
+              <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs flex items-center justify-between">
+                <span className="font-semibold">
+                  ✏️ Operations Override Active: Updated by {participant._overrideMeta?.updatedBy || 'Staff'}
+                </span>
+                <span className="text-[10px] font-mono text-purple-600">
+                  {participant._overrideMeta?.updatedAt ? new Date(participant._overrideMeta.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                </span>
+              </div>
+            )}
 
             {/* Payment & Verification Status Banner */}
             {amt > 0 || participant.payment_status === 'PAID' ? (

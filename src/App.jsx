@@ -18,6 +18,7 @@ import PasswordManagerModal from './components/PasswordManagerModal';
 import DeviceActivityModal from './components/DeviceActivityModal';
 import NeonConfigModal from './components/NeonConfigModal';
 import AntiGravityReportModal from './components/AntiGravityReportModal';
+import ForcePasswordChangeModal from './components/ForcePasswordChangeModal';
 import Toast from './components/Toast';
 
 import { exportParticipantsToCSV } from './utils/csv';
@@ -27,12 +28,18 @@ import {
   clearActiveUser,
   getParticipantsForUser, 
   syncPasswordsWithNeon,
+  isUserUsingDefaultPassword,
   DOMAINS_DIRECTORY 
 } from './utils/auth';
+import { 
+  applyParticipantOverrides, 
+  saveParticipantOverride 
+} from './utils/participantOverrides';
 import { 
   logCallForParticipant, 
   getPaymentVerificationQueue, 
   syncWithNeonDatabase,
+  addAuditLog,
   CALL_STATUSES 
 } from './utils/callStore';
 import { subscribeDbStatus } from './utils/neonDb';
@@ -43,7 +50,7 @@ import initialData from '../data.json';
 export default function App() {
   const [participants, setParticipants] = useState(() => {
     if (initialData && Array.isArray(initialData.participants)) {
-      return initialData.participants;
+      return applyParticipantOverrides(initialData.participants);
     }
     return [];
   });
@@ -65,6 +72,7 @@ export default function App() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   
   // Modals state
+  const [isForcePasswordModalOpen, setIsForcePasswordModalOpen] = useState(false);
   const [isBookmarkletOpen, setIsBookmarkletOpen] = useState(false);
   const [isTokenHealthOpen, setIsTokenHealthOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -136,12 +144,12 @@ export default function App() {
           if (res.ok) {
             const data = await res.json();
             if (data.participants && Array.isArray(data.participants)) {
-              setParticipants(data.participants);
+              setParticipants(applyParticipantOverrides(data.participants));
               if (data.summary) setSummary(data.summary);
               loaded = true;
               break;
             } else if (Array.isArray(data)) {
-              setParticipants(data);
+              setParticipants(applyParticipantOverrides(data));
               loaded = true;
               break;
             }
@@ -250,7 +258,77 @@ export default function App() {
       type: 'success',
       message: `Welcome, ${user.name}! Operations dashboard unlocked.`
     });
+
+    // Check if user is on default password, prompt to change
+    if (isUserUsingDefaultPassword(user.username)) {
+      setTimeout(() => {
+        setIsForcePasswordModalOpen(true);
+      }, 500);
+    }
   }, [triggerToast]);
+
+  // Handle Participant Record Edit by WebDev / Super Admin
+  const handleUpdateParticipant = useCallback((participantId, updatedFields) => {
+    saveParticipantOverride(participantId, updatedFields, currentUser);
+    
+    setParticipants(prev => {
+      return prev.map(p => {
+        if (String(p.id) === String(participantId)) {
+          const merged = { ...p, ...updatedFields };
+          if (updatedFields.payment_status) {
+            merged.is_paid = updatedFields.payment_status === 'PAID';
+          }
+          if (updatedFields.amount !== undefined) {
+            merged.amount = Number(updatedFields.amount);
+          }
+          merged._hasCustomOverride = true;
+          merged._overrideMeta = {
+            updatedBy: currentUser?.name || 'Staff',
+            updatedAt: new Date().toISOString()
+          };
+          return merged;
+        }
+        return p;
+      });
+    });
+
+    setSelectedParticipant(curr => {
+      if (curr && String(curr.id) === String(participantId)) {
+        const merged = { ...curr, ...updatedFields };
+        if (updatedFields.payment_status) {
+          merged.is_paid = updatedFields.payment_status === 'PAID';
+        }
+        if (updatedFields.amount !== undefined) {
+          merged.amount = Number(updatedFields.amount);
+        }
+        merged._hasCustomOverride = true;
+        merged._overrideMeta = {
+          updatedBy: currentUser?.name || 'Staff',
+          updatedAt: new Date().toISOString()
+        };
+        return merged;
+      }
+      return curr;
+    });
+
+    addAuditLog({
+      actorName: currentUser?.name || 'Staff',
+      actorRole: currentUser?.role || 'editor',
+      actorTeam: currentUser?.teamName || 'Operations',
+      action: 'PARTICIPANT_OVERRIDE',
+      targetId: String(participantId),
+      targetName: `Participant #${participantId}`,
+      eventName: 'Operations Override',
+      prevStatus: 'ORIGINAL',
+      nextStatus: updatedFields.payment_status || 'MODIFIED',
+      details: `Updated participant: status ${updatedFields.payment_status || 'N/A'}, amount ₹${updatedFields.amount ?? 0}`
+    });
+
+    triggerToast({
+      type: 'success',
+      message: 'Participant record updated successfully!'
+    });
+  }, [currentUser, triggerToast]);
 
   // Sync active user session on load
   useEffect(() => {
@@ -361,6 +439,7 @@ export default function App() {
         isRefreshing={isRefreshing}
         onLogout={handleLogout}
         onOpenPasswordManager={() => setIsPasswordManagerOpen(true)}
+        onOpenChangePassword={() => setIsForcePasswordModalOpen(true)}
         onOpenBookmarklet={() => setIsBookmarkletOpen(true)}
         onOpenTokenHealth={() => setIsTokenHealthOpen(true)}
         onOpenAuth={() => setIsAuthModalOpen(true)}
@@ -439,8 +518,19 @@ export default function App() {
         key={`drawer_${selectedParticipant?.id}`}
         callDbVersion={callDbVersion}
         participant={selectedParticipant}
+        currentUser={currentUser}
         onClose={() => setSelectedParticipant(null)}
         onTriggerCall={handleTriggerCall}
+        onUpdateParticipant={handleUpdateParticipant}
+      />
+
+      {/* Force / Prompt Password Change Modal (First login or self-service) */}
+      <ForcePasswordChangeModal
+        isOpen={isForcePasswordModalOpen}
+        currentUser={currentUser}
+        onClose={() => setIsForcePasswordModalOpen(false)}
+        onTriggerToast={triggerToast}
+        isForced={isUserUsingDefaultPassword(currentUser?.username)}
       />
 
       {/* Pop-up Box for Call Remarks, Lead Number & Status (As requested by Sagar) */}

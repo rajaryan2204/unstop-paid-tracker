@@ -34,6 +34,7 @@ export default function Header({
   isRefreshing, 
   onLogout,
   onOpenPasswordManager,
+  onOpenChangePassword,
   onOpenAuditLogs,
   onOpenVerificationQueue,
   onOpenBookmarklet,
@@ -244,6 +245,20 @@ export default function Header({
                       </div>
                     </div>
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                  </button>
+                </div>
+
+                {/* Change My Password (Available for all roles: Domain Heads, WebDev, Admins) */}
+                <div className="py-1 border-b border-zinc-100">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onOpenChangePassword();
+                    }}
+                    className="w-full px-3.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
+                  >
+                    <KeyRound className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>Change My Password</span>
                   </button>
                 </div>
 
