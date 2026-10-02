@@ -11,15 +11,13 @@ import {
   Smartphone,
   Laptop,
   Tablet,
-  MapPin,
-  HelpCircle,
-  RotateCcw
+  MapPin
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { authenticateUser, getPasswordForAccount } from '../utils/auth';
+import { authenticateUser } from '../utils/auth';
 import { getDeviceInfo } from '../utils/device';
 import ForgotPasswordModal from './ForgotPasswordModal';
 
@@ -55,15 +53,6 @@ export default function LoginScreen({ onLoginSuccess }) {
     setPassword(newPass);
     setError('');
   };
-
-  const quickLogins = [
-    { label: "Sagar Anmol", user: "sagaranmol@gmail.com", role: "Super Admin", variant: "default" },
-    { label: "Raj Aryan", user: "raj.aryan@gmail.com", role: "Super Admin", variant: "default" },
-    { label: "WebDev Editor", user: "webdev@gmail.com", role: "Operations Editor", variant: "outline" },
-    { label: "Outreach Desk", user: "outreach@gmail.com", role: "Calling Desk", variant: "outline" },
-    { label: "Plexus (Sumit)", user: "sumitbansal1290@gmail.com", role: "Plexus Lead", variant: "outline" },
-    { label: "RoboZar (Nayan)", user: "nayan98351@gmail.com", role: "RoboZar Lead", variant: "outline" },
-  ];
 
   return (
     <div className="min-h-screen bg-[#F4F4F5] text-zinc-900 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-10 relative select-none font-sans">
@@ -187,47 +176,6 @@ export default function LoginScreen({ onLoginSuccess }) {
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </form>
-
-          {/* Quick Access Roster Chips */}
-          <div className="mt-6 pt-5 border-t border-zinc-100">
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-[11px] font-medium text-zinc-400">
-                Quick Sign In:
-              </span>
-              <button
-                type="button"
-                onClick={() => setIsForgotModalOpen(true)}
-                className="text-[10px] text-zinc-500 hover:text-zinc-800 font-medium cursor-pointer"
-              >
-                Admin Reset Desk →
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {quickLogins.map((item, idx) => {
-                const currentPass = getPasswordForAccount(item.user);
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setUsername(item.user);
-                      setPassword(currentPass);
-                      setError('');
-                      const res = authenticateUser(item.user, currentPass);
-                      if (res.success) onLoginSuccess(res.user);
-                    }}
-                    className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                      item.variant === 'default'
-                        ? 'bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-800'
-                        : 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
         {/* Device & Location Security Badge */}
