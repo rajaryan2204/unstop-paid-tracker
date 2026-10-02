@@ -112,12 +112,16 @@ export default function ForgotPasswordModal({
     }
   };
 
-  // WhatsApp template
+  // WhatsApp templates
   const coordName = selectedDomainAcc?.name || 'Coordinator';
   const coordDomain = selectedDomainAcc?.domainName || 'Domain Lead';
   const coordEmail = selectedDomainAcc?.username || '';
-  const waMessage = `Hi Sagar / Raj bhaiya, I am ${coordName} (${coordDomain} Lead). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
-  const waUrl = `https://wa.me/919771174465?text=${encodeURIComponent(waMessage)}`;
+  
+  const waRajMsg = `Hi Raj Aryan, I am ${coordName} (${coordDomain}). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
+  const waRajUrl = `https://wa.me/919288522520?text=${encodeURIComponent(waRajMsg)}`;
+
+  const waSagarMsg = `Hi Sagar bhaiya, I am ${coordName} (${coordDomain}). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
+  const waSagarUrl = `https://wa.me/919771174465?text=${encodeURIComponent(waSagarMsg)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/50 backdrop-blur-xs animate-in fade-in duration-150">
@@ -238,28 +242,87 @@ export default function ForgotPasswordModal({
             )}
 
             {/* Direct Action Buttons */}
-            <div className="space-y-2 pt-2">
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Request Reset on WhatsApp (+91 97711 74465)</span>
-              </a>
+            <div className="space-y-2.5 pt-2">
+              {/* Primary Technical Support: Raj Aryan (Web Dev Member) */}
+              <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2.5 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-xs text-white flex items-center gap-1.5">
+                      <span>Raj Aryan</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-emerald-400 border border-zinc-700">
+                        Web Dev Member
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-zinc-300 font-mono mt-0.5">
+                      📞 9288522520 • ✉️ raj.aryan9242@gmail.com
+                    </div>
+                  </div>
+                </div>
 
-              <a
-                href="tel:+919771174465"
-                className="w-full py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
-              >
-                <PhoneCall className="w-4 h-4 text-zinc-600" />
-                <span>Call Sagar Anmol (Central Operations Lead)</span>
-              </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href="tel:9288522520"
+                    className="py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                  >
+                    <PhoneCall className="w-3.5 h-3.5" />
+                    <span>Call Raj Aryan</span>
+                  </a>
+
+                  <a
+                    href={waRajUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors border border-zinc-700"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>WhatsApp Raj</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Central Operations Lead: Sagar Anmol */}
+              <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-xs text-zinc-900 flex items-center gap-1.5">
+                    <span>Sagar Anmol</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200">
+                      Central Desk Lead
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                    📞 +91 97711 74465
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <a
+                    href="tel:+919771174465"
+                    className="p-2 rounded-lg bg-white hover:bg-zinc-100 text-zinc-700 border border-zinc-200 text-xs transition-colors shadow-2xs"
+                    title="Call Sagar Anmol"
+                  >
+                    <PhoneCall className="w-3.5 h-3.5 text-zinc-600" />
+                  </a>
+                  <a
+                    href={waSagarUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs transition-colors shadow-2xs"
+                    title="WhatsApp Sagar Anmol"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                  </a>
+                </div>
+              </div>
             </div>
 
-            <div className="pt-2 text-center text-[11px] text-zinc-400">
-              For immediate technical assistance: <span className="font-semibold text-zinc-600">raj.aryan@gmail.com</span>
+            <div className="pt-1 text-center text-[11px] text-zinc-500">
+              Web Dev Support Email:{' '}
+              <a
+                href={`mailto:raj.aryan9242@gmail.com?subject=techFEST%2026%20Password%20Reset%20-%20${encodeURIComponent(coordDomain)}`}
+                className="font-semibold text-zinc-800 underline hover:text-zinc-950 font-mono"
+              >
+                raj.aryan9242@gmail.com
+              </a>
             </div>
           </div>
         )}
@@ -331,7 +394,7 @@ export default function ForgotPasswordModal({
                     className="w-full bg-white border border-zinc-300 focus:border-zinc-900 rounded-xl px-3 py-2 text-xs text-zinc-900 outline-none font-medium shadow-xs"
                   >
                     <option value="sagaranmol@gmail.com">Sagar Anmol (sagaranmol@gmail.com)</option>
-                    <option value="raj.aryan@gmail.com">Raj Aryan (raj.aryan@gmail.com)</option>
+                    <option value="raj.aryan9242@gmail.com">Raj Aryan (raj.aryan9242@gmail.com)</option>
                   </select>
                 </div>
 
