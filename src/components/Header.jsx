@@ -114,14 +114,6 @@ export default function Header({
                 </span>
               )}
             </button>
-            <button
-              onClick={onOpenAntiGravityReport}
-              className="px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors flex items-center gap-1 cursor-pointer text-emerald-800 bg-emerald-50/70 border border-emerald-200/60 font-semibold"
-              title="Anti-Gravity Operations Intelligence Report (Sliet Hub)"
-            >
-              <FileText className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Anti-Gravity Report</span>
-            </button>
             {isSuperAdmin && (
               <button
                 onClick={onOpenAuditLogs}
@@ -142,7 +134,7 @@ export default function Header({
               <select
                 value={selectedDomainOverride || 'ALL'}
                 onChange={(e) => onSelectDomainOverride(e.target.value)}
-                className="h-8 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-800 rounded-lg px-2 py-1 outline-none font-medium focus:border-zinc-900 cursor-pointer w-[125px] sm:w-[155px] truncate shadow-xs transition-colors"
+                className="h-8 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-800 rounded-lg px-2 py-1 outline-none font-medium focus:border-zinc-900 cursor-pointer w-[115px] sm:w-[155px] truncate shadow-xs transition-colors"
               >
                 <option value="ALL">All 13 Domains</option>
                 {Object.values(DOMAINS_DIRECTORY).map(d => (
@@ -153,22 +145,10 @@ export default function Header({
               </select>
             </div>
           ) : (
-            <span className="h-8 px-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs font-medium text-zinc-700 flex items-center max-w-[140px] truncate">
+            <span className="h-8 px-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs font-medium text-zinc-700 flex items-center max-w-[120px] sm:max-w-[140px] truncate">
               {currentUser?.domainName || currentUser?.teamName}
             </span>
           )}
-
-          {/* Neon Database Live Pill / Credentials Config */}
-          <button 
-            onClick={onOpenNeonConfig}
-            className="hidden sm:flex items-center gap-1.5 h-8 px-2.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-700 transition-colors cursor-pointer"
-            title={neonStatus?.isConnected ? `Neon PostgreSQL Connected (${neonStatus.lastSyncTime ? new Date(neonStatus.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Live'}). Click to manage credentials & rotation.` : 'Neon Database: Click to configure connection string or manage credentials'}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${neonStatus?.isSyncing ? 'bg-amber-500 animate-pulse' : (neonStatus?.isConnected ? 'bg-emerald-500' : 'bg-zinc-400')}`} />
-            <span className="text-[11px] font-medium text-zinc-700">
-              {neonStatus?.isSyncing ? 'Syncing...' : (neonStatus?.isConnected ? 'Neon Live' : 'Neon Setup')}
-            </span>
-          </button>
 
           {/* Device Pill (Shown on very wide screens to prevent navbar clutter on laptops) */}
           <button

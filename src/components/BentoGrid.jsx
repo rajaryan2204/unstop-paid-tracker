@@ -192,7 +192,7 @@ export default function BentoGrid({
         {/* ========================================================
             CARD 1: Registration Velocity & Daily Chart Breakdown
             ======================================================== */}
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-zinc-200/80 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export default function BentoGrid({
             </p>
 
             {/* Minimalist Neutral Bar Chart with Tooltips */}
-            <div className="h-32 flex items-end justify-between gap-2.5 px-2 pt-2 pb-1 mb-4 border-b border-zinc-100">
+            <div className="h-32 flex items-end justify-between gap-1 sm:gap-2.5 px-1 sm:px-2 pt-2 pb-1 mb-4 border-b border-zinc-100">
               {chartBars.map((bar, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group relative">
                   {/* Hover Floating Pill */}
@@ -252,7 +252,7 @@ export default function BentoGrid({
                   title={`Fee Not Paid: ${incompleteCount} (${Math.round((incompleteCount / totalCount) * 100)}%)`}
                 />
               </div>
-              <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1 font-mono">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-zinc-500 mt-1.5 font-mono gap-1">
                 <span className="flex items-center gap-1 font-medium text-zinc-800">
                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-900 inline-block" />
                   Completed: {completedCount} (19%)
@@ -265,7 +265,7 @@ export default function BentoGrid({
             </div>
 
             {/* 2 Stat Tiles: Completed vs Fee Not Paid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
               <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1 flex items-center justify-between">
                   <span>COMPLETED</span>
@@ -307,7 +307,7 @@ export default function BentoGrid({
         {/* ========================================================
             CARD 2: Total Revenue & Calling Recovery Pipeline
             ======================================================== */}
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-zinc-200/80 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
@@ -322,17 +322,17 @@ export default function BentoGrid({
             </p>
 
             {/* Hero Revenue Box */}
-            <div className="bg-zinc-900 rounded-xl p-4 text-white mb-4 shadow-xs">
+            <div className="bg-zinc-900 rounded-xl p-3.5 sm:p-4 text-white mb-4 shadow-xs">
               <div className="flex items-center justify-between text-zinc-400 text-xs mb-1">
                 <span className="font-medium">Direct Unstop Gateway Revenue</span>
                 <span className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">
                   {paidGatewayCount} Paid Receipts
                 </span>
               </div>
-              <div className="text-3xl font-bold tracking-tight text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1">
                 ₹{gatewayRevenue.toLocaleString('en-IN')}
               </div>
-              <div className="text-[11px] text-zinc-400 flex items-center justify-between pt-2 border-t border-zinc-800">
+              <div className="text-[11px] text-zinc-400 flex flex-wrap items-center justify-between gap-1 pt-2 border-t border-zinc-800">
                 <span>RC Boat (₹2,995) • Soldering (₹598) • Ghost Code (₹200)</span>
               </div>
             </div>
@@ -392,7 +392,7 @@ export default function BentoGrid({
         {/* ========================================================
             CARD 3: Registration Milestones & Conversion Funnel
             ======================================================== */}
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-zinc-200/80 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
@@ -497,7 +497,7 @@ export default function BentoGrid({
       {/* ========================================================
           RECENT OPERATIONS ACTIVITY (Like Recent Transactions)
           ======================================================== */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs">
+      <div className="bg-white rounded-2xl border border-zinc-200/80 p-4 sm:p-6 shadow-xs">
         <div className="flex items-center justify-between mb-1">
           <div>
             <h3 className="font-semibold text-sm text-zinc-900 tracking-tight">
@@ -524,24 +524,24 @@ export default function BentoGrid({
                 key={act.id} 
                 className="py-3 flex items-center justify-between gap-3 group hover:bg-zinc-50/60 -mx-2 px-2 rounded-xl transition-colors"
               >
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0 group-hover:bg-zinc-200 transition-colors">
                     <IconComp className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium text-xs text-zinc-900 truncate flex items-center justify-between gap-2">
+                    <div className="font-medium text-xs text-zinc-900 flex items-center justify-between gap-2">
                       <span className="truncate">{act.title}</span>
-                      <span className="text-[11px] font-medium text-zinc-400 shrink-0">
+                      <span className="text-[10.5px] font-medium text-zinc-400 shrink-0">
                         {act.time}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between gap-2 mt-0.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mt-0.5">
                       <div className="text-[11px] text-zinc-500 truncate">
                         {act.subtitle}
                       </div>
                       {act.device && (
                         <span 
-                          className="inline-flex items-center gap-1 text-[10px] font-mono text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60 shrink-0"
+                          className="inline-flex items-center gap-1 text-[9.5px] font-mono text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200/60 shrink-0 self-start sm:self-auto"
                           title={`Logged via: ${act.device}`}
                         >
                           {act.deviceType === 'mobile' ? (

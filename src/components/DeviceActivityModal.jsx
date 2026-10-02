@@ -24,6 +24,7 @@ import {
   getDeviceInfo, 
   fetchNetworkLocationInfo, 
   getActiveLoginSessions, 
+  fetchCloudLoginSessions,
   terminateLoginSession 
 } from '../utils/device';
 
@@ -37,6 +38,14 @@ export default function DeviceActivityModal({ isOpen, onClose, currentUser }) {
     if (isOpen) {
       setDeviceInfo(getDeviceInfo());
       setSessions(getActiveLoginSessions());
+
+      // Fetch cloud sessions from Neon DB
+      fetchCloudLoginSessions().then(cloudSessions => {
+        if (cloudSessions && cloudSessions.length > 0) {
+          setSessions(cloudSessions);
+        }
+      });
+
       // Refresh live IP and location in background
       fetchNetworkLocationInfo(false).then(() => {
         setDeviceInfo(getDeviceInfo());
@@ -52,7 +61,11 @@ export default function DeviceActivityModal({ isOpen, onClose, currentUser }) {
     try {
       await fetchNetworkLocationInfo(true);
       setDeviceInfo(getDeviceInfo());
-      setActionNotice('Live network IP and location synchronized via Geolocation API.');
+      const cloud = await fetchCloudLoginSessions();
+      if (cloud && cloud.length > 0) {
+        setSessions(cloud);
+      }
+      setActionNotice('Live network IP and cloud devices synchronized.');
       setTimeout(() => setActionNotice(''), 4000);
     } catch (e) {
       setActionNotice('Location updated from current network profile.');
@@ -218,9 +231,9 @@ export default function DeviceActivityModal({ isOpen, onClose, currentUser }) {
                 }) : 'Recently';
 
                 return (
-                  <div key={sess.id} className="p-3.5 flex items-start justify-between gap-3 hover:bg-zinc-50/70 transition-colors">
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <div key={sess.id} className="p-3 sm:p-3.5 flex items-start justify-between gap-2.5 sm:gap-3 hover:bg-zinc-50/70 transition-colors">
+                    <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 mt-0.5">
                         {isMobile ? (
                           <Smartphone className="w-4 h-4" />
                         ) : isTablet ? (
@@ -231,25 +244,30 @@ export default function DeviceActivityModal({ isOpen, onClose, currentUser }) {
                       </div>
 
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-xs text-zinc-900 truncate">
-                            {sess.deviceModel} • {sess.browser}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-xs text-zinc-900">
+                            {sess.deviceModel}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-zinc-100 text-zinc-700 border border-zinc-200 shrink-0">
+                          <span className="text-[10px] text-zinc-400 font-mono">
+                            • {sess.browser}
+                          </span>
+                          <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono bg-zinc-100 text-zinc-700 border border-zinc-200 shrink-0">
                             {sess.teamName}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-600 mt-0.5">
-                          <MapPin className="w-3 h-3 text-zinc-400 shrink-0" />
-                          <span>{sess.location}</span>
+                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-600 mt-0.5 flex-wrap">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                            <span>{sess.location}</span>
+                          </span>
                           <span className="text-zinc-300">•</span>
                           <span className="text-zinc-400 font-mono text-[10px]">{sess.ip}</span>
                         </div>
 
                         <div className="text-[10px] text-zinc-400 font-mono mt-0.5 flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5 text-zinc-400" />
-                          <span>Signed in {dateStr} ({sess.userName})</span>
+                          <Clock className="w-2.5 h-2.5 text-zinc-400 shrink-0" />
+                          <span className="truncate">Signed in {dateStr} ({sess.userName})</span>
                         </div>
                       </div>
                     </div>

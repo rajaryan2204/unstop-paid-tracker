@@ -36,6 +36,7 @@ import {
   CALL_STATUSES 
 } from './utils/callStore';
 import { subscribeDbStatus } from './utils/neonDb';
+import { recordLoginSession } from './utils/device';
 
 import initialData from '../data.json';
 
@@ -244,11 +245,19 @@ export default function App() {
     setCurrentUser(user);
     setSelectedDomainOverride('ALL');
     setSelectedEventFilter('');
+    recordLoginSession(user);
     triggerToast({
       type: 'success',
       message: `Welcome, ${user.name}! Operations dashboard unlocked.`
     });
   }, [triggerToast]);
+
+  // Sync active user session on load
+  useEffect(() => {
+    if (currentUser) {
+      recordLoginSession(currentUser);
+    }
+  }, []);
 
   // Handle Explicit Logout
   const handleLogout = useCallback(() => {

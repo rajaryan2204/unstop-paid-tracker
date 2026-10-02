@@ -4,7 +4,7 @@
 import { neon } from '@neondatabase/serverless';
 
 export const DEFAULT_NEON_DATABASE_URL = 
-  import.meta.env?.VITE_NEON_DATABASE_URL || '';
+  import.meta.env?.VITE_NEON_DATABASE_URL || 'postgresql://neondb_owner:npg_Sr9XpW5sKcPU@ep-late-shadow-awcbgs14-pooler.c-12.us-east-1.aws.neon.tech/neondb?sslmode=require';
 
 let sqlClient = null;
 
@@ -389,3 +389,106 @@ export async function deleteCustomPasswordFromNeon(username) {
     return false;
   }
 }
+
+/**
+ * Save / Upsert a device login session to Neon PostgreSQL
+ */
+export async function saveDeviceSessionToNeon(session) {
+  const sql = getSqlClient();
+  if (!sql || !session || !session.id) return false;
+
+  try {
+    await sql`
+      INSERT INTO device_sessions (
+        id, username, user_name, team_name, role, device_model, browser, os, device_type, ip, location, full_location, isp, login_time, last_active, is_active
+      ) VALUES (
+        ${session.id},
+        ${session.username || 'unknown'},
+        ${session.userName || session.username || 'User'},
+        ${session.teamName || 'Central Operations'},
+        ${session.role || 'domain_head'},
+        ${session.deviceModel || 'Mobile / Device'},
+        ${session.browser || 'Web Browser'},
+        ${session.os || 'Android'},
+        ${session.deviceType || 'mobile'},
+        ${session.ip || '103.xx.xx.xx'},
+        ${session.location || 'Sangrur, Punjab'},
+        ${session.fullLocation || 'Sangrur, Punjab, India'},
+        ${session.isp || 'Cellular / Wi-Fi'},
+        ${session.loginTime ? new Date(session.loginTime) : new Date()},
+        NOW(),
+        TRUE
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        last_active = NOW(),
+        is_active = TRUE,
+        device_model = EXCLUDED.device_model,
+        browser = EXCLUDED.browser,
+        ip = EXCLUDED.ip,
+        location = EXCLUDED.location
+    `;
+    dbStatus.isConnected = true;
+    dbStatus.error = null;
+    notifyStatus();
+    return true;
+  } catch (err) {
+    console.warn('Could not sync device session to Neon:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Fetch all active device sessions from Neon PostgreSQL
+ */
+export async function fetchDeviceSessionsFromNeon() {
+  const sql = getSqlClient();
+  if (!sql) return [];
+
+  try {
+    const rows = await sql`
+      SELECT 
+        id, username, user_name as "userName", team_name as "teamName", 
+        role, device_model as "deviceModel", browser, os, 
+        device_type as "deviceType", ip, location, full_location as "fullLocation", 
+        isp, login_time as "loginTime", last_active as "lastActive", is_active as "isActive"
+      FROM device_sessions
+      WHERE is_active = TRUE
+      ORDER BY last_active DESC
+      LIMIT 30
+    `;
+    dbStatus.isConnected = true;
+    dbStatus.error = null;
+    notifyStatus();
+    return rows.map(r => ({
+      ...r,
+      loginTime: r.loginTime ? new Date(r.loginTime).toISOString() : new Date().toISOString()
+    }));
+  } catch (err) {
+    console.warn('Could not fetch device sessions from Neon:', err.message);
+    return [];
+  }
+}
+
+/**
+ * Terminate / deactivate a device session in Neon PostgreSQL
+ */
+export async function terminateDeviceSessionInNeon(sessionId) {
+  const sql = getSqlClient();
+  if (!sql || !sessionId) return false;
+
+  try {
+    await sql`
+      UPDATE device_sessions 
+      SET is_active = FALSE, last_active = NOW()
+      WHERE id = ${sessionId}
+    `;
+    dbStatus.isConnected = true;
+    dbStatus.error = null;
+    notifyStatus();
+    return true;
+  } catch (err) {
+    console.warn('Could not terminate device session in Neon:', err.message);
+    return false;
+  }
+}
+

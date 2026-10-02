@@ -2,6 +2,12 @@
 // High-fidelity client device detection & Instagram-style IP/Location tracking
 // for TechFEST '26 Operations Calling CRM & Security Audit Trail
 
+import { 
+  saveDeviceSessionToNeon, 
+  fetchDeviceSessionsFromNeon, 
+  terminateDeviceSessionInNeon 
+} from './neonDb';
+
 const CUSTOM_DEVICE_KEY = 'tf_device_custom_name';
 const GEO_CACHE_KEY = 'tf_network_geo_cache';
 const SESSIONS_KEY = 'tf_login_sessions_v2';
@@ -32,10 +38,25 @@ function cleanAndroidModel(rawModel) {
     return `Google ${match[0]}`.trim();
   }
 
-  // OnePlus / Oppo
+  // OPPO Series (e.g. Oppo F31, F27, F25, F21, CPH..., PCH...)
+  if (/OPPO|CPH|PCH|PE[A-Z0-9]|PF[A-Z0-9]|F31|F27|F25|F21|F19/i.test(m)) {
+    if (/F31/i.test(m) || /CPH2579|CPH2631|CPH2599/i.test(m)) return 'OPPO F31 5G';
+    if (/F27/i.test(m)) return 'OPPO F27 5G';
+    if (/F25/i.test(m)) return 'OPPO F25 Pro 5G';
+    if (/F21/i.test(m)) return 'OPPO F21 Pro';
+    if (/Reno/i.test(m)) return m.toUpperCase().includes('OPPO') ? m : `OPPO ${m}`;
+    return m.toUpperCase().includes('OPPO') ? m : `OPPO (${m})`;
+  }
+
+  // OnePlus
   if (/OnePlus|NE2211|CPH2449|CPH2451/i.test(m)) {
     if (/OnePlus\s+[0-9]+/i.test(m)) return m;
     return `OnePlus Device (${m})`;
+  }
+
+  // Realme
+  if (/realme|RMX[0-9]+/i.test(m)) {
+    return m.toUpperCase().includes('REALME') ? m : `Realme (${m})`;
   }
 
   // Xiaomi / Redmi / POCO
@@ -338,20 +359,20 @@ export function setCustomDeviceName(name) {
 
 const SEED_LOGIN_SESSIONS = [
   {
-    id: 'sess_seed_1',
+    id: 'sess_oppo_f31_plexus',
     username: 'plexus',
-    userName: 'Aman Deep',
-    teamName: 'Plexus Bay',
+    userName: 'Plexus (Robowars Bay)',
+    teamName: 'Robowars & RC Bay',
     role: 'domain_head',
-    deviceModel: 'Apple iPhone 15',
-    browser: 'Safari Mobile',
-    os: 'iOS 17.5',
+    deviceModel: 'OPPO F31 5G',
+    browser: 'Chrome Mobile',
+    os: 'Android 14 / ColorOS',
     deviceType: 'mobile',
     ip: '103.24.120.45',
     location: 'Sangrur, Punjab',
     fullLocation: 'Sangrur, Punjab, India',
-    isp: 'Reliance Jio Infocomm',
-    loginTime: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    isp: 'Reliance Jio 5G',
+    loginTime: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
     isCurrentDevice: false
   },
   {
@@ -372,13 +393,13 @@ const SEED_LOGIN_SESSIONS = [
     isCurrentDevice: false
   },
   {
-    id: 'sess_seed_3',
+    id: 'sess_macbook_raj',
     username: 'raj.aryan',
     userName: 'Raj Aryan',
     teamName: 'Central Desk',
     role: 'super_admin',
     deviceModel: 'MacBook Pro 14"',
-    browser: 'Chrome',
+    browser: 'Chrome / Safari',
     os: 'macOS Sonoma',
     deviceType: 'desktop',
     ip: '103.112.54.21',
@@ -395,7 +416,14 @@ export function getActiveLoginSessions() {
     const raw = localStorage.getItem(SESSIONS_KEY);
     if (raw) {
       const list = JSON.parse(raw);
-      if (Array.isArray(list) && list.length > 0) return list;
+      if (Array.isArray(list) && list.length > 0) {
+        // Ensure Oppo F31 Plexus session is present in list
+        const hasPlexus = list.some(s => s.username === 'plexus' || (s.deviceModel && s.deviceModel.includes('OPPO')));
+        if (!hasPlexus) {
+          list.unshift(SEED_LOGIN_SESSIONS[0]);
+        }
+        return list;
+      }
     }
   } catch (e) {
     // ignore
@@ -412,7 +440,43 @@ export function saveActiveLoginSessions(sessions) {
 }
 
 /**
+ * Fetch all sessions from Neon Cloud database and merge with local device sessions
+ */
+export async function fetchCloudLoginSessions() {
+  try {
+    const cloudSessions = await fetchDeviceSessionsFromNeon();
+    if (cloudSessions && cloudSessions.length > 0) {
+      const local = getActiveLoginSessions();
+      const currentDev = getDeviceInfo();
+      
+      const mergedMap = new Map();
+      // Put cloud sessions first
+      cloudSessions.forEach(cs => mergedMap.set(cs.id, cs));
+      // Put any local session not present in cloud
+      local.forEach(ls => {
+        if (!mergedMap.has(ls.id)) mergedMap.set(ls.id, ls);
+      });
+      
+      const merged = Array.from(mergedMap.values());
+      // Re-evaluate current device flag
+      merged.forEach(s => {
+        if (s.deviceModel === currentDev.deviceModel && (s.ip === currentDev.ip || s.isCurrentDevice)) {
+          s.isCurrentDevice = true;
+        }
+      });
+
+      saveActiveLoginSessions(merged);
+      return merged;
+    }
+  } catch (err) {
+    console.warn('Could not sync cloud login sessions:', err);
+  }
+  return getActiveLoginSessions();
+}
+
+/**
  * Record a new login session when a user signs in (like Instagram Login Activity)
+ * Syncs synchronously to local storage and asynchronously to Neon PostgreSQL Cloud
  */
 export function recordLoginSession(user) {
   if (!user || !user.username) return;
@@ -445,6 +509,12 @@ export function recordLoginSession(user) {
 
   // Retain up to 25 latest active sessions
   saveActiveLoginSessions(updated.slice(0, 25));
+
+  // Sync to Neon cloud database in background
+  saveDeviceSessionToNeon(newSession).catch(err => {
+    console.warn('Failed to push session to Neon:', err);
+  });
+
   return newSession;
 }
 
@@ -455,5 +525,10 @@ export function terminateLoginSession(sessionId) {
   const sessions = getActiveLoginSessions();
   const filtered = sessions.filter(s => s.id !== sessionId);
   saveActiveLoginSessions(filtered);
+  
+  // Terminate in Neon Cloud
+  terminateDeviceSessionInNeon(sessionId).catch(() => {});
+  
   return filtered;
 }
+

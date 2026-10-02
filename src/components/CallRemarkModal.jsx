@@ -114,7 +114,7 @@ export default function CallRemarkModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl">
+      <DialogContent className="w-[95vw] sm:max-w-lg bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
         {/* Header */}
         <div className="p-5 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -263,7 +263,7 @@ export default function CallRemarkModal({
         )}
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
           
           {/* Field 1: Remark */}
           <div>
