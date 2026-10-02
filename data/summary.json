@@ -1,12 +1,12 @@
 {
-  "last_synced_at": "2026-10-02T17:14:19.597015+00:00",
-  "token_expires_at": "2026-10-03T17:14:20.693662+00:00",
+  "last_synced_at": "2026-10-02T21:41:44.318979+00:00",
+  "token_expires_at": "2026-10-03T21:41:45.275573+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3787,
-  "total_paid_registrations": 776,
-  "total_incomplete_registrations": 3011,
+  "total_unstop_registrations": 3795,
+  "total_paid_registrations": 782,
+  "total_incomplete_registrations": 3013,
   "total_amount_collected": 4392.0,
-  "total_colleges": 255,
+  "total_colleges": 256,
   "total_events_scanned": 62,
   "events_with_paid": 53,
   "events_list": [
@@ -54,16 +54,16 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 108,
-      "paid_registrations": 30,
+      "total_registrations": 109,
+      "paid_registrations": 31,
       "incomplete_registrations": 78
     },
     {
       "id": 1744778,
       "title": "Foodprint",
       "type": "competitions",
-      "total_registrations": 70,
-      "paid_registrations": 13,
+      "total_registrations": 72,
+      "paid_registrations": 15,
       "incomplete_registrations": 57
     },
     {
@@ -78,8 +78,8 @@
       "id": 1744776,
       "title": "Food Forensics",
       "type": "competitions",
-      "total_registrations": 64,
-      "paid_registrations": 9,
+      "total_registrations": 66,
+      "paid_registrations": 11,
       "incomplete_registrations": 55
     },
     {
@@ -94,9 +94,9 @@
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 79,
-      "paid_registrations": 16,
-      "incomplete_registrations": 63
+      "total_registrations": 81,
+      "paid_registrations": 17,
+      "incomplete_registrations": 64
     },
     {
       "id": 1744772,
@@ -214,9 +214,9 @@
       "id": 1744227,
       "title": "Hackathon",
       "type": "hackathons",
-      "total_registrations": 75,
+      "total_registrations": 76,
       "paid_registrations": 4,
-      "incomplete_registrations": 71
+      "incomplete_registrations": 72
     },
     {
       "id": 1744224,
