@@ -1,0 +1,72 @@
+{
+  "fixed_at": "2026-10-02 07:49:28 UTC",
+  "fixed_events": [
+    {
+      "id": 1744818,
+      "title": "Technical Quiz Competition",
+      "changes": [
+        {
+          "ticket_id": 732140,
+          "ticket_title": "For SLIET",
+          "old_code": "SLIET ",
+          "new_code": "SLIET"
+        }
+      ],
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1744214,
+      "title": "Breadboard Battle",
+      "changes": [
+        {
+          "ticket_id": 732161,
+          "ticket_title": "For SLIET",
+          "old_code": " SLIET",
+          "new_code": "SLIET"
+        }
+      ],
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1744207,
+      "title": "RoboSoccer",
+      "changes": [
+        {
+          "ticket_id": 732167,
+          "ticket_title": "For SLIET",
+          "old_code": "SLITE",
+          "new_code": "SLIET"
+        }
+      ],
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1744177,
+      "title": "Chemi-Thone",
+      "changes": [
+        {
+          "ticket_id": 732143,
+          "ticket_title": "For SLIET",
+          "old_code": " SLIET",
+          "new_code": "SLIET"
+        }
+      ],
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1744148,
+      "title": "BGMI",
+      "changes": [
+        {
+          "ticket_id": 732131,
+          "ticket_title": "For SLIET",
+          "old_code": " SLIET",
+          "new_code": "SLIET"
+        }
+      ],
+      "status": "SUCCESS"
+    }
+  ],
+  "already_clean_count": 56,
+  "skipped_count": 1
+}

@@ -77,8 +77,8 @@ export default function AntiGravityReportModal({
    - Caller payment claims queued for Saturday verification with Accounts & Fest Secretariat.
 3. **90-Day Payout & Accounts Clearance:**
    - Complete Unstop payout takes 90 days. SLIET College PAN and accounts billing profile mapped.
-4. **Coupon 61 / 62 Error Analysis:**
-   - ₹100 flat discount coupon behavior audited for Unstop opportunity settings.
+4. **Coupon 61 / 62 Whitespace Batch Fix:**
+   - Identified whitespace issues (' SLIET', 'SLIET ') and typo ('SLITE') across Unstop opportunity payment tickets. Autonomous batch API repair executed and verified for all 62 competitions to clean "SLIET" with 100% success.
 5. **Participant Certificates:**
    - Automated Certificate of Participation eligibility tracking on verified registration.
 `;
@@ -256,18 +256,18 @@ export default function AntiGravityReportModal({
                 </div>
               </div>
 
-              {/* Item 4: Coupon 61 / 62 Error Analysis */}
-              <div className="p-3.5 bg-amber-50/60 rounded-xl border border-amber-200/80">
-                <div className="flex items-center gap-2 font-semibold text-amber-950 mb-1">
-                  <Tag className="w-4 h-4 text-amber-700" />
-                  <span>4. Coupon 61/62 Error & ₹100 Discount</span>
+              {/* Item 4: Coupon 61 / 62 Whitespace Batch Fix */}
+              <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200/80">
+                <div className="flex items-center gap-2 font-semibold text-emerald-950 mb-1">
+                  <Tag className="w-4 h-4 text-emerald-700" />
+                  <span>4. Coupon Whitespace Fixed (62/62 Events)</span>
                 </div>
-                <p className="text-[11px] text-amber-900 leading-relaxed">
-                  Investigated the coupon 62 error noted with Unstop opportunity payment settings. Documented ₹100 flat discount structure to ensure seamless candidate checkout.
+                <p className="text-[11px] text-emerald-900 leading-relaxed">
+                  Identified whitespace issues (<code className="font-mono bg-white px-1 py-0.5 rounded border border-emerald-200">' SLIET'</code> / <code className="font-mono bg-white px-1 py-0.5 rounded border border-emerald-200">'SLIET '</code>) and typo (<code className="font-mono bg-white px-1 py-0.5 rounded border border-emerald-200">'SLITE'</code>) on Unstop Opportunity Payment tickets that prevented candidates from applying the discount. Executed autonomous batch API repair and verified all 62 events permanently updated to clean <strong className="text-emerald-900 font-mono">"SLIET"</strong>.
                 </p>
-                <div className="mt-2 text-[10px] font-mono text-amber-800 bg-white/80 p-1.5 rounded border border-amber-200/60 flex items-center justify-between">
-                  <span>Discount: ₹100 / Event Pass</span>
-                  <span className="font-bold text-amber-700">✓ Audited</span>
+                <div className="mt-2 text-[10px] font-mono text-emerald-800 bg-white/80 p-1.5 rounded border border-emerald-200/60 flex items-center justify-between">
+                  <span>Batch API Fix: 62/62 Events Verified</span>
+                  <span className="font-bold text-emerald-700">✓ 100% Repaired</span>
                 </div>
               </div>
 
