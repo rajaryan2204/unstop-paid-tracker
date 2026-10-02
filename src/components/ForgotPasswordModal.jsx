@@ -1,50 +1,32 @@
 // src/components/ForgotPasswordModal.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   X, 
   KeyRound, 
   ShieldAlert, 
   PhoneCall, 
   MessageSquare, 
-  Mail,
-  Building,
-  User
+  Mail
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { 
-  OFFICIAL_ACCOUNTS, 
-  DEFAULT_INITIAL_PASSWORD 
-} from '../utils/auth';
+import { DEFAULT_INITIAL_PASSWORD } from '../utils/auth';
 
 export default function ForgotPasswordModal({ 
   isOpen, 
   onClose 
 }) {
-  const [selectedDomainId, setSelectedDomainId] = useState('plexus');
-
   if (!isOpen) return null;
 
-  // Filter domain & staff accounts
-  const domainAccounts = OFFICIAL_ACCOUNTS.filter(a => a.role === 'domain_head' || a.role === 'webdev' || a.role === 'operations_calling');
-  const selectedDomainAcc = OFFICIAL_ACCOUNTS.find(a => 
-    a.domainId === selectedDomainId || a.username === selectedDomainId
-  ) || domainAccounts[0];
-
-  // Coordinator info for pre-filled templates
-  const coordName = selectedDomainAcc?.name || 'Coordinator';
-  const coordDomain = selectedDomainAcc?.domainName || 'Domain Lead';
-  const coordEmail = selectedDomainAcc?.username || '';
-  
-  const waRajMsg = `Hi Raj Aryan, I am ${coordName} (${coordDomain}). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
+  const waRajMsg = "Hi Raj Aryan, I forgot my techFEST '26 portal password. Please reset my account password to default (Techfest@2026).";
   const waRajUrl = `https://wa.me/919288522520?text=${encodeURIComponent(waRajMsg)}`;
 
-  const waSagarMsg = `Hi Sagar bhaiya, I am ${coordName} (${coordDomain}). I forgot my techFEST '26 portal password for official account ${coordEmail}. Please reset my password to default (Techfest@2026).`;
+  const waSagarMsg = "Hi Sagar bhaiya, I forgot my techFEST '26 portal password. Please reset my account password to default (Techfest@2026).";
   const waSagarUrl = `https://wa.me/917366879486?text=${encodeURIComponent(waSagarMsg)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-900/50 backdrop-blur-xs animate-in fade-in duration-150">
       <div 
-        className="w-full max-w-lg bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -82,52 +64,16 @@ export default function ForgotPasswordModal({
             <div>
               <span className="font-semibold block mb-0.5">Central Security Policy:</span>
               <span>
-                All coordinator accounts are protected. If you forgot your password, contact Central Desk Admins directly to reset your account back to <strong className="font-mono text-amber-950">{DEFAULT_INITIAL_PASSWORD}</strong>.
+                All organizer accounts are protected. If you forgot your password, contact Central Desk Admins directly below to reset your account back to <strong className="font-mono text-amber-950">{DEFAULT_INITIAL_PASSWORD}</strong>.
               </span>
             </div>
           </div>
 
-          {/* Select Domain / Role */}
-          <div>
-            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
-              Select Your Domain / Role:
-            </label>
-            <select
-              value={selectedDomainId}
-              onChange={(e) => setSelectedDomainId(e.target.value)}
-              className="w-full bg-white border border-zinc-300 focus:border-zinc-900 rounded-xl px-3 py-2 text-xs text-zinc-900 outline-none shadow-xs font-medium"
-            >
-              {domainAccounts.map((acc) => (
-                <option key={acc.username} value={acc.domainId || acc.username}>
-                  {acc.domainName ? `${acc.domainName} (${acc.name} - ${acc.bay || 'Desk'})` : `${acc.name} (${acc.username})`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Account Details Card */}
-          {selectedDomainAcc && (
-            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-1.5 font-mono">
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Coordinator:</span>
-                <span className="text-zinc-900 font-semibold">{selectedDomainAcc.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Official Email:</span>
-                <span className="text-zinc-900 font-semibold">{selectedDomainAcc.username}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Bay / Location:</span>
-                <span className="text-zinc-900 font-semibold">{selectedDomainAcc.bay || 'Operations'}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Direct Contact Buttons */}
-          <div className="space-y-2.5 pt-1">
+          {/* Contact Details Cards */}
+          <div className="space-y-3 pt-1">
             
             {/* 1. Raj Aryan (Web Dev Member) */}
-            <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2.5 shadow-xs">
+            <div className="p-4 rounded-xl bg-zinc-900 text-white space-y-3 shadow-xs">
               <div>
                 <div className="font-semibold text-xs text-white flex items-center gap-1.5">
                   <span>Raj Aryan</span>
@@ -162,7 +108,7 @@ export default function ForgotPasswordModal({
             </div>
 
             {/* 2. Sagar Anmol (Central Operations Lead) */}
-            <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
               <div>
                 <div className="font-semibold text-xs text-zinc-900 flex items-center gap-1.5">
                   <span>Sagar Anmol</span>
@@ -198,10 +144,10 @@ export default function ForgotPasswordModal({
           </div>
 
           {/* Email Support */}
-          <div className="pt-1 text-center text-[11px] text-zinc-500">
-            Web Dev Technical Email:{' '}
+          <div className="pt-2 text-center text-[11px] text-zinc-500">
+            Technical Support Email:{' '}
             <a
-              href={`mailto:raj.aryan9242@gmail.com?subject=techFEST%2026%20Password%20Reset%20-%20${encodeURIComponent(coordDomain)}`}
+              href="mailto:raj.aryan9242@gmail.com?subject=techFEST%2026%20Password%20Reset%20Request"
               className="font-semibold text-zinc-800 underline hover:text-zinc-950 font-mono"
             >
               raj.aryan9242@gmail.com
