@@ -11,14 +11,17 @@ import {
   Smartphone,
   Laptop,
   Tablet,
-  MapPin
+  MapPin,
+  HelpCircle,
+  RotateCcw
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { authenticateUser } from '../utils/auth';
+import { authenticateUser, getPasswordForAccount } from '../utils/auth';
 import { getDeviceInfo } from '../utils/device';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 export default function LoginScreen({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -26,6 +29,7 @@ export default function LoginScreen({ onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const dev = getDeviceInfo();
 
   const handleSubmit = (e) => {
@@ -46,13 +50,19 @@ export default function LoginScreen({ onLoginSuccess }) {
     }, 200);
   };
 
+  const handleResetSuccess = (targetUser, newPass) => {
+    setUsername(targetUser);
+    setPassword(newPass);
+    setError('');
+  };
+
   const quickLogins = [
-    { label: "Sagar Anmol", user: "sagaranmol@gmail.com", pass: "Techfest@2026", role: "Super Admin", variant: "default" },
-    { label: "Raj Aryan", user: "raj.aryan@gmail.com", pass: "Techfest@2026", role: "Super Admin", variant: "default" },
-    { label: "WebDev Editor", user: "webdev@gmail.com", pass: "Techfest@2026", role: "Operations Editor", variant: "outline" },
-    { label: "Outreach Desk", user: "outreach@gmail.com", pass: "Techfest@2026", role: "Calling Desk", variant: "outline" },
-    { label: "Plexus (Sumit)", user: "sumitbansal1290@gmail.com", pass: "Techfest@2026", role: "Plexus Lead", variant: "outline" },
-    { label: "RoboZar (Nayan)", user: "nayan98351@gmail.com", pass: "Techfest@2026", role: "RoboZar Lead", variant: "outline" },
+    { label: "Sagar Anmol", user: "sagaranmol@gmail.com", role: "Super Admin", variant: "default" },
+    { label: "Raj Aryan", user: "raj.aryan@gmail.com", role: "Super Admin", variant: "default" },
+    { label: "WebDev Editor", user: "webdev@gmail.com", role: "Operations Editor", variant: "outline" },
+    { label: "Outreach Desk", user: "outreach@gmail.com", role: "Calling Desk", variant: "outline" },
+    { label: "Plexus (Sumit)", user: "sumitbansal1290@gmail.com", role: "Plexus Lead", variant: "outline" },
+    { label: "RoboZar (Nayan)", user: "nayan98351@gmail.com", role: "RoboZar Lead", variant: "outline" },
   ];
 
   return (
@@ -110,10 +120,18 @@ export default function LoginScreen({ onLoginSuccess }) {
                 <label className="text-xs font-medium text-zinc-700">
                   Password
                 </label>
-                <span className="text-[11px] font-mono text-zinc-400">
-                  Initial: Techfest@2026
-                </span>
+                
+                {/* Forgot Password / Admin Reset Link */}
+                <button
+                  type="button"
+                  onClick={() => setIsForgotModalOpen(true)}
+                  className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer hover:underline flex items-center gap-1"
+                >
+                  <KeyRound className="w-3 h-3 text-amber-500" />
+                  <span>Forgot / Reset Password?</span>
+                </button>
               </div>
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -135,13 +153,27 @@ export default function LoginScreen({ onLoginSuccess }) {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+
+              <div className="flex items-center justify-between mt-1 text-[11px] text-zinc-400 font-mono">
+                <span>Default Initial: Techfest@2026</span>
+                <span className="text-[10px] text-zinc-400">Admin Managed</span>
+              </div>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2 animate-in fade-in duration-150">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-                <span>{error}</span>
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between gap-2 animate-in fade-in duration-150">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{error}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotModalOpen(true)}
+                  className="shrink-0 text-[11px] font-semibold underline text-rose-800 hover:text-rose-950 cursor-pointer"
+                >
+                  Reset
+                </button>
               </div>
             )}
 
@@ -158,35 +190,47 @@ export default function LoginScreen({ onLoginSuccess }) {
 
           {/* Quick Access Roster Chips */}
           <div className="mt-6 pt-5 border-t border-zinc-100">
-            <div className="text-[11px] font-medium text-zinc-400 mb-2.5">
-              Quick Sign In:
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-[11px] font-medium text-zinc-400">
+                Quick Sign In:
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsForgotModalOpen(true)}
+                className="text-[10px] text-zinc-500 hover:text-zinc-800 font-medium cursor-pointer"
+              >
+                Admin Reset Desk →
+              </button>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {quickLogins.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setUsername(item.user);
-                    setPassword(item.pass);
-                    setError('');
-                    const res = authenticateUser(item.user, item.pass);
-                    if (res.success) onLoginSuccess(res.user);
-                  }}
-                  className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                    item.variant === 'default'
-                      ? 'bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-800'
-                      : 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+              {quickLogins.map((item, idx) => {
+                const currentPass = getPasswordForAccount(item.user);
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setUsername(item.user);
+                      setPassword(currentPass);
+                      setError('');
+                      const res = authenticateUser(item.user, currentPass);
+                      if (res.success) onLoginSuccess(res.user);
+                    }}
+                    className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                      item.variant === 'default'
+                        ? 'bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-800'
+                        : 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Instagram-style Active Device & Location Security Badge */}
+        {/* Device & Location Security Badge */}
         <div className="mt-3 px-4 py-2.5 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-between text-[11px] text-zinc-600 shadow-2xs">
           <div className="flex items-center gap-2 min-w-0">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
@@ -213,6 +257,14 @@ export default function LoginScreen({ onLoginSuccess }) {
           SLIET Longowal • techFEST '26 Core Operations Team
         </p>
       </div>
+
+      {/* Forgot Password / Admin On-Spot Reset Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotModalOpen}
+        onClose={() => setIsForgotModalOpen(false)}
+        onSuccessReset={handleResetSuccess}
+      />
+
     </div>
   );
 }

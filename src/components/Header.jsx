@@ -116,12 +116,22 @@ export default function Header({
               )}
             </button>
             {isSuperAdmin && (
-              <button
-                onClick={onOpenAuditLogs}
-                className="hidden xl:inline-flex px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
-              >
-                Audit Trail
-              </button>
+              <>
+                <button
+                  onClick={onOpenPasswordManager}
+                  className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer text-xs font-medium text-zinc-600"
+                  title="Super Admin: Manage and reset domain coordinator passwords"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Passwords</span>
+                </button>
+                <button
+                  onClick={onOpenAuditLogs}
+                  className="hidden xl:inline-flex px-2.5 py-1 rounded-md hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
+                >
+                  Audit Trail
+                </button>
+              </>
             )}
           </nav>
         </div>

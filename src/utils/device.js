@@ -6,7 +6,7 @@ import {
   saveDeviceSessionToNeon, 
   fetchDeviceSessionsFromNeon, 
   terminateDeviceSessionInNeon 
-} from './neonDb';
+} from './neonDb.js';
 
 const CUSTOM_DEVICE_KEY = 'tf_device_custom_name';
 const GEO_CACHE_KEY = 'tf_network_geo_cache';

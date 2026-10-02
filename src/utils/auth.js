@@ -4,8 +4,8 @@ import {
   fetchCustomPasswordsFromNeon, 
   writeCustomPasswordToNeon, 
   deleteCustomPasswordFromNeon 
-} from './neonDb';
-import { recordLoginSession } from './device';
+} from './neonDb.js';
+import { recordLoginSession } from './device.js';
 
 export const DOMAINS_DIRECTORY = {
   robozar: {
@@ -605,6 +605,16 @@ export async function syncPasswordsWithNeon() {
 }
 
 /**
+ * Checks if an account has an active custom password set
+ */
+export function hasAccountCustomPassword(username) {
+  if (!username) return false;
+  const custom = getCustomPasswords();
+  const clean = username.toLowerCase().trim();
+  return Boolean(custom[clean]);
+}
+
+/**
  * Super Admin Password Reset Tool
  * Allows Raj and Sagar to change/reset passwords for any account
  */
@@ -644,6 +654,83 @@ export function resetAccountPasswordToDefault(adminUser, targetUsername) {
   return true;
 }
 
+/**
+ * Master Admin On-Spot Reset Tool
+ * Verifies admin credentials (sagaranmol@gmail.com or raj.aryan@gmail.com)
+ * and resets or changes any domain coordinator's password.
+ * Can be called from Login Screen or Admin Settings.
+ */
+export function adminAuthorizeAndResetPassword(adminIdentifier, adminPassword, targetUsername, newPassword = null) {
+  const cleanAdmin = (adminIdentifier || '').toLowerCase().trim();
+  const cleanAdminPass = (adminPassword || '').trim();
+
+  // Find admin account
+  const adminAcc = OFFICIAL_ACCOUNTS.find(a => 
+    a.role === 'super_admin' && 
+    (a.username.toLowerCase() === cleanAdmin || a.email.toLowerCase() === cleanAdmin)
+  );
+
+  if (!adminAcc) {
+    throw new Error('Access Denied: Only Super Admins (sagaranmol@gmail.com, raj.aryan@gmail.com) can authorize resets.');
+  }
+
+  // Verify Admin password
+  const expectedAdminPass = getPasswordForAccount(adminAcc.username);
+  const customPasswords = getCustomPasswords();
+  const adminHasCustom = Boolean(customPasswords[adminAcc.username.toLowerCase()]);
+  
+  const isAdminMatch = adminHasCustom 
+    ? (cleanAdminPass === expectedAdminPass)
+    : (cleanAdminPass === expectedAdminPass || cleanAdminPass === DEFAULT_INITIAL_PASSWORD || cleanAdminPass === 'sliet@2026');
+
+  if (!isAdminMatch) {
+    throw new Error('Invalid Admin Password. Please verify your credentials.');
+  }
+
+  // Find target account
+  const cleanTarget = (targetUsername || '').toLowerCase().trim();
+  const targetAcc = OFFICIAL_ACCOUNTS.find(a => 
+    a.username.toLowerCase() === cleanTarget || 
+    (a.aliasUsername && a.aliasUsername.toLowerCase() === cleanTarget) ||
+    (a.email && a.email.toLowerCase() === cleanTarget)
+  );
+
+  if (!targetAcc) {
+    throw new Error(`Target account "${targetUsername}" not found in TechFEST directory.`);
+  }
+
+  let finalPassword = '';
+  const isSettingCustom = Boolean(newPassword && newPassword.trim().length >= 4);
+
+  if (isSettingCustom) {
+    finalPassword = newPassword.trim();
+    customPasswords[targetAcc.username.toLowerCase()] = finalPassword;
+    saveCustomPasswords(customPasswords);
+
+    // Background Cloud Sync to Neon PostgreSQL
+    writeCustomPasswordToNeon(targetAcc.username.toLowerCase(), finalPassword, adminAcc.username)
+      .catch(e => console.error('Neon writeCustomPassword error:', e));
+  } else {
+    // Reset to initial default
+    delete customPasswords[targetAcc.username.toLowerCase()];
+    saveCustomPasswords(customPasswords);
+
+    // Background Cloud Delete in Neon PostgreSQL
+    deleteCustomPasswordFromNeon(targetAcc.username.toLowerCase())
+      .catch(e => console.error('Neon deleteCustomPassword error:', e));
+
+    finalPassword = targetAcc.defaultPassword || DEFAULT_INITIAL_PASSWORD;
+  }
+
+  return {
+    success: true,
+    targetAccount: targetAcc,
+    adminAccount: adminAcc,
+    password: finalPassword,
+    isDefault: !isSettingCustom
+  };
+}
+
 export function getActiveUser() {
   try {
     const raw = localStorage.getItem(SESSION_STORAGE_KEY);
@@ -677,7 +764,9 @@ export function clearActiveUser() {
 }
 
 /**
- * Authenticates user credentials against the official accounts and custom passwords.
+ * Authenticates user credentials against official accounts and custom passwords.
+ * If user has set a custom password, only that custom password is valid.
+ * If user is still on default, accepts default initial password.
  */
 export function authenticateUser(usernameInput, passwordInput) {
   if (!usernameInput || !passwordInput) {
@@ -702,18 +791,27 @@ export function authenticateUser(usernameInput, passwordInput) {
   }
 
   const expectedPassword = getPasswordForAccount(account.username);
+  const isCustomSet = hasAccountCustomPassword(account.username);
 
-  // Password comparison with flexible initial fallbacks
-  const isMatch = (cleanPass === expectedPassword) || 
-                  (cleanPass === DEFAULT_INITIAL_PASSWORD) ||
-                  (cleanPass === 'sliet@2026') ||
-                  (cleanPass === `${account.username}@sliet`) ||
-                  (account.aliasUsername && cleanPass === `${account.aliasUsername}@sliet`);
+  // If a custom password has been set, only accept the custom password.
+  // If no custom password has been set (still default), accept DEFAULT_INITIAL_PASSWORD or legacy sliet@2026.
+  let isMatch = false;
+  if (isCustomSet) {
+    isMatch = (cleanPass === expectedPassword);
+  } else {
+    isMatch = (cleanPass === expectedPassword) || 
+              (cleanPass === DEFAULT_INITIAL_PASSWORD) ||
+              (cleanPass === 'sliet@2026') ||
+              (cleanPass === `${account.username}@sliet`) ||
+              (account.aliasUsername && cleanPass === `${account.aliasUsername}@sliet`);
+  }
 
   if (!isMatch) {
     return { 
       success: false, 
-      error: `Incorrect password for ${account.name}. Default initial password is "${DEFAULT_INITIAL_PASSWORD}".` 
+      error: isCustomSet 
+        ? `Incorrect password for ${account.name}. If you forgot your password, contact Central Desk Admins (Sagar/Raj) to reset it.`
+        : `Incorrect password for ${account.name}. Default initial password is "${DEFAULT_INITIAL_PASSWORD}".` 
     };
   }
 
