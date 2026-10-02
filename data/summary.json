@@ -1,14 +1,14 @@
 {
-  "last_synced_at": "2026-10-02T03:34:35.183697+00:00",
-  "token_expires_at": "2026-10-03T03:34:36.194552+00:00",
+  "last_synced_at": "2026-10-02T10:13:55.294121+00:00",
+  "token_expires_at": "2026-10-03T10:13:56.190160+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3699,
-  "total_paid_registrations": 713,
-  "total_incomplete_registrations": 2986,
-  "total_amount_collected": 3793.0,
-  "total_colleges": 250,
+  "total_unstop_registrations": 3727,
+  "total_paid_registrations": 735,
+  "total_incomplete_registrations": 2992,
+  "total_amount_collected": 4392.0,
+  "total_colleges": 255,
   "total_events_scanned": 62,
-  "events_with_paid": 48,
+  "events_with_paid": 51,
   "events_list": [
     {
       "id": 1744819,
@@ -23,8 +23,8 @@
       "title": "Technical Quiz Competition",
       "type": "competitions",
       "total_registrations": 60,
-      "paid_registrations": 0,
-      "incomplete_registrations": 60
+      "paid_registrations": 3,
+      "incomplete_registrations": 57
     },
     {
       "id": 1744809,
@@ -38,8 +38,8 @@
       "id": 1744782,
       "title": "Quiz Nova",
       "type": "quizzes",
-      "total_registrations": 114,
-      "paid_registrations": 48,
+      "total_registrations": 115,
+      "paid_registrations": 49,
       "incomplete_registrations": 66
     },
     {
@@ -54,9 +54,9 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 103,
-      "paid_registrations": 26,
-      "incomplete_registrations": 77
+      "total_registrations": 106,
+      "paid_registrations": 28,
+      "incomplete_registrations": 78
     },
     {
       "id": 1744778,
@@ -70,9 +70,9 @@
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 84,
+      "total_registrations": 87,
       "paid_registrations": 5,
-      "incomplete_registrations": 79
+      "incomplete_registrations": 82
     },
     {
       "id": 1744776,
@@ -86,17 +86,17 @@
       "id": 1744774,
       "title": "Food Forge",
       "type": "competitions",
-      "total_registrations": 52,
-      "paid_registrations": 0,
+      "total_registrations": 55,
+      "paid_registrations": 3,
       "incomplete_registrations": 52
     },
     {
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 75,
+      "total_registrations": 76,
       "paid_registrations": 13,
-      "incomplete_registrations": 62
+      "incomplete_registrations": 63
     },
     {
       "id": 1744772,
@@ -126,9 +126,9 @@
       "id": 1744769,
       "title": "CAD Design Challenge",
       "type": "competitions",
-      "total_registrations": 51,
+      "total_registrations": 52,
       "paid_registrations": 1,
-      "incomplete_registrations": 50
+      "incomplete_registrations": 51
     },
     {
       "id": 1744768,
@@ -166,8 +166,8 @@
       "id": 1744234,
       "title": "Case Crack",
       "type": "quizzes",
-      "total_registrations": 54,
-      "paid_registrations": 51,
+      "total_registrations": 56,
+      "paid_registrations": 53,
       "incomplete_registrations": 3
     },
     {
@@ -182,9 +182,9 @@
       "id": 1744231,
       "title": "Case Ethical Crosstalk",
       "type": "competitions",
-      "total_registrations": 130,
+      "total_registrations": 131,
       "paid_registrations": 1,
-      "incomplete_registrations": 129
+      "incomplete_registrations": 130
     },
     {
       "id": 1744230,
@@ -222,9 +222,9 @@
       "id": 1744224,
       "title": "The Neural Nexus",
       "type": "competitions",
-      "total_registrations": 91,
-      "paid_registrations": 8,
-      "incomplete_registrations": 83
+      "total_registrations": 93,
+      "paid_registrations": 9,
+      "incomplete_registrations": 84
     },
     {
       "id": 1744223,
@@ -246,8 +246,8 @@
       "id": 1744220,
       "title": "Debug and Deploy",
       "type": "competitions",
-      "total_registrations": 112,
-      "paid_registrations": 9,
+      "total_registrations": 114,
+      "paid_registrations": 11,
       "incomplete_registrations": 103
     },
     {
@@ -270,17 +270,17 @@
       "id": 1744216,
       "title": "Ghost Code",
       "type": "competitions",
-      "total_registrations": 77,
-      "paid_registrations": 73,
+      "total_registrations": 78,
+      "paid_registrations": 74,
       "incomplete_registrations": 4
     },
     {
       "id": 1744215,
       "title": "Heuristic Havoc",
       "type": "competitions",
-      "total_registrations": 55,
-      "paid_registrations": 4,
-      "incomplete_registrations": 51
+      "total_registrations": 57,
+      "paid_registrations": 7,
+      "incomplete_registrations": 50
     },
     {
       "id": 1744214,
@@ -342,17 +342,17 @@
       "id": 1744204,
       "title": "Designare",
       "type": "competitions",
-      "total_registrations": 52,
+      "total_registrations": 53,
       "paid_registrations": 0,
-      "incomplete_registrations": 52
+      "incomplete_registrations": 53
     },
     {
       "id": 1744180,
       "title": "Truss Load",
       "type": "competitions",
-      "total_registrations": 54,
+      "total_registrations": 55,
       "paid_registrations": 51,
-      "incomplete_registrations": 3
+      "incomplete_registrations": 4
     },
     {
       "id": 1744178,
@@ -406,8 +406,8 @@
       "id": 1744167,
       "title": "Poster and Paper Presentation",
       "type": "competitions",
-      "total_registrations": 50,
-      "paid_registrations": 1,
+      "total_registrations": 51,
+      "paid_registrations": 2,
       "incomplete_registrations": 49
     },
     {
@@ -471,24 +471,24 @@
       "title": "BGMI",
       "type": "competitions",
       "total_registrations": 72,
-      "paid_registrations": 0,
-      "incomplete_registrations": 72
+      "paid_registrations": 1,
+      "incomplete_registrations": 71
     },
     {
       "id": 1744147,
       "title": "Free Fire",
       "type": "competitions",
-      "total_registrations": 96,
-      "paid_registrations": 13,
+      "total_registrations": 97,
+      "paid_registrations": 14,
       "incomplete_registrations": 83
     },
     {
       "id": 1743774,
       "title": "Kritrim - Model Exhibition",
       "type": "competitions",
-      "total_registrations": 55,
-      "paid_registrations": 3,
-      "incomplete_registrations": 52
+      "total_registrations": 57,
+      "paid_registrations": 4,
+      "incomplete_registrations": 53
     },
     {
       "id": 1742433,
