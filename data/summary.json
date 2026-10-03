@@ -1,14 +1,14 @@
 {
-  "last_synced_at": "2026-10-03T07:26:01.455179+00:00",
-  "token_expires_at": "2026-10-04T07:26:02.472642+00:00",
+  "last_synced_at": "2026-10-03T12:56:09.388690+00:00",
+  "token_expires_at": "2026-10-04T12:56:10.153488+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3809,
-  "total_paid_registrations": 797,
-  "total_incomplete_registrations": 3012,
+  "total_unstop_registrations": 3815,
+  "total_paid_registrations": 814,
+  "total_incomplete_registrations": 3001,
   "total_amount_collected": 4392.0,
   "total_colleges": 257,
   "total_events_scanned": 62,
-  "events_with_paid": 53,
+  "events_with_paid": 54,
   "events_list": [
     {
       "id": 1744819,
@@ -55,24 +55,24 @@
       "title": "Tech4Earth",
       "type": "competitions",
       "total_registrations": 111,
-      "paid_registrations": 33,
-      "incomplete_registrations": 78
+      "paid_registrations": 34,
+      "incomplete_registrations": 77
     },
     {
       "id": 1744778,
       "title": "Foodprint",
       "type": "competitions",
-      "total_registrations": 72,
-      "paid_registrations": 15,
+      "total_registrations": 73,
+      "paid_registrations": 16,
       "incomplete_registrations": 57
     },
     {
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 89,
+      "total_registrations": 90,
       "paid_registrations": 7,
-      "incomplete_registrations": 82
+      "incomplete_registrations": 83
     },
     {
       "id": 1744776,
@@ -87,8 +87,8 @@
       "title": "Food Forge",
       "type": "competitions",
       "total_registrations": 58,
-      "paid_registrations": 7,
-      "incomplete_registrations": 51
+      "paid_registrations": 8,
+      "incomplete_registrations": 50
     },
     {
       "id": 1744773,
@@ -183,8 +183,8 @@
       "title": "Case Ethical Crosstalk",
       "type": "competitions",
       "total_registrations": 132,
-      "paid_registrations": 2,
-      "incomplete_registrations": 130
+      "paid_registrations": 3,
+      "incomplete_registrations": 129
     },
     {
       "id": 1744230,
@@ -199,8 +199,8 @@
       "title": "Digital Design Challenge",
       "type": "competitions",
       "total_registrations": 53,
-      "paid_registrations": 3,
-      "incomplete_registrations": 50
+      "paid_registrations": 4,
+      "incomplete_registrations": 49
     },
     {
       "id": 1744228,
@@ -230,9 +230,9 @@
       "id": 1744223,
       "title": "Aerostrike",
       "type": "competitions",
-      "total_registrations": 57,
+      "total_registrations": 58,
       "paid_registrations": 3,
-      "incomplete_registrations": 54
+      "incomplete_registrations": 55
     },
     {
       "id": 1744221,
@@ -247,8 +247,8 @@
       "title": "Debug and Deploy",
       "type": "competitions",
       "total_registrations": 116,
-      "paid_registrations": 13,
-      "incomplete_registrations": 103
+      "paid_registrations": 14,
+      "incomplete_registrations": 102
     },
     {
       "id": 1744219,
@@ -271,8 +271,8 @@
       "title": "Ghost Code",
       "type": "competitions",
       "total_registrations": 80,
-      "paid_registrations": 76,
-      "incomplete_registrations": 4
+      "paid_registrations": 75,
+      "incomplete_registrations": 5
     },
     {
       "id": 1744215,
@@ -295,16 +295,16 @@
       "title": "Chemi Craft",
       "type": "competitions",
       "total_registrations": 48,
-      "paid_registrations": 1,
-      "incomplete_registrations": 47
+      "paid_registrations": 2,
+      "incomplete_registrations": 46
     },
     {
       "id": 1744211,
       "title": "Mechnovate",
       "type": "competitions",
       "total_registrations": 50,
-      "paid_registrations": 1,
-      "incomplete_registrations": 49
+      "paid_registrations": 2,
+      "incomplete_registrations": 48
     },
     {
       "id": 1744210,
@@ -343,8 +343,8 @@
       "title": "Designare",
       "type": "competitions",
       "total_registrations": 54,
-      "paid_registrations": 0,
-      "incomplete_registrations": 54
+      "paid_registrations": 1,
+      "incomplete_registrations": 53
     },
     {
       "id": 1744180,
@@ -359,8 +359,8 @@
       "title": "Hydraload",
       "type": "competitions",
       "total_registrations": 48,
-      "paid_registrations": 1,
-      "incomplete_registrations": 47
+      "paid_registrations": 2,
+      "incomplete_registrations": 46
     },
     {
       "id": 1744177,
@@ -406,8 +406,8 @@
       "id": 1744167,
       "title": "Poster and Paper Presentation",
       "type": "competitions",
-      "total_registrations": 55,
-      "paid_registrations": 3,
+      "total_registrations": 56,
+      "paid_registrations": 4,
       "incomplete_registrations": 52
     },
     {
@@ -415,8 +415,8 @@
       "title": "Soap Making",
       "type": "competitions",
       "total_registrations": 54,
-      "paid_registrations": 5,
-      "incomplete_registrations": 49
+      "paid_registrations": 6,
+      "incomplete_registrations": 48
     },
     {
       "id": 1744165,
@@ -430,9 +430,9 @@
       "id": 1744164,
       "title": "Chemi-Mystery",
       "type": "competitions",
-      "total_registrations": 51,
+      "total_registrations": 52,
       "paid_registrations": 4,
-      "incomplete_registrations": 47
+      "incomplete_registrations": 48
     },
     {
       "id": 1744161,
@@ -471,32 +471,32 @@
       "title": "BGMI",
       "type": "competitions",
       "total_registrations": 76,
-      "paid_registrations": 3,
-      "incomplete_registrations": 73
+      "paid_registrations": 4,
+      "incomplete_registrations": 72
     },
     {
       "id": 1744147,
       "title": "Free Fire",
       "type": "competitions",
-      "total_registrations": 99,
-      "paid_registrations": 15,
-      "incomplete_registrations": 84
+      "total_registrations": 100,
+      "paid_registrations": 17,
+      "incomplete_registrations": 83
     },
     {
       "id": 1743774,
       "title": "Kritrim - Model Exhibition",
       "type": "competitions",
       "total_registrations": 57,
-      "paid_registrations": 4,
-      "incomplete_registrations": 53
+      "paid_registrations": 6,
+      "incomplete_registrations": 51
     },
     {
       "id": 1742433,
       "title": "Jugaad",
       "type": "hackathons",
       "total_registrations": 60,
-      "paid_registrations": 5,
-      "incomplete_registrations": 55
+      "paid_registrations": 6,
+      "incomplete_registrations": 54
     },
     {
       "id": 1742408,
