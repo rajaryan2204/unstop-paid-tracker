@@ -279,21 +279,38 @@ export const OFFICIAL_ACCOUNTS = [
     description: 'Editor access to view and update attendee records, payment statuses, and notes across all competitions.'
   },
 
-  // 4: Combined Reception & Outreach Desk
+  // 4: Combined Reception & Outreach Desk 1
   {
     username: 'outreach@gmail.com',
     aliasUsername: 'outreach@sliet',
     defaultPassword: DEFAULT_INITIAL_PASSWORD,
-    name: 'Reception & Outreach Calling Desk',
+    name: 'Reception & Outreach Calling Desk 1',
     email: 'outreach@gmail.com',
     role: 'operations_calling',
     accountType: 'operations',
     team: 'outreach',
     teamName: 'Reception & Outreach Team',
-    title: 'Participant Calling & Spot Registration Desk',
+    title: 'Participant Calling & Spot Registration Desk 1',
     domainId: null,
-    avatar: 'RO',
+    avatar: 'O1',
     description: 'Unified front-desk reception and outbound calling operations across all events.'
+  },
+
+  // 5: Reception & Outreach Desk 2
+  {
+    username: 'outreach1@gmail.com',
+    aliasUsername: 'outreach1@sliet',
+    defaultPassword: DEFAULT_INITIAL_PASSWORD,
+    name: 'Reception & Outreach Calling Desk 2',
+    email: 'outreach1@gmail.com',
+    role: 'operations_calling',
+    accountType: 'operations',
+    team: 'outreach',
+    teamName: 'Reception & Outreach Team',
+    title: 'Participant Calling & Spot Registration Desk 2',
+    domainId: null,
+    avatar: 'O2',
+    description: 'Outbound participant calling and spot registration desk across all events.'
   },
 
   // 5-17: 13 Domain Leads (Live official email credentials)

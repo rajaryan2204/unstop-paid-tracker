@@ -71,6 +71,8 @@ export default function PasswordManagerModal({
   });
 
   const domainCount = OFFICIAL_ACCOUNTS.filter(a => a.role === 'domain_head').length;
+  const staffCount = OFFICIAL_ACCOUNTS.filter(a => a.role === 'webdev' || a.role === 'operations_calling').length;
+  const adminCount = OFFICIAL_ACCOUNTS.filter(a => a.role === 'super_admin').length;
   const customCount = OFFICIAL_ACCOUNTS.filter(a => hasAccountCustomPassword(a.username)).length;
   const defaultCount = OFFICIAL_ACCOUNTS.length - customCount;
 
@@ -288,7 +290,7 @@ export default function PasswordManagerModal({
                     : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
-                Staff & Ops (2)
+                Staff & Ops ({staffCount})
               </button>
               <button
                 type="button"
@@ -299,7 +301,7 @@ export default function PasswordManagerModal({
                     : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
-                Central Admins (2)
+                Central Admins ({adminCount})
               </button>
               <button
                 type="button"
@@ -310,7 +312,7 @@ export default function PasswordManagerModal({
                     : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
-                All (17)
+                All ({OFFICIAL_ACCOUNTS.length})
               </button>
             </div>
 
