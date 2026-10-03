@@ -1,12 +1,12 @@
 {
-  "last_synced_at": "2026-10-03T00:52:23.557802+00:00",
-  "token_expires_at": "2026-10-04T00:52:24.623895+00:00",
+  "last_synced_at": "2026-10-03T07:26:01.455179+00:00",
+  "token_expires_at": "2026-10-04T07:26:02.472642+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3795,
-  "total_paid_registrations": 782,
-  "total_incomplete_registrations": 3013,
+  "total_unstop_registrations": 3809,
+  "total_paid_registrations": 797,
+  "total_incomplete_registrations": 3012,
   "total_amount_collected": 4392.0,
-  "total_colleges": 256,
+  "total_colleges": 257,
   "total_events_scanned": 62,
   "events_with_paid": 53,
   "events_list": [
@@ -22,8 +22,8 @@
       "id": 1744818,
       "title": "Technical Quiz Competition",
       "type": "competitions",
-      "total_registrations": 61,
-      "paid_registrations": 4,
+      "total_registrations": 63,
+      "paid_registrations": 6,
       "incomplete_registrations": 57
     },
     {
@@ -54,8 +54,8 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 109,
-      "paid_registrations": 31,
+      "total_registrations": 111,
+      "paid_registrations": 33,
       "incomplete_registrations": 78
     },
     {
@@ -70,8 +70,8 @@
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 88,
-      "paid_registrations": 6,
+      "total_registrations": 89,
+      "paid_registrations": 7,
       "incomplete_registrations": 82
     },
     {
@@ -86,8 +86,8 @@
       "id": 1744774,
       "title": "Food Forge",
       "type": "competitions",
-      "total_registrations": 57,
-      "paid_registrations": 6,
+      "total_registrations": 58,
+      "paid_registrations": 7,
       "incomplete_registrations": 51
     },
     {
@@ -126,8 +126,8 @@
       "id": 1744769,
       "title": "CAD Design Challenge",
       "type": "competitions",
-      "total_registrations": 53,
-      "paid_registrations": 1,
+      "total_registrations": 54,
+      "paid_registrations": 2,
       "incomplete_registrations": 52
     },
     {
@@ -151,8 +151,8 @@
       "title": "Chess",
       "type": "competitions",
       "total_registrations": 73,
-      "paid_registrations": 13,
-      "incomplete_registrations": 60
+      "paid_registrations": 14,
+      "incomplete_registrations": 59
     },
     {
       "id": 1744238,
@@ -223,8 +223,8 @@
       "title": "The Neural Nexus",
       "type": "competitions",
       "total_registrations": 93,
-      "paid_registrations": 9,
-      "incomplete_registrations": 84
+      "paid_registrations": 10,
+      "incomplete_registrations": 83
     },
     {
       "id": 1744223,
@@ -246,8 +246,8 @@
       "id": 1744220,
       "title": "Debug and Deploy",
       "type": "competitions",
-      "total_registrations": 114,
-      "paid_registrations": 11,
+      "total_registrations": 116,
+      "paid_registrations": 13,
       "incomplete_registrations": 103
     },
     {
@@ -279,8 +279,8 @@
       "title": "Heuristic Havoc",
       "type": "competitions",
       "total_registrations": 58,
-      "paid_registrations": 8,
-      "incomplete_registrations": 50
+      "paid_registrations": 9,
+      "incomplete_registrations": 49
     },
     {
       "id": 1744214,
@@ -318,8 +318,8 @@
       "id": 1744207,
       "title": "RoboSoccer",
       "type": "competitions",
-      "total_registrations": 47,
-      "paid_registrations": 45,
+      "total_registrations": 48,
+      "paid_registrations": 46,
       "incomplete_registrations": 2
     },
     {
@@ -350,9 +350,9 @@
       "id": 1744180,
       "title": "Truss Load",
       "type": "competitions",
-      "total_registrations": 56,
-      "paid_registrations": 52,
-      "incomplete_registrations": 4
+      "total_registrations": 58,
+      "paid_registrations": 53,
+      "incomplete_registrations": 5
     },
     {
       "id": 1744178,
@@ -470,9 +470,9 @@
       "id": 1744148,
       "title": "BGMI",
       "type": "competitions",
-      "total_registrations": 74,
-      "paid_registrations": 2,
-      "incomplete_registrations": 72
+      "total_registrations": 76,
+      "paid_registrations": 3,
+      "incomplete_registrations": 73
     },
     {
       "id": 1744147,
