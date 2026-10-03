@@ -1,12 +1,12 @@
 {
-  "last_synced_at": "2026-10-03T12:56:09.388690+00:00",
-  "token_expires_at": "2026-10-04T12:56:10.153488+00:00",
+  "last_synced_at": "2026-10-03T17:42:58.031451+00:00",
+  "token_expires_at": "2026-10-04T17:42:58.972548+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3815,
-  "total_paid_registrations": 814,
-  "total_incomplete_registrations": 3001,
+  "total_unstop_registrations": 3840,
+  "total_paid_registrations": 838,
+  "total_incomplete_registrations": 3002,
   "total_amount_collected": 4392.0,
-  "total_colleges": 257,
+  "total_colleges": 258,
   "total_events_scanned": 62,
   "events_with_paid": 54,
   "events_list": [
@@ -38,8 +38,8 @@
       "id": 1744782,
       "title": "Quiz Nova",
       "type": "quizzes",
-      "total_registrations": 117,
-      "paid_registrations": 51,
+      "total_registrations": 118,
+      "paid_registrations": 52,
       "incomplete_registrations": 66
     },
     {
@@ -54,49 +54,49 @@
       "id": 1744779,
       "title": "Tech4Earth",
       "type": "competitions",
-      "total_registrations": 111,
-      "paid_registrations": 34,
+      "total_registrations": 115,
+      "paid_registrations": 38,
       "incomplete_registrations": 77
     },
     {
       "id": 1744778,
       "title": "Foodprint",
       "type": "competitions",
-      "total_registrations": 73,
-      "paid_registrations": 16,
+      "total_registrations": 74,
+      "paid_registrations": 17,
       "incomplete_registrations": 57
     },
     {
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 90,
+      "total_registrations": 91,
       "paid_registrations": 7,
-      "incomplete_registrations": 83
+      "incomplete_registrations": 84
     },
     {
       "id": 1744776,
       "title": "Food Forensics",
       "type": "competitions",
-      "total_registrations": 66,
-      "paid_registrations": 11,
+      "total_registrations": 69,
+      "paid_registrations": 14,
       "incomplete_registrations": 55
     },
     {
       "id": 1744774,
       "title": "Food Forge",
       "type": "competitions",
-      "total_registrations": 58,
-      "paid_registrations": 8,
-      "incomplete_registrations": 50
+      "total_registrations": 61,
+      "paid_registrations": 10,
+      "incomplete_registrations": 51
     },
     {
       "id": 1744773,
       "title": "Cognitive Challenges",
       "type": "competitions",
-      "total_registrations": 81,
-      "paid_registrations": 17,
-      "incomplete_registrations": 64
+      "total_registrations": 83,
+      "paid_registrations": 18,
+      "incomplete_registrations": 65
     },
     {
       "id": 1744772,
@@ -150,8 +150,8 @@
       "id": 1744757,
       "title": "Chess",
       "type": "competitions",
-      "total_registrations": 73,
-      "paid_registrations": 14,
+      "total_registrations": 74,
+      "paid_registrations": 15,
       "incomplete_registrations": 59
     },
     {
@@ -166,24 +166,24 @@
       "id": 1744234,
       "title": "Case Crack",
       "type": "quizzes",
-      "total_registrations": 57,
-      "paid_registrations": 54,
+      "total_registrations": 58,
+      "paid_registrations": 55,
       "incomplete_registrations": 3
     },
     {
       "id": 1744232,
       "title": "Brand Blitz",
       "type": "competitions",
-      "total_registrations": 59,
-      "paid_registrations": 57,
+      "total_registrations": 61,
+      "paid_registrations": 59,
       "incomplete_registrations": 2
     },
     {
       "id": 1744231,
       "title": "Case Ethical Crosstalk",
       "type": "competitions",
-      "total_registrations": 132,
-      "paid_registrations": 3,
+      "total_registrations": 133,
+      "paid_registrations": 4,
       "incomplete_registrations": 129
     },
     {
@@ -334,8 +334,8 @@
       "id": 1744205,
       "title": "Jam Session",
       "type": "cultural",
-      "total_registrations": 49,
-      "paid_registrations": 2,
+      "total_registrations": 50,
+      "paid_registrations": 3,
       "incomplete_registrations": 47
     },
     {
@@ -367,8 +367,8 @@
       "title": "Chemi-Thone",
       "type": "competitions",
       "total_registrations": 52,
-      "paid_registrations": 1,
-      "incomplete_registrations": 51
+      "paid_registrations": 2,
+      "incomplete_registrations": 50
     },
     {
       "id": 1744174,
@@ -406,16 +406,16 @@
       "id": 1744167,
       "title": "Poster and Paper Presentation",
       "type": "competitions",
-      "total_registrations": 56,
+      "total_registrations": 57,
       "paid_registrations": 4,
-      "incomplete_registrations": 52
+      "incomplete_registrations": 53
     },
     {
       "id": 1744166,
       "title": "Soap Making",
       "type": "competitions",
-      "total_registrations": 54,
-      "paid_registrations": 6,
+      "total_registrations": 56,
+      "paid_registrations": 8,
       "incomplete_registrations": 48
     },
     {
@@ -430,8 +430,8 @@
       "id": 1744164,
       "title": "Chemi-Mystery",
       "type": "competitions",
-      "total_registrations": 52,
-      "paid_registrations": 4,
+      "total_registrations": 53,
+      "paid_registrations": 5,
       "incomplete_registrations": 48
     },
     {
@@ -479,8 +479,8 @@
       "title": "Free Fire",
       "type": "competitions",
       "total_registrations": 100,
-      "paid_registrations": 17,
-      "incomplete_registrations": 83
+      "paid_registrations": 19,
+      "incomplete_registrations": 81
     },
     {
       "id": 1743774,
