@@ -1,15 +1,23 @@
 {
-  "last_synced_at": "2026-10-03T17:42:58.031451+00:00",
-  "token_expires_at": "2026-10-04T17:42:58.972548+00:00",
+  "last_synced_at": "2026-10-03T20:27:22.104768+00:00",
+  "token_expires_at": "2026-10-04T20:27:23.105963+00:00",
   "auth_mode": "automated_login",
-  "total_unstop_registrations": 3840,
-  "total_paid_registrations": 838,
-  "total_incomplete_registrations": 3002,
+  "total_unstop_registrations": 3846,
+  "total_paid_registrations": 842,
+  "total_incomplete_registrations": 3004,
   "total_amount_collected": 4392.0,
-  "total_colleges": 258,
-  "total_events_scanned": 62,
+  "total_colleges": 259,
+  "total_events_scanned": 63,
   "events_with_paid": 54,
   "events_list": [
+    {
+      "id": 1765475,
+      "title": null,
+      "type": "workshops",
+      "total_registrations": 0,
+      "paid_registrations": 0,
+      "incomplete_registrations": 0
+    },
     {
       "id": 1744819,
       "title": "The Aqua-Epoch",
@@ -70,16 +78,16 @@
       "id": 1744777,
       "title": "Clue Craze",
       "type": "competitions",
-      "total_registrations": 91,
+      "total_registrations": 92,
       "paid_registrations": 7,
-      "incomplete_registrations": 84
+      "incomplete_registrations": 85
     },
     {
       "id": 1744776,
       "title": "Food Forensics",
       "type": "competitions",
-      "total_registrations": 69,
-      "paid_registrations": 14,
+      "total_registrations": 70,
+      "paid_registrations": 15,
       "incomplete_registrations": 55
     },
     {
@@ -174,8 +182,8 @@
       "id": 1744232,
       "title": "Brand Blitz",
       "type": "competitions",
-      "total_registrations": 61,
-      "paid_registrations": 59,
+      "total_registrations": 62,
+      "paid_registrations": 60,
       "incomplete_registrations": 2
     },
     {
@@ -390,8 +398,8 @@
       "id": 1744170,
       "title": "Fabriquer",
       "type": "competitions",
-      "total_registrations": 53,
-      "paid_registrations": 2,
+      "total_registrations": 54,
+      "paid_registrations": 3,
       "incomplete_registrations": 51
     },
     {
@@ -470,16 +478,16 @@
       "id": 1744148,
       "title": "BGMI",
       "type": "competitions",
-      "total_registrations": 76,
+      "total_registrations": 77,
       "paid_registrations": 4,
-      "incomplete_registrations": 72
+      "incomplete_registrations": 73
     },
     {
       "id": 1744147,
       "title": "Free Fire",
       "type": "competitions",
-      "total_registrations": 100,
-      "paid_registrations": 19,
+      "total_registrations": 101,
+      "paid_registrations": 20,
       "incomplete_registrations": 81
     },
     {
